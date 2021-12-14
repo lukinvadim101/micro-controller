@@ -10,18 +10,18 @@
 </head>
 <body>
   <div class="container">
-    <div class="tabs d-flex justify-content-start">
-      <button class="tab " data-id="main">Главное окно</button>
-      <button class="tab active" data-id="measurements">Журнал измерений</button>
-      <button class="tab" data-id="events">Журнал событий</button>
-      <button class="tab" data-id="oscillograms">Осцилограммы</button>
-      <button class="tab" data-id="measurementsDB">БД измерений</button>      
-      <button class="tab" data-id="eventsDB">БД событий</button>
-      <button class="tab" data-id="oscillogramsDB">БД осцилограмм</button>
-      <button class="tab" data-id="configuration">Конфигурирование</button>
+    <div class="nav-tabs d-flex justify-content-start">
+      <button class="nav-tab " data-id="main">Главное окно</button>
+      <button class="nav-tab active" data-id="measurements">Журнал измерений</button>
+      <button class="nav-tab" data-id="events">Журнал событий</button>
+      <button class="nav-tab" data-id="oscillograms">Осцилограммы</button>
+      <button class="nav-tab" data-id="measurementsDB">БД измерений</button>      
+      <button class="nav-tab" data-id="eventsDB">БД событий</button>
+      <button class="nav-tab" data-id="oscillogramsDB">БД осцилограмм</button>
+      <button class="nav-tab" data-id="configuration">Конфигурирование</button>
     </div>
-    <div class="content-wrapper">
-      <div class="content " id="main">
+    <div class="main-content-wrapper">
+      <div class="main-content " id="main">
         <div class="mt-4">Текущие дата/время:<span></span></div>
         <div class="d-flex flex-row justify-content-evenly mt-4 card"> 
           <div><span class="signal accident-signal"></span>Авария</div>
@@ -111,32 +111,47 @@
         </div>  
       </div> <!-- main -->
        
-      <div class="content active" id="measurements">
-          <div class="mt-4">
-            <div class="row card flex-row justify-content-center align-items-center">
-              <div class="col-3">Записей в устройстве: <span>17</span></div>
-              <div class="col-3 tac"><button class="py-1">Обновить</button></div>
-              <div class="col-3">Время загрузки, сек <span>1</span></div>
-            </div>
-            <div class="row card mt-4">
-              <div class="tab-table">
-                <ul class="measurments-tabs">
-                  <button class="py-2 measurment-tab active" data-id="measurements-all" >Все записи</button>
-                  <button class="py-2 measurment-tab" data-id="measurements-switch" >Переключения</button>
-                </ul>
-                <div class="measurments-content">
-                  
-                </div>
+      <div class="main-content active" id="measurements">
+        <div class="mt-4">
+          <div class="row card flex-row justify-content-center align-items-center">
+            <div class="col-3">Записей в устройстве: <span>17</span></div>
+            <div class="col-3 tac"><button class="py-1">Обновить</button></div>
+            <div class="col-3">Время загрузки, сек <span>1</span></div>
+          </div>
+          <div class="row card mt-4">
+            <div class="tab-table">
+              <ul class="measurments-tabs">
+                <button class="py-2 measurment-tab active" data-id="measurements-all" >Все записи</button>
+                <button class="py-2 measurment-tab" data-id="measurements-switch" >Переключения</button>
+              </ul>
+              <div class="measurments-content sub-content active" id="measurements-all">
+                <!-- генерировать таблицу всех записей -->
+              </div>
+              <div class="measurments-content sub-content" id="measurements-switch">
+                  <!-- генерировать таблицу записей переключений -->
               </div>
             </div>
           </div>
+        </div>
       </div> 
-      <div class="content" id="events">3</div>
-      <div class="content" id="oscillograms">4</div>
-      <div class="content" id="measurementsDB">5</div>
-      <div class="content" id="eventsDB">6</div>
-      <div class="content" id="oscillogramsDB">7</div>
-      <div class="content" id="configuration">8</div>
+      <div class="main-content" id="events">
+        <div class="row card flex-row justify-content-center align-items-center mt-4">
+          <div class="col-3">Записей в устройстве: <span>24</span></div>
+          <div class="col-3 tac"><button class="py-1">Обновить</button></div>
+          <div class="col-3">Время загрузки, сек <span>1</span></div>
+        </div>
+        <div class="row card mt-4">
+          <div class="measurments-content sub-content active" id="events-all">
+            <!-- генерировать таблицу собыйти -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="main-content" id="oscillograms">4</div>
+      <div class="main-content" id="measurementsDB">5</div>
+      <div class="main-content" id="eventsDB">6</div>
+      <div class="main-content" id="oscillogramsDB">7</div>
+      <div class="main-content" id="configuration">8</div>
     </div>
   </div>
 

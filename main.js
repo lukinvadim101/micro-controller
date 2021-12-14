@@ -1,23 +1,27 @@
 // tabs
-const tabs = document.querySelector(".tabs");
-const tabButton = document.querySelectorAll(".tab");
-const contents = document.querySelectorAll(".content");
+const navTabs = document.querySelector(".nav-tabs");
+const navTabButton = document.querySelectorAll(".nav-tab");
+const mainContents = document.querySelectorAll(".main-content");
 
-tabs.onclick = e => {
+const tabsSwitcher = (e, tabs, contents) => {
   const {id} = e.target.dataset;
   if (id) {
-    tabButton.forEach(btn => {
+    tabs.forEach(btn => {
       btn.classList.remove("active");
     });
     e.target.classList.add("active");
-
+   
     contents.forEach(content => {
       content.classList.remove("active");
     });
     const element = document.getElementById(id);
     element.classList.add("active");
-  }
+  };
 };
+
+navTabs.addEventListener('click', (e)=> tabsSwitcher(e, navTabButton, mainContents));
+
+
 
 // modal 
 const modal = document.getElementById("myModal");
@@ -223,40 +227,50 @@ selfDiagnosisAlarm();
 // measurments tab
 const measurmentsTabs = document.querySelector('.measurments-tabs');
 const measurmentTab = document.querySelectorAll('.measurment-tab');
-const measurmentsContent = document.querySelector('.measurments-content');
+const measurmentsContent = document.querySelectorAll('.measurments-content');
 
-measurmentsTabs.onclick = e => {
-  const {id} = e.target.dataset;
-  if (id) {
-    measurmentTab.forEach(btn => {
-      btn.classList.remove("active");
-    });
-    e.target.classList.add("active");
-  }
-  measurmentsContent.insertAdjacentHTML("afterbegin", `
-  <table class="mt-4">
-    <thead>
-      <th>1</th>
-      <th>2</th>
-      <th>3</th>
-      <th>4</th>
-      <th>5</th>
-      <th>6</th>
-      <th>7</th>
-      <th>8</th>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-      </tr>
-    </tbody>
-  </table>`);
-};
+const measurementsAllTab = document.querySelector('#measurements-all'); 
+const measurementsSwitchTab = document.querySelector('#measurements-switch');
 
+measurmentsTabs.addEventListener('click', (e)=> tabsSwitcher(e, measurmentTab, measurmentsContent));
+
+// генерировать таблицы измерений
+measurementsAllTab.insertAdjacentHTML("afterbegin", `
+<table class="mt-4">
+  <thead>
+    <th>все записи</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>111</td>
+    </tr>
+  </tbody>
+</table>`);
+
+measurementsSwitchTab.insertAdjacentHTML("afterbegin", `
+<table class="mt-4">
+  <thead>
+    <th>записи переключений</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>222</td>
+    </tr>
+  </tbody>
+</table>`);
+
+// events tab
+
+const eventsTable = document.querySelector('#events-all');
+
+eventsTable.insertAdjacentHTML("afterbegin", `
+<table class="mt-4">
+  <thead>
+    <th>записи событий</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>333</td>
+    </tr>
+  </tbody>
+</table>`);
