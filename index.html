@@ -12,10 +12,10 @@
   <div class="container">
     <div class="nav-tabs d-flex justify-content-start">
       <button class="nav-tab " data-id="main">Главное окно</button>
-      <button class="nav-tab active" data-id="measurements">Журнал измерений</button>
+      <button class="nav-tab " data-id="measurements">Журнал измерений</button>
       <button class="nav-tab" data-id="events">Журнал событий</button>
-      <button class="nav-tab" data-id="oscillograms">Осцилограммы</button>
-      <button class="nav-tab" data-id="measurementsDB">БД измерений</button>      
+      <button class="nav-tab " data-id="oscillograms">Осцилограммы</button>
+      <button class="nav-tab active" data-id="measurementsDB">БД измерений</button>      
       <button class="nav-tab" data-id="eventsDB">БД событий</button>
       <button class="nav-tab" data-id="oscillogramsDB">БД осцилограмм</button>
       <button class="nav-tab" data-id="configuration">Конфигурирование</button>
@@ -111,7 +111,7 @@
         </div>  
       </div> <!-- main -->
        
-      <div class="main-content active" id="measurements">
+      <div class="main-content " id="measurements">
         <div class="mt-4">
           <div class="row card flex-row justify-content-center align-items-center">
             <div class="col-3">Записей в устройстве: <span>17</span></div>
@@ -119,21 +119,20 @@
             <div class="col-3">Время загрузки, сек <span>1</span></div>
           </div>
           <div class="row card mt-4">
-            <div class="tab-table">
-              <ul class="measurments-tabs">
-                <button class="py-2 measurment-tab active" data-id="measurements-all" >Все записи</button>
-                <button class="py-2 measurment-tab" data-id="measurements-switch" >Переключения</button>
-              </ul>
-              <div class="measurments-content sub-content active" id="measurements-all">
-                <!-- генерировать таблицу всех записей -->
-              </div>
-              <div class="measurments-content sub-content" id="measurements-switch">
-                  <!-- генерировать таблицу записей переключений -->
-              </div>
+            <ul class="measurments-tabs">
+              <button class="py-2 measurment-tab active" data-id="measurements-all" >Все записи</button>
+              <button class="py-2 measurment-tab" data-id="measurements-switch" >Переключения</button>
+            </ul>
+            <div class="measurments-content sub-content active" id="measurements-all">
+              <!-- генерировать таблицу всех записей -->
+            </div>
+            <div class="measurments-content sub-content" id="measurements-switch">
+                <!-- генерировать таблицу записей переключений -->
             </div>
           </div>
         </div>
-      </div> 
+      </div>  <!-- measurements -->
+
       <div class="main-content" id="events">
         <div class="row card flex-row justify-content-center align-items-center mt-4">
           <div class="col-3">Записей в устройстве: <span>24</span></div>
@@ -141,14 +140,106 @@
           <div class="col-3">Время загрузки, сек <span>1</span></div>
         </div>
         <div class="row card mt-4">
-          <div class="measurments-content sub-content active" id="events-all">
+          <div id="events-all">
             <!-- генерировать таблицу собыйти -->
           </div>
         </div>
-      </div>
-      
-      <div class="main-content" id="oscillograms">4</div>
-      <div class="main-content" id="measurementsDB">5</div>
+      </div> <!-- events -->
+
+      <div class="main-content " id="oscillograms">
+        <div class="card ">
+          <div class="row flex-row justify-content-center align-items-center mt-2">
+            <div class="col-4 tac"><button class="py-1">Обновить список осцилограмм</button></div>
+            <div class="col-3">Число осцилограмм: <span>1</span></div>
+          </div>
+          <div class="row justify-content-center">
+            <select class="col-6 mt-3 px-2 py-1" size="4">
+              <option class='mt-1' value=a>Первый</option>
+              <option class='mt-1' value=b>Второй</option>
+              <option class='mt-1' value=c>Третий</option>
+              <option class='mt-1' value=d>Четвертый</option>
+            </select>
+          </div>
+        </div>
+        <div class="row card mt-4">
+          <ul class="oscillograms-tabs">
+            <button class="py-2 oscillograms-tab active" data-id="oscillograms-table" >Таблица</button>
+            <button class="py-2 oscillograms-tab" data-id="oscillograms-canvas" >Осцилограмма</button>
+          </ul>
+          <div class="card mt-4">
+            <div class="oscillograms-content sub-content" id="oscillograms-table">
+              table <!-- генерировать таблицу осцилограмм ? -->
+            </div>
+            <div class="oscillograms-content sub-content active" id="oscillograms-canvas">
+              <div class="row justify-content-center">
+                <div class="card col-9 flex-row justify-content-center">
+                  <div class="col"> Режим отображения
+                    <select class="col-3 mt-2" name="" id="">
+                      <option value="">Все</option>
+                      <option value="">?</option>
+                    </select>
+                  </div>
+                  <div class="col">
+                    <div><input type="checkbox" name="" id="">Точки</div>
+                    <div class="mt-1"><input type="checkbox" name="" id="">Значения точек</div>
+                  </div>
+                  <div class="col-3 d-flex justify-content-between">
+                    <button class="py-2">a</button>
+                    <button class="py-2">b</button>
+                    <button class="py-2">c</button>
+                    <button class="py-2">d</button>
+                    <button class="py-2">e</button>
+                  </div>
+                </div>
+              </div>
+                canvas <!-- генерировать canvas -->
+            </div>
+          </div>
+        </div>
+      </div> <!-- oscillograms -->
+
+      <div class="main-content active" id="measurementsDB">
+        <div class="row card mt-2">
+          <ul class="measurmentsDB-tabs">
+            <button class="py-2 measurmentDB-tab active" data-id="measurementsDB-table" >Таблица</button>
+            <button class="py-2 measurmentDB-tab" data-id="measurementsDB-trends" >Тренды</button>
+          </ul>
+          <div class="measurmentsDB-content sub-content active" id="measurementsDB-table">
+            <div class="row mt-2">
+              <div class="col-3 card">
+                <h4>Выборка всех данных из базы</h4>
+                <div class="mt-3"> Число записей в выборке: <span>17</span></div>
+                <div><button class="py-2 mt-3">Прочитать данные из базы</button></div>
+              </div>
+              <div class="col card ms-2">
+                <h4>Интервал просмотра</h4>
+                <div class="row justify-content-between align-items-start">
+                  <select class="col-3 mt-2" name="" id="">
+                    <option value="">За всё время</option>
+                    <option value="">?</option>
+                  </select>
+                  <div class="col-2">
+                    <div class="mt-2"> Начало:</br> <input class="mt-1" type="date" name="" id=""></div> 
+                  </div>
+                  <div class="col-2">
+                    <div class="mt-2"> Конец: </br> <input class="mt-1" type="date" name="" id=""></div>
+                  </div>
+                  <div class="col-2">
+                    <button class="py-2">Выбрать записи по дате</button>
+                  </div>
+                </div>
+
+                
+                
+              </div>
+            </div>
+            <!-- measurementsDB-table -->
+          </div>
+          <div class="measurmentsDB-content sub-content" id="measurementsDB-trends">
+            measurementsDB-trends
+          </div>
+        </div>
+      </div> 
       <div class="main-content" id="eventsDB">6</div>
       <div class="main-content" id="oscillogramsDB">7</div>
       <div class="main-content" id="configuration">8</div>
@@ -164,7 +255,7 @@
 </div>
 
  <script src="main.js"></script>
- <script src="https://unpkg.com/spacingjs" defer></script>  <!-- spacing helper -->
+ <!-- <script src="https://unpkg.com/spacingjs" defer></script>  spacing helper -->
 
 </body>
 </html>

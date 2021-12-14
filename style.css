@@ -67,6 +67,7 @@ button {
 }
 
 .main-content.active {
+
   display: block;
 }
 
@@ -215,8 +216,7 @@ table thead tr th:last-child {
 table tbody td {
 	text-align: left;
 	border: none;
-	padding: 10px 15px;main-
-	vertical-align: top;
+	padding: 10px 15px;
 }
 table tbody tr:nth-child(even){
 	background: #f3f3f3;
@@ -227,3 +227,5 @@ table tbody tr td:first-child {
 table tbody tr td:last-child {
 	border-radius: 0 8px 8px 0;
 }
+
+/* add select style */

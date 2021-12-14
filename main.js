@@ -274,3 +274,18 @@ eventsTable.insertAdjacentHTML("afterbegin", `
     </tr>
   </tbody>
 </table>`);
+
+// oscillograms tab
+const oscillogramsTabs = document.querySelector('.oscillograms-tabs');
+const oscillogramTab = document.querySelectorAll('.oscillograms-tab');
+const oscillogramsContent = document.querySelectorAll('.oscillograms-content');
+
+oscillogramsTabs.addEventListener('click', (e)=> tabsSwitcher(e, oscillogramTab, oscillogramsContent));
+
+
+// measurementsDB-tab
+const measurmentsDBTabs = document.querySelector('.measurmentsDB-tabs');
+const measurmentDBTab = document.querySelectorAll('.measurmentDB-tab');
+const measurmentsDBContent = document.querySelectorAll('.measurmentsDB-content');
+
+measurmentsDBTabs.addEventListener('click', (e)=> tabsSwitcher(e, measurmentDBTab, measurmentsDBContent));
