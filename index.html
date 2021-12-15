@@ -201,10 +201,10 @@
       <div class="main-content active" id="measurementsDB">
         <div class="row card mt-2">
           <ul class="measurmentsDB-tabs">
-            <button class="py-2 measurmentDB-tab active" data-id="measurementsDB-table" >Таблица</button>
-            <button class="py-2 measurmentDB-tab" data-id="measurementsDB-trends" >Тренды</button>
+            <button class="py-2 measurmentDB-tab " data-id="measurementsDB-table" >Таблица</button>
+            <button class="py-2 measurmentDB-tab active" data-id="measurementsDB-trends" >Тренды</button>
           </ul>
-          <div class="measurmentsDB-content sub-content active" id="measurementsDB-table">
+          <div class="measurmentsDB-content sub-content " id="measurementsDB-table">
             <div class="row mt-2">
               <div class="col-3 card">
                 <h4>Выборка всех данных из базы</h4>
@@ -227,16 +227,108 @@
                   <div class="col-2">
                     <button class="py-2">Выбрать записи по дате</button>
                   </div>
-                </div>
-
-                
+                </div>              
                 
               </div>
+              <div class="card mt-2">
+                <h4>Выборка по условию</h4>
+                <div class="row pt-2 ">
+                  <div class="col-2">
+                    <select name="" id="">
+                      <option value="">№ соленоида отключения</option>
+                      <option value="">?</option>
+                    </select>
+                  </div>
+                  <div class="col-1">
+                    <select class="col-10" name="" id="">
+                      <option value="">a</option>
+                      <option value="">?</option>
+                    </select>
+                  </div>
+                  <div class="col-1 ">
+                    <input class="col-10"type="text" name="" id="">
+                  </div>
+                  <div class="col-1 ">
+                    <select class="col-10" name="" id="">
+                      <option value="">b</option>
+                      <option value="">?</option>
+                    </select>
+                  </div>
+                  <div class="col-1">
+                    <select class="col-10" name="" id="">
+                      <option value="">c</option>
+                      <option value="">?</option>
+                    </select>
+                  </div>
+                  <div class="col-1">
+                    <select class="col-10" name="" id="">
+                      <option value="">d</option>
+                      <option value="">?</option>
+                    </select>
+                  </div>
+                  <div class="col-1">
+                    <input class="col-10" type="text" name="" id="">
+                  </div>
+                  <div class="col justify-content-end d-flex">
+                    <button class="py-2"> Выбрать записи по условию</button>
+                  </div>
+                </div>
+                </div>
             </div>
             <!-- measurementsDB-table -->
           </div>
-          <div class="measurmentsDB-content sub-content" id="measurementsDB-trends">
-            measurementsDB-trends
+          <div class="measurmentsDB-content sub-content active" id="measurementsDB-trends">
+            <div class="row mt-2">
+              <div class="col-4 card"> 
+                <h4>Тернд</h4>
+                <div class="row pt-2 justify-content-between align-items-center">
+                  <select class="col-5" name="" id="">
+                    <option value="">Износ</option>
+                    <option value="">?</option>
+                  </select>
+                    <div class="col ms-5"><input  type="checkbox" name="" id="">A</div>
+                    <div class="col"><input type="checkbox" name="" id="">B</div>
+                    <div class="col"><input  type="checkbox" name="" id="">C</div>
+                </div>
+              </div>
+              <div class="col card ms-2"> 
+                <h4>Интервал просмотра</h4>
+                <div class="row">
+                  <div class="row justify-content-between align-items-start">
+                    <select class="col-4 mt-2" name="" id="">
+                      <option value="">За всё время</option>
+                      <option value="">?</option>
+                    </select>
+                    <div class="col-3 ms-4">
+                      <div class="mt-2"> Начало:</br> <input class="mt-1" type="date" name="" id=""></div> 
+                    </div>
+                    <div class="col-3">
+                      <div class="mt-2"> Конец: </br> <input class="mt-1" type="date" name="" id=""></div>
+                    </div>
+                 
+                  </div>           
+
+                </div>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="card">
+                <h4>Интервал просмотра</h4>
+                <div class="row pt-2 ">
+                  <div class="col-2"><input type="checkbox" name="" id="" >Значения точек</div>
+                  <div class="col-1"><input type="checkbox" name="" id="" checked >Точки</div>
+                  <div class="col"><input type="checkbox" name="" id="">В масштабе времени</div>
+                  <div class="col"><input type="checkbox" name="" id="">Дата и время замера</div>
+                  <div class="col-3 ms-5 d-flex justify-content-between">
+                    <button class="py-2">a</button>
+                    <button class="py-2">b</button>
+                    <button class="py-2">c</button>
+                    <button class="py-2">d</button>
+                    <button class="py-2">e</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div> 
