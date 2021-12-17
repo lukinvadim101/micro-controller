@@ -289,3 +289,5 @@ const measurmentDBTab = document.querySelectorAll('.measurmentDB-tab');
 const measurmentsDBContent = document.querySelectorAll('.measurmentsDB-content');
 
 measurmentsDBTabs.addEventListener('click', (e)=> tabsSwitcher(e, measurmentDBTab, measurmentsDBContent));
+
+// eventsDB-tab

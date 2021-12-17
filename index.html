@@ -172,7 +172,7 @@
             </div>
             <div class="oscillograms-content sub-content active" id="oscillograms-canvas">
               <div class="row justify-content-center">
-                <div class="card col-9 flex-row justify-content-center">
+                <div class="card col-11 flex-row justify-content-center">
                   <div class="col"> Режим отображения
                     <select class="col-3 mt-2" name="" id="">
                       <option value="">Все</option>
@@ -233,7 +233,7 @@
               <div class="card mt-2">
                 <h4>Выборка по условию</h4>
                 <div class="row pt-2 ">
-                  <div class="col-2">
+                  <div class="col-3">
                     <select name="" id="">
                       <option value="">№ соленоида отключения</option>
                       <option value="">?</option>
@@ -305,9 +305,7 @@
                     <div class="col-3">
                       <div class="mt-2"> Конец: </br> <input class="mt-1" type="date" name="" id=""></div>
                     </div>
-                 
-                  </div>           
-
+                  </div>          
                 </div>
               </div>
             </div>
@@ -329,10 +327,50 @@
                 </div>
               </div>
             </div>
+            <div class="card mt-4">
+              <!-- measurmentsDB graph -->
+              
+            </div>
           </div>
         </div>
       </div> 
-      <div class="main-content" id="eventsDB">6</div>
+      <div class="main-content " id="eventsDB">
+        <div class="card row justify-content-between flex-row">
+          <div class="col card">
+            <h4 class="pb-4">Выборка всех даных из базы</h4>
+            <div>Число записей в выборке: <span>39</span></div>
+            <button class="py-2 mt-4">Прочитать данные из базы</button>
+          </div>
+          <div class="col card mx-2">
+            <h4 class="pb-4">Интревал просмотра</h4>
+            <select class="col-6 mb-3" name="" id="">
+              <option value="">За всё время</option>
+              <option value="">?</option>
+            </select>
+            <div class="mt-2 d-flex justify-content-between col-9"> Начало: <input  type="date" name="" id=""></div> 
+            <div class="mt-2 d-flex justify-content-between col-9"> Конец: <input  type="date" name="" id=""></div> 
+            <button class="py-2 mt-4"> Выбрать записи по дате</button>
+          </div>
+          <div class="col card">
+            <h4 class="pb-4">Выборка по условию</h4>
+            <div class="row">
+              <select class="col" name="" id="">
+                <option value="">Код события</option>
+                <option value="">?</option>
+              </select>
+              <select class="col-2 mx-2" name="" id="">
+                <option value="">=</option>
+                <option value="">?</option>
+              </select>
+              <input class="col" type="text" name="" id="">
+            </div>
+            <button class="mt-4 py-2"> Выбрать записи по условию</button>
+          </div>
+        </div>
+        <div class="card mt-4"></div>
+          
+      </div>   <!-- eventsDB -->
+    
       <div class="main-content" id="oscillogramsDB">7</div>
       <div class="main-content" id="configuration">8</div>
     </div>
