@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable camelcase */
 // main tabs
 const navTabs = document.querySelector(".nav-tabs");
 const navTabButton = document.querySelectorAll(".nav-tab");
@@ -358,12 +360,9 @@ setInterval(() => {
 const modal = document.getElementById("myModal");
 const modalBtn = document.getElementById("modalBtn");
 const closeModal = document.getElementsByClassName("close")[0];
-modalBtn.onclick = () => {
-  modal.style.display = "block";
-};
-closeModal.onclick = () => {
-  modal.style.display = "none";
-};
+
+// closeModal.onclick = () => {modal.style.display = "none";};
+
 // window.onclick = (event)=> { // закрыть модалльное окно при клике вне окна
 //   if (event.target === modal) {
 //     modal.style.display = "none";
@@ -598,4 +597,115 @@ const serviceModal = () => {
 document.getElementById('serviceModal').addEventListener('click', ()=> serviceModal());
 
 const findReg = (regStr) => document.getElementById(`${regStr}`);
-findReg("0111").textContent = 'zzzz';
+// findReg("0010").textContent = 'zzzz';
+
+// data
+
+function dbg_out(s){console.log(s);}
+
+const socket = new WebSocket("ws://127.0.0.1:8080", 76);
+socket.onopen = function(e){};
+socket.onmessage = function(e){recv(e.data);};
+socket.onclose = function(e){if (e.wasClean){dbg_out("Соединение закрыто нормально");}else{dbg_out("Соединение закрыто экстренно");}};
+socket.onerror = function(e){dbg_out("Ошибка соединения: " + e.message);};
+
+let upload_pointer = 0;
+let firmware_array = 0;
+
+// let registersHash = {'0010':,
+//  '0011',
+//   '0012'};
+
+function recv(data){
+  const r = new FileReader();
+  r.onload = ()=> {
+    let int16_array = new Uint16Array(r.result);
+    let register = int16_array[1];
+    let value = int16_array[2];
+
+    console.log(register);
+
+    // let el = registersArray.filter( num => num === `00${register}`);
+    // console.log(el);
+    // findReg(el[0]).textContent = value;
+
+    if (register === 10) {document.getElementById(`0010`).textContent = value; }
+    if (register === 11) {document.getElementById(`0011`).textContent = value; }
+    if (register === 12) {document.getElementById(`0012`).textContent = value; }
+
+
+
+    if (int16_array[1] === 398)// #define FIRMWARE_UPLOAD 398
+    {
+      upload_pointer = int16_array[2] + (int16_array[3] << 16);
+
+      if (upload_pointer < 0x10000) {// #define FIRMWARE_SIZE 0x10000
+        if (socket)
+          if (socket.readyState === 1)
+            socket.send(firmware_array.subarray(upload_pointer, upload_pointer + 512));
+      }
+      else
+        upload_pointer = 0;
+    }
+  };
+  r.readAsArrayBuffer(data);
+
+}
+
+function send(operation, register, value){
+  let sendArray = new Uint16Array(64);
+
+  sendArray[0] = operation;
+  sendArray[1] = register;
+  sendArray[2] = value;
+
+  if (socket)
+    if (socket.readyState === 1)
+      socket.send(sendArray);
+}
+
+// function data_read(){
+//   send(0, reg.value, val.value);
+// }
+
+// function data_write(){
+//   send(1, reg.value, val.value);
+// }
+
+document.addEventListener('load', ()=> {
+  // send(0, 10, 0);
+  send(0, 11, 0);
+  send(0, 12, 0);
+});
+
+
+function setDate(){
+  send(0, 10, 0);
+  send(0, 11, 0);
+  send(0, 12, 0);
+}
+
+document.getElementById('setDate').addEventListener('click', setDate);
+
+
+function read_file(inp){
+  f = inp.files[0];
+  r = new FileReader();
+
+  r.onload = function() {
+    data_array = new Uint8Array(r.result);
+    firmware_array = new Uint8Array(0x10000).fill(0xFF, 0, 0x10000);// #define FIRMWARE_SIZE 0x10000
+    firmware_array.set(data_array);
+
+    int8_array = new Uint8Array(512).fill(0, 0, 512);
+
+    for (i = 0; i < f.name.length; i++)
+      int8_array[i] = f.name.charCodeAt(i);
+
+    if (socket)
+      if (socket.readyState == 1)
+        socket.send(int8_array);
+  };
+
+  r.readAsArrayBuffer(f);
+}

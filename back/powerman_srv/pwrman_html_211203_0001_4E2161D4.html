@@ -1,0 +1,101 @@
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+</head>
+<body bgcolor="#000" ondragstart="return false" ondrop="return false" style="height:100vh; margin:0px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items: center; -webkit-justify-content:center; justify-content:center">
+	<div style="position:relative; height:100vh; max-height:600px;">
+		<input id=reg placeholder="�������">
+		<input id=val placeholder="��������">
+		<input type=button value="������" onclick=data_read()>
+		<input type=button value="������" onclick=data_write()>
+		<br>
+		<br>
+		<input type="file" onchange="read_file(this)">
+	</div>
+</body>
+<script>
+function dbg_out(s){console.log(s)}
+
+socket = new WebSocket("ws://127.0.0.1:8080", 76);
+socket.onopen = function(e){};
+socket.onmessage = function(e){recv(e.data)};
+socket.onclose = function(e){if (e.wasClean){dbg_out("���������� ������� ���������")}else{dbg_out("���������� ������� ���������")}};
+socket.onerror = function(e){dbg_out("������ ����������: " + e.message)};
+
+upload_pointer = 0;
+firmware_array = 0;
+
+function recv(data)
+{
+	var r = new FileReader();
+	r.onload = function()
+	{
+		int16_array = new Uint16Array(r.result);
+		reg.value = int16_array[1];
+		val.value = int16_array[2];
+
+		if (int16_array[1] == 398)//#define FIRMWARE_UPLOAD 398
+		{
+			upload_pointer = int16_array[2] + (int16_array[3] << 16);
+
+			if (upload_pointer < 0x10000)//#define FIRMWARE_SIZE 0x10000
+			{
+				if (socket)
+					if (socket.readyState == 1)
+						socket.send(firmware_array.subarray(upload_pointer, upload_pointer + 512));
+			}
+			else
+				upload_pointer = 0;
+		}
+	};
+	r.readAsArrayBuffer(data);
+}
+
+function send(operation, register, value)
+{
+	send_array = new Uint16Array(64);
+
+	send_array[0] = operation;
+	send_array[1] = register;
+	send_array[2] = value;
+
+	if (socket)
+		if (socket.readyState == 1)
+			socket.send(send_array);
+}
+
+function data_read()
+{
+	send(0, reg.value, val.value);
+}
+
+function data_write()
+{
+	send(1, reg.value, val.value);
+}
+
+
+function read_file(inp)
+{
+	f = inp.files[0];
+	r = new FileReader();
+
+	r.onload = function()
+	{
+		data_array = new Uint8Array(r.result);
+		firmware_array = new Uint8Array(0x10000).fill(0xFF, 0, 0x10000);//#define FIRMWARE_SIZE 0x10000
+		firmware_array.set(data_array);
+
+		int8_array = new Uint8Array(512).fill(0, 0, 512);
+
+		for (i = 0; i < f.name.length; i++)
+			int8_array[i] = f.name.charCodeAt(i);
+
+		if (socket)
+			if (socket.readyState == 1)
+				socket.send(int8_array);
+	};
+
+	r.readAsArrayBuffer(f);
+}
+</script>

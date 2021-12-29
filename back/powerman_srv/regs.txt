@@ -1,0 +1,24 @@
+#define TIME_YEAR_REG                           10    - текущий год. Можно читать/писать
+#define TIME_MONTH_REG                          11    - текущий месяц. Можно читать/писать
+#define TIME_DATE_REG                           12    - текущее число. Можно читать/писать
+
+#define OSCIL_COUNT_REG                         200    - общее число осциллограмм. Можно читать
+#define OSCIL_CURRENT_REG                       201    - текущая осциллограмма. Можно читать/писать
+                                                    __
+#define OSCIL_VALUES_CURRENT_PHASE_A_REG        613   |
+#define OSCIL_VALUES_CURRENT_PHASE_B_REG        614   |точка 0 из 1000. Можно читать
+#define OSCIL_VALUES_CURRENT_PHASE_C_REG        615   |
+#define OSCIL_VALUES_BLOCK_STATE_REG            616 __|
+#define OSCIL_VALUES_CURRENT_PHASE_A_REG        617   |
+#define OSCIL_VALUES_CURRENT_PHASE_B_REG        618   |точка 1 из 1000. Можно читать
+#define OSCIL_VALUES_CURRENT_PHASE_C_REG        619   |
+#define OSCIL_VALUES_BLOCK_STATE_REG            620 __|
+.
+.                                                      точка 2 из 1000 и далее
+.
+.
+.
+.
+.
+.
+.
