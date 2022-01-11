@@ -1,19 +1,20 @@
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
 
-const xPadding = 30;
-const yPadding = 10;
+const padding = {x: 60, y: 20};
+const dotRadius = 2;
 
-
-const data = { values:[
-  { X: 0, Y: -180 },
-  { X: 2, Y: -8 },
-  { X: 3, Y: 18 },
-  { X: 4, Y: 34 },
-  { X: 5, Y: 40 },
-  { X: 6, Y: 80 },
-  { X: 7, Y: 180 }
+const ddata = { values:[
+  { X: 0, Y: 140000 },
+  { X: 0, Y: -140000 },
+  { X: 1, Y: -30000 },
+  { X: 2, Y: -110000 },
+  { X: 3, Y: 28000 },
+  { X: 4, Y: 10034 },
+  { X: 5, Y: 14000 },
+  { X: 136, Y: 82000 },
 ]};
+
 
 // map source values into a designated range
 function mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
@@ -21,8 +22,8 @@ function mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
 }
 // mapping helper function
 function calcSourceMinMax(a,prop){
-  let min=1000000;
-  let max=-1000000;
+  let min=Infinity;
+  let max=-Infinity;
   for(let i=0;i<a.length;i++){
     const value=a[i][prop];
     if(value<min){min=value;}
@@ -32,122 +33,120 @@ function calcSourceMinMax(a,prop){
 }
 
 // calc the min & max values of data.values (calc both X & Y ranges)
-const rangeX=calcSourceMinMax(data.values,'X');
-const rangeY=calcSourceMinMax(data.values,'Y');
+const rangeX=calcSourceMinMax(ddata.values,'X');
+const rangeY=calcSourceMinMax(ddata.values,'Y');
 
 
 // calc the drawable graph boundaries
-const graphLeft=xPadding;
-const graphRight=canvas.width-xPadding;
-const graphTop=yPadding;
-const graphBottom=canvas.height-yPadding;
+const graphLeft=padding.x;
+const graphRight=canvas.width-padding.x;
+const graphTop=padding.y;
+const graphBottom=canvas.height-padding.y;
 
 function getDisplayXY(valueX,valueY){
   // calc the display X & Y from data.values[i]
   const x = mapRange(valueX,rangeX.min,rangeX.max,graphLeft,graphRight);
-  // Note: canvas y values increase going downward
-  // so swap graphTop & graphBottom
+  // Note: canvas y values increase going downward so swap graphTop & graphBottom
   const y = mapRange(valueY,rangeY.min,rangeY.max,graphBottom,graphTop);
   return({displayX:x,displayY:y});
 }
 
-// graph styling
-const dotRadius=3;
-
-
-
-// draw the graph content
-let starting=getDisplayXY(data.values[0].X,data.values[0].Y);
-dot(starting,dotRadius);
-for(let i=1;i<data.values.length;i++){
-  const ending=getDisplayXY(data.values[i].X,data.values[i].Y);
-  connector(starting,ending);
-  dot(ending,dotRadius);
-  starting=ending;
-}
-
-// draw the graph axes
-const y0=getDisplayXY(graphLeft,0).displayY;
-ctx.beginPath();
-ctx.moveTo(graphLeft,graphTop);
-ctx.lineTo(graphLeft,graphBottom);
-ctx.moveTo(graphLeft,y0);
-ctx.lineTo(graphRight,y0);
-ctx.strokeStyle='gray';
-ctx.stroke();
-
-// draw the graph legends
-ctx.textAlign='right';
-ctx.textBaseline='middle';
-const yMin=getDisplayXY(graphLeft,rangeY.min).displayY;
-const yMax=getDisplayXY(graphLeft,rangeY.max).displayY;
-const xMax=getDisplayXY(graphRight,rangeX.max).displayX;
-ctx.fillText(rangeY.min,graphLeft-10,yMin);
-ctx.fillText(0,graphLeft-10,y0);
-ctx.fillText(rangeY.max,graphLeft-10,yMax);
-ctx.fillText(rangeX.max,graphRight+10,y0);
-
-// for (let n = 0; n < graphRight; n++) {
-//   const value = Math.round(xMax - n * xMax/ 10000);
-//   console.log(value);
-//   ctx.save();
-//   ctx.translate(this.x - this.padding, n * this.height / this.numYTicks + this.y);
-//   ctx.fillText(value, 50, 225);
-//   ctx.restore();
-// }
-// ctx.restore();
-
-
-
-
-
-function drawYAxis() {
-
-  ctx.beginPath();
-  ctx.moveTo(this.x, this.y);
-  ctx.lineTo(this.x, this.y + this.height);
-  ctx.strokeStyle = this.axisColor;
-  ctx.lineWidttx;
-  ctx.stroke();
-  ctx.restore();
-  // draw tick marks  
-  for (let n = 0; n < this.numYTicks; n++) {
-    ctx.beginPath();
-    ctx.moveTo(this.x, n * this.height / this.numYTicks + this.y);
-    ctx.lineTo(this.x + this.tickSize, n * this.height / this.numYTicks + this.y);
-    ctx.stroke();
-  }
-  // draw values  
-  ctx.fillStyle = "black";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-  for (let n = 0; n < this.numYTicks; n++) {
-    const value = Math.round(this.maxY - n * this.maxY / this.numYTicks);
-    ctx.save();
-    ctx.translate(this.x - this.padding, n * this.height / this.numYTicks + this.y);
-    ctx.fillText(value, 0, 0);
-    ctx.restore();
-  }
-  ctx.restore();
-};
-
-drawYAxis();
-//
 function connector(starting,ending){
   ctx.beginPath();
   ctx.moveTo(starting.displayX,starting.displayY);
   ctx.lineTo(ending.displayX,ending.displayY);
+  ctx.strokeStyle='red';
   ctx.stroke();
 }
-//
 function dot(position,radius){
   ctx.beginPath();
   ctx.moveTo(position.displayX,position.displayY);
   ctx.arc(position.displayX,position.displayY,radius,0,Math.PI*2);
   ctx.closePath();
+  
   ctx.fill();
 }
 
+// // draw the graph content
+// let starting=getDisplayXY(data.values[0].X,data.values[0].Y);
+// dot(starting,dotRadius);
+// for(let i=1;i<data.values.length;i++){
+//   const ending=getDisplayXY(data.values[i].X,data.values[i].Y);
+//   connector(starting,ending);
+//   dot(ending,dotRadius);
+//   starting=ending;
+// }
 
+const drawContent = (data) => {
+  let starting=getDisplayXY(data.values[0].X,data.values[0].Y);
+  dot(starting,dotRadius);
+  for(let i=1;i<data.values.length;i++){
+    const ending=getDisplayXY(data.values[i].X,data.values[i].Y);
+    connector(starting,ending);
+    dot(ending,dotRadius);
+    starting=ending;
+  }
+};
 
+drawContent(ddata);
+// axes
+const y0=getDisplayXY(graphLeft,0).displayY;
+ctx.beginPath();
+ctx.moveTo(graphLeft,graphTop);
+ctx.lineTo(graphLeft,graphBottom);
+ctx.moveTo(graphLeft,graphBottom);
+ctx.lineTo(graphRight,graphBottom);
+ctx.moveTo(graphLeft,y0);
+ctx.lineTo(graphRight,y0);
+ctx.strokeStyle='gray';
+ctx.stroke();
 
+// scale
+const drawDashedLine = (fromX, toX, fromY, toY)=> {
+  ctx.beginPath();
+  ctx.setLineDash([8, 4]);
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(toX, toY);
+  ctx.stroke();
+};
+
+const drawYScale = ()=> {
+  const yScale = [];
+  const yValueGap = (Math.abs(rangeY.min) + rangeY.max) / 14; // значения оси Y
+  const yScaleGap = (graphBottom - graphTop) / 14;
+
+  ctx.textAlign='right';
+  ctx.textBaseline='middle';
+
+  for (let j = graphTop; j < graphBottom; j+= yScaleGap) {
+    yScale.push(j);
+    if (Math.ceil(j) !== graphBottom && Math.ceil(j) !== y0) {
+      drawDashedLine(graphLeft, graphRight, j, j); // сетка  X
+    } 
+  }
+  
+  for (let i = rangeY.max; i >= rangeY.min; i-= yValueGap) {
+    const scalePoint = yScale.shift();
+    ctx.fillText(new Intl.NumberFormat('ru-RU').format(i),graphLeft-10,scalePoint);
+  }
+
+};
+
+drawYScale();
+
+const drawXScale = ()=> {
+  const xValueGap = (graphRight - graphLeft) /rangeX.max;
+
+  ctx.textAlign='center';
+  let xVal = rangeX.min;
+  for (let i = graphLeft; i <= graphRight; i+= xValueGap) {
+    if (xVal % 20 === 0) {
+      ctx.fillText(xVal,i, graphBottom + 10);
+      drawDashedLine( i, i, 430, 20); // сетка   Y
+    }
+   
+    xVal++;
+  }
+};
+console.log('b', graphBottom);
+drawXScale();
