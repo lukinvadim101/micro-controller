@@ -2,9 +2,9 @@ const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
 
 const padding = {x: 60, y: 20};
-const dotRadius = 2;
+const dotRadius = 1;
 
-const ddata = { values:[
+const aData = { values:[
   { X: 0, Y: 140000 },
   { X: 0, Y: -140000 },
   { X: 1, Y: -30000 },
@@ -13,6 +13,28 @@ const ddata = { values:[
   { X: 4, Y: 10034 },
   { X: 5, Y: 14000 },
   { X: 136, Y: 82000 },
+]};
+
+const bData = { values:[
+  { X: 0, Y: 120000 },
+  { X: 0, Y: -140000 },
+  { X: 1, Y: -30000 },
+  { X: 2, Y: -110000 },
+  { X: 3, Y: 27000 },
+  { X: 4, Y: 1034 },
+  { X: 5, Y: 14000 },
+  { X: 16, Y: 2000 },
+]};
+
+const cData = { values:[
+  { X: 0, Y: -140000 },
+  { X: 1, Y: -30000 },
+  { X: 2, Y: -110000 },
+  { X: 3, Y: 22000 },
+  { X: 4, Y: 1034 },
+  { X: 5, Y: 14000 },
+  { X: 10, Y: 130000 },
+  { X: 26, Y: 22000 },
 ]};
 
 
@@ -33,8 +55,8 @@ function calcSourceMinMax(a,prop){
 }
 
 // calc the min & max values of data.values (calc both X & Y ranges)
-const rangeX=calcSourceMinMax(ddata.values,'X');
-const rangeY=calcSourceMinMax(ddata.values,'Y');
+const rangeX=calcSourceMinMax(aData.values,'X');
+const rangeY=calcSourceMinMax(aData.values,'Y');
 
 
 // calc the drawable graph boundaries
@@ -51,11 +73,11 @@ function getDisplayXY(valueX,valueY){
   return({displayX:x,displayY:y});
 }
 
-function connector(starting,ending){
+function connector(starting,ending,color){
   ctx.beginPath();
   ctx.moveTo(starting.displayX,starting.displayY);
   ctx.lineTo(ending.displayX,ending.displayY);
-  ctx.strokeStyle='red';
+  ctx.strokeStyle=color;
   ctx.stroke();
 }
 function dot(position,radius){
@@ -77,18 +99,23 @@ function dot(position,radius){
 //   starting=ending;
 // }
 
-const drawContent = (data) => {
+const drawContent = (data, color) => {
   let starting=getDisplayXY(data.values[0].X,data.values[0].Y);
   dot(starting,dotRadius);
+ 
   for(let i=1;i<data.values.length;i++){
     const ending=getDisplayXY(data.values[i].X,data.values[i].Y);
-    connector(starting,ending);
+    
+    connector(starting,ending, color);
     dot(ending,dotRadius);
     starting=ending;
   }
 };
 
-drawContent(ddata);
+// drawContent(aData, 'red');
+// drawContent(bData, 'blue');
+drawContent(cData, 'green');
+
 // axes
 const y0=getDisplayXY(graphLeft,0).displayY;
 ctx.beginPath();

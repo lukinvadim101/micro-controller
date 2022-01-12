@@ -8,6 +8,9 @@
 	<title>MicroDocument</title>
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="grid.css">
+	<style type="text/css">
+    #canvas{border:1px solid red;}
+    </style>
 </head>
 
 <body>
@@ -23,11 +26,11 @@
 			<button class="nav-tab " data-id="main">Главное окно</button>
 			<button class="nav-tab " data-id="measurements">Журнал измерений</button>
 			<button class="nav-tab" data-id="events">Журнал событий</button>
-			<button class="nav-tab " data-id="oscillograms">Осцилограммы</button>
+			<button class="nav-tab active" data-id="oscillograms">Осцилограммы</button>
 			<button class="nav-tab " data-id="measurementsDB">БД измерений</button>
 			<button class="nav-tab" data-id="eventsDB">БД событий</button>
 			<button class="nav-tab" data-id="oscillogramsDB">БД осцилограмм</button>
-			<button class="nav-tab active" data-id="configuration">Конфигурирование</button>
+			<button class="nav-tab " data-id="configuration">Конфигурирование</button>
 		</div>
 		<div class="main-content-wrapper "> 
 			<div class="main-content " id="main"> <!-- main tab end -->
@@ -182,7 +185,7 @@
 				</div>
 			</div> 	<!-- events end -->
 
-			<div class="main-content " id="oscillograms"> 	<!-- oscillograms start-->
+			<div class="main-content active" id="oscillograms"> 	<!-- oscillograms start-->
 				<div class="card ">
 					<div class="row flex-row justify-content-center align-items-center mt-2">
 						<div class="col-4 tac">
@@ -213,9 +216,11 @@
 							<div class="row justify-content-center">
 								<div class="card col-11 flex-row justify-content-center">
 									<div class="col">Режим отображения
-										<select class="col-3 mt-2" name="" id="">
-											<option value="">Все</option>
-											<option value="">?</option>
+										<select class="col-3 mt-2" name="" id="osciloCanvasRegim">
+											<option value="all" selected>Все</option>
+											<option value="a">A</option>
+											<option value="b">B</option>
+											<option value="c">C</option>
 										</select>
 									</div>
 									<div class="col">
@@ -242,7 +247,11 @@
 										</button>
 									</div>
 								</div>
-							</div>canvas
+							</div>
+							<div class=" mt-3 d-flex justify-content-center" id="oscilloCanvasContainer">
+								<canvas id="oscilloCanvas" width="900" height="450" ></canvas>
+							</div>
+							
 							<!-- генерировать canvas -->
 						</div>
 					</div>
@@ -455,7 +464,7 @@
 
 			<div class="main-content" id="oscillogramsDB">7</div>	<!-- oscillogramsDB  -->
 		
-			<div class="main-content active" id="configuration"> 	<!-- configuration start -->
+			<div class="main-content" id="configuration"> 	<!-- configuration start -->
 				<ul class="configuration-tabs">
 					<button class="py-2 configuration-tab active" data-id="configuration-device">Конфигурирация устройства</button>
 					<button class="py-2 configuration-tab " data-id="configuration-control">Конфигурирация функций контроля</button>
