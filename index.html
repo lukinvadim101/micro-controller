@@ -8,9 +8,6 @@
 	<title>MicroDocument</title>
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="grid.css">
-	<style type="text/css">
-    #canvas{border:1px solid red;}
-    </style>
 </head>
 
 <body>
@@ -223,28 +220,22 @@
 											<option value="c">C</option>
 										</select>
 									</div>
-									<div class="col">
+									<div class="col-3">
 										<div>
-											<input type="checkbox" name="" id="">Точки</div>
+											<input type="checkbox" name="" id="osciloCanvasDots" checked>Точки</div>
 										<div class="mt-1">
-											<input type="checkbox" name="" id="">Значения точек</div>
+											<input type="checkbox" name="" id="osciloCanvasDotsVal">Значения точек</div>
 									</div>
-									<div class="col-3 d-flex justify-content-between">
-										<button class="py-0 px-0">
-											<img src="./icons/pointer.png" alt="pointer">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/magnifier.png" alt="magnifier">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/plus.png" alt="plus">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/minus.png" alt="minus">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/fullresize.png" alt="full resize">
-										</button>
+									<div class="col d-flex justify-content-between " >
+										<div id="phaseAOccilloColorWrap">Фаза А
+											<div id="phaseAOccilloColor"></div>
+										</div>
+										<div id="phaseBOccilloColorWrap">Фаза B
+											<div id="phaseBOccilloColor"></div>
+										</div>
+										<div id="phaseCOccilloColorWrap"class="me-2">Фаза C
+											<div id="phaseCOccilloColor"></div>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -708,22 +699,19 @@
 				</div>
 			</div> 	<!-- configuration end -->
 		</div>
-		<!-- <button id="modalBtn">Open Modal</button> --> <!-- test modal -->
 		
 		<div id="myModal" class="modal">
 			<div class="modal-content"> <span class="close">&times;</span>
 				<div>none</div>
 			</div>
 		</div>
-		<div style="position:relative; height:100vh; max-height:600px;">
-			<input id=reg placeholder="Регистр">
-			<input id=val placeholder="Значение">
-			<input type=button value="Чтение" onclick=data_read()>
-			<input type=button value="Запись" onclick=data_write()>
-			<br>
-			<br>
-			<input type="file" onchange="read_file(this)">
-		</div>
+
+	
+			<button id="statusAlarm"> status alarm</button>
+			<button id="accidentAlarm"> accident alarm</button>
+			<button id="generalAlarm"> general alarm</button>
+			<button id="selfDiagnosislAlarm"> self diagnosis alarm</button>
+	
 
 		<script src="main.js"></script>
 </body>
