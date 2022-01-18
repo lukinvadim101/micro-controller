@@ -142,28 +142,43 @@ const aData = { values:[
   { X: 3, Y: 28000 },
   { X: 4, Y: 10034 },
   { X: 5, Y: 14000 },
-  { X: 13, Y: 82000 },
+  { X: 6, Y: 82000 },
+  { X: 7, Y: 82000 },
+  { X: 8, Y: 140000 },
+  { X: 9, Y: 0 },
+  { X: 10, Y: -20000 },
+  { X: 11, Y: 28000 },
+  { X: 12, Y: 10034 },
+  { X: 13, Y: 14000 },
+  { X: 14, Y: 82000 },
+  { X: 15, Y: 82000 },
+  { X: 16, Y: 140000 },
+  { X: 17, Y: 0 },
+  { X: 18, Y: -20000 },
+  { X: 19, Y: 28000 },
+  { X: 20, Y: 10034 },
+  { X: 21, Y: 14000 },
+  { X: 22, Y: 82000 },
+  { X: 23, Y: 82000 },
 ]};
 
 const bData = { values:[
-  { X: 0, Y: 120000 },
-  { X: 1, Y: -30000 },
-  { X: 2, Y: -110500 },
-  { X: 3, Y: 27000 },
-  { X: 4, Y: 1034 },
-  { X: 5, Y: 14000 },
-  { X: 116, Y: 2000 },
+  { X: 0, Y: -30000 },
+  { X: 1, Y: -110500 },
+  { X: 2, Y: 27000 },
+  { X: 3, Y: 1034 },
+  { X: 4, Y: 14000 },
+  { X: 5, Y: 2000 },
 ]};
 
 const cData = { values:[
-  { X: 0, Y: -140000 },
-  { X: 1, Y: -30000 },
-  { X: 2, Y: -110000 },
-  { X: 3, Y: 22000 },
-  { X: 4, Y: 1034 },
-  { X: 5, Y: 14000 },
-  { X: 10, Y: 151320 },
-  { X: 21, Y: 22000 },
+  { X: 0, Y: -30000 },
+  { X: 1, Y: -110000 },
+  { X: 2, Y: 22000 },
+  { X: 3, Y: 1034 },
+  { X: 4, Y: 14000 },
+  { X: 5, Y: 151320 },
+  { X: 6, Y: 22000 },
 ]};
 
 
@@ -247,6 +262,8 @@ const y0=getDisplayXY(graphLeft,0).displayY;
 
 // axes
 const drawAxes = ()=> {
+  oscilloCanvas.width = document.querySelector('#oscilloCanvasContainer').offsetWidth - 150;
+  oscilloCanvas.height = document.querySelector('#oscilloCanvasContainer').offsetHeight;
   ctx.beginPath();
   ctx.moveTo(graphLeft,graphTop);
   ctx.lineTo(graphLeft,graphBottom);
@@ -265,14 +282,22 @@ const drawDashedLine = (fromX, toX, fromY, toY)=> {
   ctx.stroke();
 };
 
+const drawLine = (fromX, toX, fromY, toY)=> {
+  ctx.beginPath();
+  ctx.setLineDash([]);
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(toX, toY);
+  ctx.stroke();
+};
+
 // helper округление
 function roundToMultiple(num, multiple) {
   return Math.round(num/multiple)*multiple;
 }
- 
+
 const drawYScale = ()=> {
-  const yScale = [];
-  const maxRound1000 = roundToMultiple(rangeY.max, 1000);
+
+  const maxRound1000 = roundToMultiple(rangeY.max, 10);
   const minRound1000 = roundToMultiple( Math.abs(rangeY.min), 10);
 
   const yValuePositiveGap = (maxRound1000) / 5; // 5 я часть значения оси Y+
@@ -280,38 +305,45 @@ const drawYScale = ()=> {
 
   ctx.textAlign='right';
   ctx.textBaseline='middle';
-  
+
+   
   for (let i = rangeY.max; i >= 0 ; i-=yValuePositiveGap) {
     let scaleVal = roundToMultiple(i, 1000);
     let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
     ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),graphLeft-10,scaleValPosY);
-    drawDashedLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
-    
-   
+    if ( i === 0) {
+      drawLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+    } else {
+      drawDashedLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+    }
   }
   
-  for (let i = 0; i > rangeY.min ; i-=yValueNegativeGap) {
+  for (let i = 0; i >= rangeY.min ; i-=yValueNegativeGap) {
     let scaleVal = roundToMultiple(i, 1000);
     let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
     ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),graphLeft-10,scaleValPosY);
-    drawDashedLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X-
+    if ( i=== 0) {
+      drawLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+    }else {
+      drawDashedLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+    }
   }
-
 };
 
 const drawXScale = ()=> {
-  const xValueGap = (graphRight - graphLeft) /rangeX.max;
-
   ctx.textAlign='center';
-  let xVal = rangeX.min;
-  
-  for (let i = graphLeft; i <= graphRight; i+= xValueGap) {
-    if (xVal % 5 === 0 && xVal !== 0) {
-      ctx.fillText(xVal,i, graphBottom + 10);
-      drawDashedLine( i, i, 430, 20); // сетка   Y
+    
+  for (let i = rangeX.min; i <= rangeX.max; i++) {
+
+    if (i/5 % 1 === 0 ) { // 200 мс 
+      let scaleValPosX = getDisplayXY(i,graphBottom + 10).displayX;
+      ctx.fillText(i/5 ,scaleValPosX, graphBottom + 10);
+
+      if (i !== 0) {
+        drawDashedLine( scaleValPosX, scaleValPosX, graphBottom, graphTop); // сетка   Y
+      }
+      ctx.setLineDash([]);
     }
-   
-    xVal++;
   }
 };
 
@@ -321,6 +353,7 @@ const clearCanvas = (ctx, canvas)=> { ctx.clearRect(0, 0, canvas.width, canvas.h
 const drawOscilloCanvas = ()=> {
   clearCanvas(ctx, oscilloCanvas);
   ctx.lineWidth = 1;
+  
   drawAxes();  
   drawXScale();
   drawYScale();
@@ -378,8 +411,6 @@ osciloCanvasDotsVal.addEventListener('change',()=> {
   drawOscilloCanvas();
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 });
-
-
 
 // fix resize
 window.addEventListener('resize', (event)=> {
