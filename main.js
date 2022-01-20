@@ -63,10 +63,10 @@ const markElemInDiagramm = (diagrammId, value) => {
   const exactDiagrammPhases = AllPhases.filter(el => el.closest(diagrammId));
   const elem = exactDiagrammPhases.filter(el => +el.dataset.value <= value && +el.dataset.value + 10 > value);
   elem[0].classList.add('phase-active', 'blink');
-  
+
   // return elem;
 };
-// specific el add style 
+// specific el add style
 markElemInDiagramm('#phaseDiagrammA', 49); //  0012 амперы?
 markElemInDiagramm('#phaseDiagrammB', 119); //  0014
 markElemInDiagramm('#phaseDiagrammC', 89); // 0016
@@ -228,7 +228,7 @@ function dot(position,radius){
   ctx.moveTo(position.displayX,position.displayY);
   ctx.arc(position.displayX,position.displayY,radius,0,Math.PI*2);
   ctx.closePath();
-  
+
   ctx.fill();
 }
 
@@ -237,14 +237,14 @@ const osciloCanvasDotsVal = document.getElementById('osciloCanvasDotsVal');
 
 const drawContent = (data, color) => {
   let starting=getDisplayXY(data.values[0].X,data.values[0].Y);
- 
+
   ctx.setLineDash([]);
- 
+
   for(let i=1;i<=data.values.length -1;i++){
     const ending=getDisplayXY(data.values[i].X,data.values[i].Y);
     if (osciloCanvasDotsVal.checked) {
       ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
-    }   
+    }
     connector(starting,ending, color);
     if (osciloCanvasDots.checked) {
       dot(ending,dotRadius);
@@ -306,7 +306,7 @@ const drawYScale = ()=> {
   ctx.textAlign='right';
   ctx.textBaseline='middle';
 
-   
+
   for (let i = rangeY.max; i >= 0 ; i-=yValuePositiveGap) {
     let scaleVal = roundToMultiple(i, 1000);
     let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
@@ -317,7 +317,7 @@ const drawYScale = ()=> {
       drawDashedLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
     }
   }
-  
+
   for (let i = 0; i >= rangeY.min ; i-=yValueNegativeGap) {
     let scaleVal = roundToMultiple(i, 1000);
     let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
@@ -332,10 +332,10 @@ const drawYScale = ()=> {
 
 const drawXScale = ()=> {
   ctx.textAlign='center';
-    
+
   for (let i = rangeX.min; i <= rangeX.max; i++) {
 
-    if (i/5 % 1 === 0 ) { // 200 мс 
+    if (i/5 % 1 === 0 ) { // 200 мс
       let scaleValPosX = getDisplayXY(i,graphBottom + 10).displayX;
       ctx.fillText(i/5 ,scaleValPosX, graphBottom + 10);
 
@@ -353,8 +353,8 @@ const clearCanvas = (ctx, canvas)=> { ctx.clearRect(0, 0, canvas.width, canvas.h
 const drawOscilloCanvas = ()=> {
   clearCanvas(ctx, oscilloCanvas);
   ctx.lineWidth = 1;
-  
-  drawAxes();  
+
+  drawAxes();
   drawXScale();
   drawYScale();
 };
@@ -393,11 +393,11 @@ const chooseOsciloCanvasRegim = (val)=> {
     drawContent(aData, 'red');
     drawContent(bData, 'blue');
     drawContent(cData, 'green');
-    
+
   }
 };
 osciloCanvasRegim.addEventListener('change', (e) => {
-  
+
   drawOscilloCanvas();
   chooseOsciloCanvasRegim(e.target.value);
 });
@@ -414,23 +414,13 @@ osciloCanvasDotsVal.addEventListener('change',()=> {
 
 // fix resize
 window.addEventListener('resize', (event)=> {
-   
+
   oscilloCanvas.width = document.querySelector('#oscilloCanvasContainer').offsetWidth - 150;
   oscilloCanvas.height = document.querySelector('#oscilloCanvasContainer').offsetHeight;
   drawOscilloCanvas();
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 
 });
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -450,13 +440,13 @@ class Chart {
     this.maxY = con.maxY;
     this.unitsPerTickX = con.unitsPerTickX;
     this.unitsPerTickY = con.unitsPerTickY;
-    // constants  
+    // constants
     this.padding = 10;
     this.tickSize = 10;
     this.axisColor = "#555";
     this.pointRadius = 4;
     this.fontHeight = 12;
-    // relationships       
+    // relationships
     this.context = this.canvas.getContext("2d");
     this.rangeX = this.maxX - this.minY;
     this.rangeY = this.maxY - this.minY;
@@ -478,14 +468,14 @@ class Chart {
     this.context.strokeStyle = this.axisColor;
     this.context.lineWidth = 2;
     this.context.stroke();
-    // draw tick marks  
+    // draw tick marks
     for (let n = 0; n < this.numXTicks; n++) {
       this.context.beginPath();
       this.context.moveTo((n + 1) * this.width / this.numXTicks + this.x, this.y + this.height);
       this.context.lineTo((n + 1) * this.width / this.numXTicks + this.x, this.y + this.height - this.tickSize);
       this.context.stroke();
     }
-    // draw labels  
+    // draw labels
     this.context.fillStyle = "black";
     this.context.textAlign = "center";
     this.context.textBaseline = "middle";
@@ -510,14 +500,14 @@ class Chart {
     context.lineWidth = 2;
     context.stroke();
     context.restore();
-    // draw tick marks  
+    // draw tick marks
     for (let n = 0; n < this.numYTicks; n++) {
       context.beginPath();
       context.moveTo(this.x, n * this.height / this.numYTicks + this.y);
       context.lineTo(this.x + this.tickSize, n * this.height / this.numYTicks + this.y);
       context.stroke();
     }
-    // draw values  
+    // draw values
     context.fillStyle = "black";
     context.textAlign = "right";
     context.textBaseline = "middle";
@@ -554,7 +544,7 @@ class Chart {
     context.moveTo(data[0].x * this.scaleX, data[0].y * this.scaleY);
     for (let n = 0; n < data.length; n++) {
       const point = data[n];
-      // draw segment  
+      // draw segment
       context.lineTo(point.x * this.scaleX, point.y * this.scaleY);
       context.stroke();
       context.closePath();
@@ -562,7 +552,7 @@ class Chart {
       context.arc(point.x * this.scaleX, point.y * this.scaleY, this.pointRadius, 0, 2 * Math.PI, false);
       context.fill();
       context.closePath();
-      // position for next segment  
+      // position for next segment
       context.beginPath();
       context.moveTo(point.x * this.scaleX, point.y * this.scaleY);
     }
@@ -570,10 +560,10 @@ class Chart {
   };
 
   transformContext() {
-    // move context to center of canvas  
+    // move context to center of canvas
     this.context.translate(this.x, this.y + this.height);
-    // invert the y scale so that that increments  
-    // as you move upwards  
+    // invert the y scale so that that increments
+    // as you move upwards
     this.context.scale(1, -1);
   };
 }
@@ -668,7 +658,7 @@ setInterval(() => {
   document.getElementById('current_date_time_block').innerHTML = setDateTime();
 }, 1000);
 
-// modal 
+// modal
 const modal = document.getElementById("myModal");
 const modalBtn = document.getElementById("modalBtn");
 const closeModal = document.getElementsByClassName("close")[0];
@@ -807,7 +797,7 @@ const selfDiagnosisAlarm = () => {
         <div><input type="checkbox" name="" id="">Неисправность внутренней FLASH-памяти</div>
         <div class="mt-2 "><input type="checkbox" name="" id="">Неисправность внутренней SRAM-памяти</div>
         <div class="mt-2"><input type="checkbox" name="" id="">Неисправность АЦП</div>
-        <div class="mt-2"><input type="checkbox" name="" id="">Ошибка считывания FRAM (энергозависимых данных). Приняты данные по умолчанию</div> 
+        <div class="mt-2"><input type="checkbox" name="" id="">Ошибка считывания FRAM (энергозависимых данных). Приняты данные по умолчанию</div>
         </div>
       </div>
     </div>
@@ -820,7 +810,7 @@ const selfDiagnosisAlarm = () => {
 
 document.getElementById('statusAlarm').addEventListener('click', ()=>statusAlarmSignal(''));
 document.getElementById('accidentAlarm').addEventListener('click', ()=>accidentModal());
-document.getElementById('generalAlarm').addEventListener('click', ()=>generalAlarm()); 
+document.getElementById('generalAlarm').addEventListener('click', ()=>generalAlarm());
 document.getElementById('selfDiagnosislAlarm').addEventListener('click', ()=>selfDiagnosisAlarm());
 
 
@@ -861,7 +851,7 @@ const serviceModal = () => {
           <input type="text" name="" id="" class="col-1 py-1">
           <button class="py-1" id="0x108">Установить колличество включений</button>
         </div>
-       
+
         <div class="mt-2">
           <input type="text" name="" id="" class="col-1 py-1">
           <button class="py-1" id="0x109">Установить колличество отключений</button>
@@ -888,7 +878,7 @@ const serviceModal = () => {
     <div class="card mt-2">
       <h4 class="mt-2">Очистка данных устройства и программы</h4>
       <div class="row mt-2 ">
-        <button class="col py-2 " id="0x100">  Очистить журнал измерений</button> 
+        <button class="col py-2 " id="0x100">  Очистить журнал измерений</button>
         <button class="col  py-2 mx-2" id="0x101">Очистить журнал событий</button>
         <button class="col py-2 " id="0x102">Очистить данные осцилограмм</button>
       </div>
@@ -916,15 +906,21 @@ const serviceModal = () => {
 
 document.getElementById('serviceModal').addEventListener('click', ()=> serviceModal());
 
-const findReg = (regStr) => document.getElementById(`${regStr}`);
-// findReg("0010").textContent = 'zzzz';
+const findReg = (regStr) =>  document.getElementById(`${regStr}`);
 
 // data
 
 function dbg_out(s){console.log(s);}
 
 const socket = new WebSocket("ws://127.0.0.1:8080", 76);
-socket.onopen = function(e){};
+socket.onopen = function(e){
+
+  console.log('o');
+  send(0, 10, 0);
+  send(0, 11, 0);
+  send(0, 12, 0);
+
+};
 socket.onmessage = function(e){recv(e.data);};
 socket.onclose = function(e){if (e.wasClean){dbg_out("Соединение закрыто нормально");}else{dbg_out("Соединение закрыто экстренно");}};
 socket.onerror = function(e){dbg_out("Ошибка соединения: " + e.message);};
@@ -932,9 +928,25 @@ socket.onerror = function(e){dbg_out("Ошибка соединения: " + e.m
 let upload_pointer = 0;
 let firmware_array = 0;
 
-// let registersHash = {'0010':,
-//  '0011',
-//   '0012'};
+const regArrayToSetValues = [
+  10, 11, 12, // test date
+  0000,0001, 0002, 0003, //  конфиг
+  0010, 0011, 0012, 0013, 0014, 0015, //  время в конфиг
+  0109, 0110, 0012, 0014, 0016, // главное окно. выключатель, фазы
+  0251, 0252,0253, 0254, 0255, 0256, 0257, //гл. окно. время последней коммутации
+  0258, 0260, 0261, 0262,0263,0264,0265,0266,0267, //гл. окно. данные последней коммутации
+  411, 415,
+
+];
+
+const regArrayToSetValuesIfElse = [
+  0111, 0259,
+]
+
+const regArrayToSetValuesWithCoefficent = [
+  0113, 0115, 0117, //   расход ресурса фаз в %
+ ]
+
 
 function recv(data){
   const r = new FileReader();
@@ -945,14 +957,31 @@ function recv(data){
 
     console.log(register);
 
-    // let el = registersArray.filter( num => num === `00${register}`);
-    // console.log(el);
-    // findReg(el[0]).textContent = value;
 
-    if (register === 10) {document.getElementById(`0010`).textContent = value; }
-    if (register === 11) {document.getElementById(`0011`).textContent = value; }
-    if (register === 12) {document.getElementById(`0012`).textContent = value; }
+    if (regArrayToSetValues.includes(register)) {
+      findReg(`${register}`).textContent = value;
+    }
 
+    if (register === 0111 && value === 1) {
+      findReg(`${register}`).textContent = 'Включено'
+    }
+    if (register === 0111 && value === 2) {
+      findReg(`${register}`).textContent = 'Отключено'
+    }
+
+    if (register === 0113 || 0115 || 0017) { //  износ ресурса фаз
+      findReg(`${register}`).textContent = (value * 0.01).toFixed(2);
+    }
+
+    if (register === 0259 && value === 1) {
+      findReg(`${register}`).textContent = 'ВКЛ.'
+    }
+    if (register === 0259 && value === 2) {
+      findReg(`${register}`).textContent = 'ОТКЛ.'
+    }
+
+    // if (register === 11) {findReg("0011").textContent = value; }
+    // if (register === 12) {findReg("0012").textContent = value; }
 
 
     if (int16_array[1] === 398)// #define FIRMWARE_UPLOAD 398
@@ -992,11 +1021,21 @@ function send(operation, register, value){
 //   send(1, reg.value, val.value);
 // }
 
-document.addEventListener('load', ()=> {
+const fff = ()=> {
+  for (let i=10; i <= 12; i++) {
+    send (0, i, 0)
+  }
+}
+
+
+
+const script = document.getElementById('script');
+script.onload = function() {
   // send(0, 10, 0);
-  send(0, 11, 0);
-  send(0, 12, 0);
-});
+  // send(0, 11, 0);
+  // send(0, 12, 0);
+  fff();
+}
 
 
 function setDate(){
@@ -1029,3 +1068,4 @@ function read_file(inp){
 
   r.readAsArrayBuffer(f);
 }
+
