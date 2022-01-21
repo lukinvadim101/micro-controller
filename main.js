@@ -71,6 +71,18 @@ markElemInDiagramm('#phaseDiagrammA', 49); //  0012 амперы?
 markElemInDiagramm('#phaseDiagrammB', 119); //  0014
 markElemInDiagramm('#phaseDiagrammC', 89); // 0016
 
+const oscilloViewbtn = document.getElementById('oscilloViewbtn');
+oscilloViewbtn.addEventListener('click', () => {
+  navTabButton.forEach(btn => {
+    btn.classList.remove("active");
+  });
+  document.getElementById('oscillograms-tab').classList.add("active");
+  mainContents.forEach(content => {
+    content.classList.remove("active");
+  });
+  document.getElementById('oscillograms').classList.add("active");
+});
+
 // measurments tab
 const measurmentsTabs = document.querySelector('.measurments-tabs');
 const measurmentTab = document.querySelectorAll('.measurment-tab');
@@ -79,18 +91,71 @@ const measurementsAllTab = document.querySelector('#measurements-all');
 const measurementsSwitchTab = document.querySelector('#measurements-switch');
 measurmentsTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentTab, measurmentsContent));
 
-// генерировать таблицы измерений
-measurementsAllTab.insertAdjacentHTML("afterbegin", `
-<table class="mt-4">
-  <thead>
-    <th>все записи</th>
-  </thead>
-  <tbody>
-    <tr>
-      <td>111</td>
-    </tr>
-  </tbody>
-</table>`);
+let measurmentsTableCurrentObj = {
+  '0201': null,
+  '0204': null,
+  '0205': null,
+  '0206': null,
+  '0207': null,
+  '0208': null,
+  '0209': null,
+  '0210': null,
+  '0211': null,
+  '0212': null,
+  '0213': null,
+  '0214': null,
+  '0215': null,
+  '0216': null,
+  '0217': null,
+  '0218': null,
+  '0219': null,
+  '0220': null,
+  '0221': null,
+  '0222': null,
+  '0223': null,
+  '0224': null,
+  '0225': null,
+  '0226': null,
+  '0227': null,
+  '0228': null,
+
+
+}
+
+const measurementsAllTableBody = document.getElementById('measurementsAllTableBody');
+const addCurrentEntryToMeasurementsAllTable = ()=> {
+  const obj = measurmentsTableCurrentObj
+  measurementsAllTableBody.insertAdjacentHTML("afterbegin", `
+  <tr>
+    <td>${obj['0201']}</td> 
+    <td>
+      ${obj['0206']}.${obj['0205']}.${obj['0204']}
+      ${obj['0207']}:${obj['0208']}:${obj['0209']}.${obj['0210']}
+    </td>
+    <td>${obj['0211']}</td>
+    <td>${obj['0212']}</td>
+    <td>${obj['0213']}</td>
+    <td>${obj['0214']}</td>
+    <td>${obj['0215']}</td>
+    <td>${obj['0216']}</td>
+    <td>${obj['0217']}</td>
+    <td>${obj['0218']}</td>
+    <td>${obj['0219']}</td>
+    <td>${obj['0220']}</td>
+    <td>${obj['0221']}</td>
+    <td>${obj['0222']}</td>
+    <td>${obj['0223']}</td>
+    <td>${obj['0224']}</td>
+    <td>${obj['0225']}</td>
+    <td>${obj['0226']}</td>
+    <td>${obj['0227']}</td>
+    <td>${obj['0228']}</td>
+  </tr>
+`);
+}
+
+// addCurrentEntryToMeasurementsAllTable()
+
 
 measurementsSwitchTab.insertAdjacentHTML("afterbegin", `
 <table class="mt-4">
@@ -105,20 +170,40 @@ measurementsSwitchTab.insertAdjacentHTML("afterbegin", `
 </table>`);
 
 // events tab
+let eventsTableCurrentObj = {
+  '0301': null,
+  '0303': null,
+  '0304': null,
+  '0305': null,
+  '0306': null,
+  '0307': null,
+  '0308': null,
+  '0309': null,
+  '0310': null,
+  '0311': null,
+}
+const addCurrentEntryToEventsTable = ()=> {
+  const eventsTableBody = document.querySelector('#eventsTableBody');
+  const obj = eventsTableCurrentObj
+  eventsTableBody.insertAdjacentHTML("beforeend", `
+  <tr>
+    <td>${obj['0301']}</td>
+    <td>
+      ${obj['0305']}.${obj['0304']}.${obj['0303']}
+      ${obj['0306']}:${obj['0307']}:${obj['0308']}.${obj['0309']}
+      </td>
+    </td>
+    <td>${obj['0310'] === null ? obj['0310'] + ' (пришло)' : obj['0310'] + ' (ушло)' }</td>
+    <td>${obj['0311']}</td>
+    <td>нужна таблица расшифровки</td>
+  </tr>
+  </tbody>`);
+}
 
-const eventsTable = document.querySelector('#events-all');
+// addCurrentEntryToEventsTable();
 
-eventsTable.insertAdjacentHTML("afterbegin", `
-<table class="mt-4">
-  <thead>
-    <th>записи событий</th>
-  </thead>
-  <tbody>
-    <tr>
-      <td>333</td>
-    </tr>
-  </tbody>
-</table>`);
+
+
 
 // oscillograms tab
 const oscillogramsTabs = document.querySelector('.oscillograms-tabs');
@@ -129,8 +214,7 @@ oscillogramsTabs.addEventListener('click', (e) => tabsSwitcher(e, oscillogramTab
 // oscillogram Canvas
 let oscilloCanvas=document.getElementById("oscilloCanvas");
 let ctx=oscilloCanvas.getContext("2d");
-oscilloCanvas.width = document.querySelector('#oscilloCanvasContainer').offsetWidth - 150;
-oscilloCanvas.height = document.querySelector('#oscilloCanvasContainer').offsetHeight;;
+
 
 const padding = {x: 60, y: 20};
 const dotRadius = 2;
@@ -262,8 +346,7 @@ const y0=getDisplayXY(graphLeft,0).displayY;
 
 // axes
 const drawAxes = ()=> {
-  oscilloCanvas.width = document.querySelector('#oscilloCanvasContainer').offsetWidth - 150;
-  oscilloCanvas.height = document.querySelector('#oscilloCanvasContainer').offsetHeight;
+
   ctx.beginPath();
   ctx.moveTo(graphLeft,graphTop);
   ctx.lineTo(graphLeft,graphBottom);
@@ -350,20 +433,36 @@ const drawXScale = ()=> {
 // clear
 const clearCanvas = (ctx, canvas)=> { ctx.clearRect(0, 0, canvas.width, canvas.height);};
 
+const getWHContainer = () => {
+  let w = document.querySelector('#oscilloCanvasContainer').offsetWidth - 150;
+  let h = document.querySelector('#oscilloCanvasContainer').offsetHeight;
+
+  return({w,h})
+}
+
+
 const drawOscilloCanvas = ()=> {
+  
   clearCanvas(ctx, oscilloCanvas);
   ctx.lineWidth = 1;
-
   drawAxes();
   drawXScale();
   drawYScale();
 };
 
-drawOscilloCanvas();
-drawContent(aData, 'red');
-drawContent(bData, 'blue');
-drawContent(cData, 'green');
+const oscilloInitrender = ()=> {
+  drawOscilloCanvas();
+  drawContent(aData, 'red');
+  drawContent(bData, 'blue');
+  drawContent(cData, 'green');
+}
 
+document.getElementById('oscillograms-tab').addEventListener('click', ()=> {
+  oscilloInitrender();
+})
+oscilloViewbtn.addEventListener('click', ()=> {
+  oscilloInitrender();
+})
 const osciloCanvasRegim = document.getElementById('osciloCanvasRegim');
 
 const chooseOsciloCanvasRegim = (val)=> {
@@ -412,15 +511,6 @@ osciloCanvasDotsVal.addEventListener('change',()=> {
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 });
 
-// fix resize
-window.addEventListener('resize', (event)=> {
-
-  oscilloCanvas.width = document.querySelector('#oscilloCanvasContainer').offsetWidth - 150;
-  oscilloCanvas.height = document.querySelector('#oscilloCanvasContainer').offsetHeight;
-  drawOscilloCanvas();
-  chooseOsciloCanvasRegim(osciloCanvasRegim.value);
-
-});
 
 
 
@@ -644,7 +734,7 @@ function addZero(value) {
   return value;
 }
 
-function setDateTime() {
+function pcTime() {
   const currentDatetime = new Date();
   const day = addZero(currentDatetime.getDate());
   const month = addZero(currentDatetime.getMonth() + 1);
@@ -652,11 +742,26 @@ function setDateTime() {
   const hours = addZero(currentDatetime.getHours());
   const minutes = addZero(currentDatetime.getMinutes());
   const seconds = addZero(currentDatetime.getSeconds());
-  return day + "." + month + "." + year + " " + hours + ":" + minutes + ":" + seconds;
+
+  return {day, month, year, hours, minutes, seconds}
 }
 setInterval(() => {
-  document.getElementById('current_date_time_block').innerHTML = setDateTime();
+  document.getElementById('current_date_time_block').innerHTML = `
+  ${pcTime().day}.${pcTime().month}.${pcTime().year}
+  ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`
 }, 1000);
+
+setHadleTimeInput = ()=> {
+  handleDay.value = pcTime().day;
+  handleMounth.value = pcTime().month;
+  handleYear.value = pcTime().year;
+  handleHour.value = pcTime().hours;
+  handleMin.value = pcTime().minutes;
+}
+setHadleTimeInput()
+
+setInterval(()=>setHadleTimeInput(),60000)
+
 
 // modal
 const modal = document.getElementById("myModal");
@@ -693,7 +798,6 @@ const statusAlarmSignal = (status) => {
     document.querySelector('.accident-signal').classList.add('blink');
   }
 };
-
 
 
 const accidentModal = () => {
@@ -815,100 +919,22 @@ document.getElementById('selfDiagnosislAlarm').addEventListener('click', ()=>sel
 
 
 const serviceModal = () => {
-  const HTMLcontent = `<div class="card mt-4">
-  <div class="card">
-    <h4>Получить данные устройства</h4>
-    <div class="row justify-content-center pt-3">
-        <button class="py-2 col-3">Получить данные главного окна</button>
-        <button class="py-2 col mx-3">Получить данные сигнализации</button>
-        <button class="py-2 col ">Получить данные коммутации</button>
-        <button class="py-2 col ms-3">Получить все данные устройства</button>
-    </div>
-  </div>
-  <div class="card mt-2">
-    <h4>Задание данных устройства устройства</h4>
-    <div class="row mt-2 " >
-      <div class="col">
-       <div>
-        <select class="py-1 col-1" name="" id="">
-          <option value="">0</option>
-       </select>
-       <button class="py-1 ms-2">Установить износ фазы А</button>
-      </div>
-       <div class="my-2">
-        <select class="py-1 col-1" name="" id="">
-          <option value="">0</option>
-        </select>
-        <button class="py-1 ms-2">Установить износ фазы B</button>
-       </div>
-        <div>
-          <select   class="py-1 col-1" name="" id="">
-            <option value="">0</option>
-          </select>
-          <button class="py-1 ms-2">Установить износ фазы C</button>
-        </div>
-        <div class="mt-2">
-          <input type="text" name="" id="" class="col-1 py-1">
-          <button class="py-1" id="0x108">Установить колличество включений</button>
-        </div>
-
-        <div class="mt-2">
-          <input type="text" name="" id="" class="col-1 py-1">
-          <button class="py-1" id="0x109">Установить колличество отключений</button>
-        </div>
-     </div>
-      <div class="col">
-        <div> <input type="text" name="" id="448" class="col-1"> Коэффицент А фаза А</div>
-        <div> <input type="text" name="" id="450" class="col-1 mt-2"> Коэффицент А фаза B</div>
-        <div> <input type="text" name="" id="452" class="col-1 mt-2"> Коэффицент А фаза С</div>
-        <div> <input type="text" name="" id="449" class="col-1 mt-2"> Коэффицент B фаза А</div>
-        <div> <input type="text" name="" id="451" class="col-1 mt-2"> Коэффицент B фаза B</div>
-        <div> <input type="text" name="" id="453" class="col-1 mt-2"> Коэффицент B фаза C</div>
-        <div class="row justify-content-start mt-2">
-          <button class="col py-1" id="0x10A"> Калибровка 1000 А</button>
-          <button class="col py-1 ms-2" id="0x10B"> Калибровка 10000 А</button>
-        </div>
-      </div>
-   </div>
-      <div class="row mt-3">
-        <button class="col py-2 me-2">Установить сигнализацию</button>
-        <button class="col py-2">Сбросить сигнализацию</button>
-      </div>
-    </div>
-    <div class="card mt-2">
-      <h4 class="mt-2">Очистка данных устройства и программы</h4>
-      <div class="row mt-2 ">
-        <button class="col py-2 " id="0x100">  Очистить журнал измерений</button>
-        <button class="col  py-2 mx-2" id="0x101">Очистить журнал событий</button>
-        <button class="col py-2 " id="0x102">Очистить данные осцилограмм</button>
-      </div>
-      <div class="row mt-3 ">
-        <button class="col py-2 me-2" id="0x104"> Очистить все данные устройства</button>
-        <button class="col py-2" id="0x105">Установить конфигурацию по умолчанию</button>
-      </div>
-      <div class="row mt-4 ">
-        <button class="col py-2 ">  Очистить главное окно</button>
-        <button class="col  py-2 ms-2">Прервать опрос устройства</button>
-      </div>
-      <div class="row mt-3 ">
-        <button class="col py-2 me-2"> Очистить БД измерений</button>
-        <button class="col py-2 me-2">Очистить БД событий</button>
-        <button class="col py-2 ">Очистить БД осцилограмм</button>
-      </div>
-      <div class="row mt-4 justify-content-center">
-        <button class="col-5 ">Очистить данные устройства и БД</button>
-      </div>
-    </div>
-  </div>`;
-  setModalContent(HTMLcontent);
-  modal.style.display = "block";
+  const serviceModalContent = document.getElementById('serviceModalContent');
+  serviceModalContent.style.display = "block";
+  document.getElementById('serviceClose').addEventListener('click', ()=> {
+    serviceModalContent.style.display = "none";
+  })
 };
 
 document.getElementById('serviceModal').addEventListener('click', ()=> serviceModal());
 
-const findReg = (regStr) =>  document.getElementById(`${regStr}`);
+
 
 // data
+
+// helpers func
+const findReg = (regStr) =>  document.getElementById(`${regStr}`);
+const isEmpty = (obj)=> !Object.values(obj).some(x => x !== null && x !== '');
 
 function dbg_out(s){console.log(s);}
 
@@ -928,16 +954,24 @@ socket.onerror = function(e){dbg_out("Ошибка соединения: " + e.m
 let upload_pointer = 0;
 let firmware_array = 0;
 
-const regArrayToSetValues = [
+const regArrayToSetValuesInSpan = [
   10, 11, 12, // test date
   0000,0001, 0002, 0003, //  конфиг
   0010, 0011, 0012, 0013, 0014, 0015, //  время в конфиг
   0109, 0110, 0012, 0014, 0016, // главное окно. выключатель, фазы
+  0200, // журнал измерений
   0251, 0252,0253, 0254, 0255, 0256, 0257, //гл. окно. время последней коммутации
   0258, 0260, 0261, 0262,0263,0264,0265,0266,0267, //гл. окно. данные последней коммутации
-  411, 415,
+  0300, // журнал событий
+  414,415, // конфиг 
 
 ];
+
+const regArrayToSetValuesInInput = [
+  410, 411, 413, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447,
+  448, 449, 450, 451, 452, 453, // service
+  454, 455, 456, 457, 458, 459, 460, 461, 462, 467, 468, 471, 473, 476, // configuration control
+]
 
 const regArrayToSetValuesIfElse = [
   0111, 0259,
@@ -946,6 +980,12 @@ const regArrayToSetValuesIfElse = [
 const regArrayToSetValuesWithCoefficent = [
   0113, 0115, 0117, //   расход ресурса фаз в %
  ]
+
+
+const measurementsJournal = [0201,0204,0206, 0207,0208,0209,0210,0211,0212,0213,0214,0215,0216,0217,0218,0219,0220,0221,0222,0223,0224,0225,0226,0227,0228];
+
+const eventsJournal = [0301,0303,0304,0305,0306,0307,0308,0309,0310,0311];
+
 
 
 function recv(data){
@@ -978,6 +1018,20 @@ function recv(data){
     }
     if (register === 0259 && value === 2) {
       findReg(`${register}`).textContent = 'ОТКЛ.'
+    }
+
+    if (eventsJournal.includes(register)) {
+      eventsTableCurrentObj[`${register}`] = value
+      if(!isEmpty(eventsTableCurrentObj)) {
+        addCurrentEntryToEventsTable();
+      }
+    }
+
+    if (measurementsJournal.includes(register)) {
+      measurmentsTableCurrentObj[`${register}`] = value
+      if(!isEmpty(measurmentsTableCurrentObj)) {
+        addCurrentEntryToEventsTable();
+      }
     }
 
     // if (register === 11) {findReg("0011").textContent = value; }

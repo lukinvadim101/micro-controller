@@ -20,14 +20,14 @@
       <button  class="col-1 py-1" id="serviceModal">Сервис</button>
 		</div>
 		<div class="nav-tabs d-flex justify-content-start mt-2 ">
-			<button class="nav-tab " data-id="main">Главное окно</button>
-			<button class="nav-tab " data-id="measurements">Журнал измерений</button>
-			<button class="nav-tab" data-id="events">Журнал событий</button>
-			<button class="nav-tab active" data-id="oscillograms">Осцилограммы</button>
-			<button class="nav-tab " data-id="measurementsDB">БД измерений</button>
-			<button class="nav-tab" data-id="eventsDB">БД событий</button>
-			<button class="nav-tab" data-id="oscillogramsDB">БД осцилограмм</button>
-			<button class="nav-tab " data-id="configuration">Конфигурирование</button>
+			<button class="nav-tab col " data-id="main">Главное окно</button>
+			<button class="nav-tab col " data-id="measurements">Журнал измерений</button>
+			<button class="nav-tab col active" data-id="events">Журнал событий</button>
+			<button class="nav-tab col " data-id="oscillograms" id="oscillograms-tab">Осцилограммы</button>
+			<button class="nav-tab col " data-id="measurementsDB">БД измерений</button>
+			<button class="nav-tab col " data-id="eventsDB">БД событий</button>
+			<button class="nav-tab col " data-id="oscillogramsDB">БД осцилограмм</button>
+			<button class="nav-tab col " data-id="configuration">Конфигурирование</button>
 		</div>
 		<div class="main-content-wrapper ">
 			<div class="main-content " id="main"> <!-- main tab end -->
@@ -122,17 +122,17 @@
 								</li>
 							</ul>
 							<ul class="col-4 d-flex flex-column ">
-								<li>Износ контакта (фазa A), %:<span id="0265"> 0,02</span>
+								<li>Износ контакта (фазa A), %:<span id="0265"></span>
 								</li>
-								<li>Износ контакта (фазa B), %:<span id="0266"> 0,02</span>
+								<li>Износ контакта (фазa B), %:<span id="0266"></span>
 								</li>
-								<li>Износ контакта (фазa C), %:<span id="0267"> 0,02</span>
+								<li>Износ контакта (фазa C), %:<span id="0267"></span>
 								</li>
 							</ul>
 						</div>
 						<div class="row mt-4 justify-content-center">
 							<div class="col-4">
-								<button>Просмотр осцилограмм</button>
+								<button id="oscilloViewbtn" data-id="oscillograms">Просмотр осцилограмм</button>
 							</div>
 						</div>
 					</div>
@@ -142,12 +142,12 @@
 			<div class="main-content " id="measurements"> 	<!-- measurements start-->
 				<div class="mt-4">
 					<div class="row card flex-row justify-content-center align-items-center">
-						<div class="col-3">Записей в устройстве: <span>17</span>
+						<div class="col-3">Записей в устройстве: <span id="0200"></span>
 						</div>
 						<div class="col-3 tac">
 							<button class="py-1">Обновить</button>
 						</div>
-						<div class="col-3">Время загрузки, сек <span>1</span>
+						<div class="col-3">Время загрузки, сек <span></span>
 						</div>
 					</div>
 					<div class="row card mt-4">
@@ -156,7 +156,32 @@
 							<button class="py-2 measurment-tab" data-id="measurements-switch">Переключения</button>
 						</ul>
 						<div class="measurments-content sub-content active" id="measurements-all">
-							<!-- генерировать таблицу всех записей -->
+							<table class="measurments-table mt-4 " >
+								<thead>
+									<th>№</th>
+									<th>Дата и время</th>
+									<th>Выключатель</th>
+									<th>№ сол. откл.</th>
+									<th>Износ ф.А, %</th>
+									<th>Износ ф.В, %</th>
+									<th>Износ ф.С, %</th>
+									<th>Кол-во вкл.</th>
+									<th>Кол-во откл.</th>
+									<th>Собств. вр., мс</th>
+									<th>Полное. вр., мс</th>
+									<th>Вр. дуги ф.А, мс</th>
+									<th>Вр. дуги ф.В, мс</th>
+									<th>Вр. дуги ф.С, мс</th>
+									<th>Износ за перекл. ф.А, %</th>
+									<th>Износ за перекл. ф.В, %</th>
+									<th>Износ за перекл. ф.С, %</th>
+									<th>Ток ф.А, А</th>
+									<th>Ток ф.В, А</th>
+									<th>Ток ф.С, А</th>
+								</thead>
+								<tbody id="measurementsAllTableBody">
+								</tbody>
+							</table>
 						</div>
 						<div class="measurments-content sub-content" id="measurements-switch">
 							<!-- генерировать таблицу записей переключений -->
@@ -165,24 +190,36 @@
 				</div>
 			</div> 	<!-- measurements end-->
 
-			<div class="main-content" id="events"> 	<!-- events start -->
+			<div class="main-content " id="events"> 	<!-- events start -->
 				<div class="row card flex-row justify-content-center align-items-center mt-4">
-					<div class="col-3">Записей в устройстве: <span>24</span>
+					<div class="col-3">Записей в устройстве: <span id="0300"></span>
 					</div>
 					<div class="col-3 tac">
 						<button class="py-1">Обновить</button>
 					</div>
-					<div class="col-3">Время загрузки, сек <span>1</span>
+					<div class="col-3">Время загрузки, сек <span></span>
 					</div>
 				</div>
 				<div class="row card mt-4">
-					<div id="events-all">
+					<div >
 						<!-- генерировать таблицу собыйти -->
 					</div>
+					<table class="mt-4">
+						<thead>
+							<th class="col-1">№</th>
+							<th class="col-3">Дата и время</th>
+							<th class="col-2">Признак: </th>
+							<th class="col-1">Код</th>
+							<th>Расшифровка кода</th>
+						</thead>
+						<tbody id="eventsTableBody">
+
+						</tbody>
+					</table>
 				</div>
 			</div> 	<!-- events end -->
 
-			<div class="main-content active" id="oscillograms"> 	<!-- oscillograms start-->
+			<div class="main-content " id="oscillograms"> 	<!-- oscillograms start-->
 				<div class="card ">
 					<div class="row flex-row justify-content-center align-items-center mt-2">
 						<div class="col-4 tac">
@@ -239,23 +276,24 @@
 									</div>
 								</div>
 							</div>
-							<div class=" mt-3 d-flex justify-content-center" id="oscilloCanvasContainer"> 	<!-- генерировать canvas -->
-								<canvas id="oscilloCanvas" width="900" height="450" ></canvas>
-							</div>
-
-
+											
+							
+								<div class="card m-3 justify-content-center">
+									<canvas id="oscilloCanvas" width="1000" height="450" ></canvas>
+								</div>
+					
 						</div>
 					</div>
 				</div>
 			</div> 	<!-- oscillograms  end -->
-
-			<div class="main-content " id="measurementsDB"> 		<!-- measurementsDB start -->
+<!-- measurementsDB start -->
+			<div class="main-content " id="measurementsDB"> 		
 				<div class="row card mt-2">
 					<ul class="measurmentsDB-tabs">
-						<button class="py-2 measurmentDB-tab " data-id="measurementsDB-table">Таблица</button>
-						<button class="py-2 measurmentDB-tab active" data-id="measurementsDB-trends">Тренды</button>
+						<button class="py-2 measurmentDB-tab active" data-id="measurementsDB-table">Таблица</button>
+						<button class="py-2 measurmentDB-tab " data-id="measurementsDB-trends">Тренды</button>
 					</ul>
-					<div class="measurmentsDB-content sub-content " id="measurementsDB-table"><!--  measurementsDB-table-->
+					<div class="measurmentsDB-content sub-content active" id="measurementsDB-table"><!--  measurementsDB-table-->
 						<div class="row mt-2">
 							<div class="col-3 card">
 								<h4>Выборка всех данных из базы</h4>
@@ -269,8 +307,14 @@
 								<h4>Интервал просмотра</h4>
 								<div class="row justify-content-between align-items-start">
 									<select class="col-3 mt-2" name="" id="">
+										<option value="">Текущий день</optio>
+										<option value="">Пердыдущий день</option>
+										<option value="">Текущая неделя</option>
+										<option value="">Пердыдущая неделя</option>
+										<option value="">Текущий месяц</option>
+										<option value="">Текущий год</option>
 										<option value="">За всё время</option>
-										<option value="">?</option>
+										<option value="">Заданный интервал</option>
 									</select>
 									<div class="col-2">
 										<div class="mt-2">Начало:</br>
@@ -282,7 +326,7 @@
 											<input class="mt-1" type="date" name="" id="">
 										</div>
 									</div>
-									<div class="col-2">
+									<div class="col-2 me-2">
 										<button class="py-2">Выбрать записи по дате</button>
 									</div>
 								</div>
@@ -293,13 +337,32 @@
 									<div class="col-3">
 										<select name="" id="">
 											<option value="">№ соленоида отключения</option>
-											<option value="">?</option>
+											<option value="">Износ ф.А, %</option>
+											<option value="">Износ ф.В, %</option>
+											<option value="">Износ ф.С, %</option>
+											<option value="">Кол-во включений</option>
+											<option value="">Кол-во отключений</option>
+											<option value="">Собственное время, мс</option>
+											<option value="">Полное время, мс</option>
+											<option value="">Время дуги ф.А, мс</option>
+											<option value="">Время дуги ф.В, мс</option>
+											<option value="">Время дуги ф.С, мс</option>
+											<option value="">Износ за пер. ф.А, %</option>
+											<option value="">Износ за пер. ф.В, %</option>
+											<option value="">Износ за пер. ф.С, %</option>
+											<option value="">Ток ф.А, А</option>
+											<option value="">Ток ф.В, А</option>
+											<option value="">Ток ф.С, А</option>
 										</select>
 									</div>
 									<div class="col-1">
 										<select class="col-10" name="" id="">
-											<option value="">a</option>
-											<option value="">?</option>
+											<option value="">=</option>
+											<option value=""><></option>
+											<option value="">></option>
+											<option value=""><</option>
+											<option value="">>=</option>
+											<option value=""><=</option>
 										</select>
 									</div>
 									<div class="col-1 ">
@@ -307,20 +370,42 @@
 									</div>
 									<div class="col-1 ">
 										<select class="col-10" name="" id="">
-											<option value="">b</option>
-											<option value="">?</option>
+											<option value=""></option>
+											<option value="and">and</option>
+											<option value="or">or</option>
 										</select>
 									</div>
 									<div class="col-1">
 										<select class="col-10" name="" id="">
-											<option value="">c</option>
-											<option value="">?</option>
+											<option value=""></option>
+											<option value="">№ соленоида отключения</option>
+											<option value="">Износ ф.А, %</option>
+											<option value="">Износ ф.В, %</option>
+											<option value="">Износ ф.С, %</option>
+											<option value="">Кол-во включений</option>
+											<option value="">Кол-во отключений</option>
+											<option value="">Собственное время, мс</option>
+											<option value="">Полное время, мс</option>
+											<option value="">Время дуги ф.А, мс</option>
+											<option value="">Время дуги ф.В, мс</option>
+											<option value="">Время дуги ф.С, мс</option>
+											<option value="">Износ за пер. ф.А, %</option>
+											<option value="">Износ за пер. ф.В, %</option>
+											<option value="">Износ за пер. ф.С, %</option>
+											<option value="">Ток ф.А, А</option>
+											<option value="">Ток ф.В, А</option>
+											<option value="">Ток ф.С, А</option>
 										</select>
 									</div>
 									<div class="col-1">
 										<select class="col-10" name="" id="">
-											<option value="">d</option>
-											<option value="">?</option>
+											<option value=""></option>
+											<option value="">=</option>
+											<option value=""><></option>
+											<option value="">></option>
+											<option value=""><</option>
+											<option value="">>=</option>
+											<option value=""><=</option>
 										</select>
 									</div>
 									<div class="col-1">
@@ -341,7 +426,16 @@
 								<div class="row pt-2 justify-content-between align-items-center">
 									<select class="col-5" name="" id="">
 										<option value="">Износ</option>
-										<option value="">?</option>
+										<option value="">Износ за переключения</option>
+										<option value="">Кол-во включений</option>
+										<option value="">Кол-во отключений</option>
+										<option value="">Собственное время вкл.</option>
+										<option value="">Собственное время откл.</option>
+										<option value="">Полное время вкл.</option>
+										<option value="">Полное время откл.</option>
+										<option value="">Время дуги вкл.</option>
+										<option value="">Время дуги откл.</option>
+										<option value="">Ток</option>
 									</select>
 									<div class="col ms-5">
 										<input type="checkbox" name="" id="">A</div>
@@ -356,8 +450,14 @@
 								<div class="row">
 									<div class="row justify-content-between align-items-start">
 										<select class="col-4 mt-2" name="" id="">
+											<option value="">Текущий день</option>
+											<option value="">Пердыдущий день</option>
+											<option value="">Текущая неделя</option>
+											<option value="">Пердыдущая неделя</option>
+											<option value="">Текущий месяц</option>
+											<option value="">Текущий год</option>
 											<option value="">За всё время</option>
-											<option value="">?</option>
+											<option value="">Заданный интервал</option>
 										</select>
 										<div class="col-3 ms-4">
 											<div class="mt-2">Начало:</br>
@@ -386,21 +486,7 @@
 									<div class="col">
 										<input type="checkbox" name="" id="">Дата и время замера</div>
 									<div class="col-3 ms-5 d-flex justify-content-between">
-										<button class="py-0 px-0">
-											<img src="./icons/pointer.png" alt="pointer">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/magnifier.png" alt="magnifier">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/plus.png" alt="plus">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/minus.png" alt="minus">
-										</button>
-										<button class="py-0 px-0">
-											<img src="./icons/fullresize.png" alt="full resize">
-										</button>
+											<!-- легенда -->
 									</div>
 								</div>
 							</div>
@@ -411,8 +497,8 @@
 					</div>
 				</div>
 			</div> 	<!-- measurementsDB end -->
-
-			<div class="main-content " id="eventsDB"> <!-- eventsDB start -->
+<!-- eventsDB start -->
+			<div class="main-content " id="eventsDB"> 
 				<div class="card row justify-content-between flex-row">
 					<div class="col card">
 						<h4 class="pb-4">Выборка всех даных из базы</h4>
@@ -423,8 +509,14 @@
 					<div class="col card mx-2">
 						<h4 class="pb-4">Интревал просмотра</h4>
 						<select class="col-6 mb-3" name="" id="">
+							<option value="">Текущий день</option>
+							<option value="">Пердыдущий день</option>
+							<option value="">Текущая неделя</option>
+							<option value="">Пердыдущая неделя</option>
+							<option value="">Текущий месяц</option>
+							<option value="">Текущий год</option>
 							<option value="">За всё время</option>
-							<option value="">?</option>
+							<option value="">Заданный интервал</option>
 						</select>
 						<div class="mt-2 d-flex justify-content-between col-9">Начало:
 							<input type="date" name="" id="">
@@ -439,11 +531,14 @@
 						<div class="row">
 							<select class="col" name="" id="">
 								<option value="">Код события</option>
-								<option value="">?</option>
 							</select>
 							<select class="col-2 mx-2" name="" id="">
 								<option value="">=</option>
-								<option value="">?</option>
+								<option value=""><></option>
+								<option value="">></option>
+								<option value=""><</option>
+								<option value="">>=</option>
+								<option value=""><=</option>
 							</select>
 							<input class="col" type="text" name="" id="">
 						</div>
@@ -454,8 +549,8 @@
 			</div> <!-- eventsDB end -->
 
 			<div class="main-content" id="oscillogramsDB">7</div>	<!-- oscillogramsDB  -->
-
-			<div class="main-content " id="configuration"> 	<!-- configuration start -->
+<!-- configuration start -->
+			<div class="main-content active" id="configuration"> 	
 				<ul class="configuration-tabs">
 					<button class="py-2 configuration-tab active" data-id="configuration-device">Конфигурирация устройства</button>
 					<button class="py-2 configuration-tab " data-id="configuration-control">Конфигурирация функций контроля</button>
@@ -484,19 +579,26 @@
 							<div class="col card me-2">
 								<h4 class="pb-3">Параметры RS485</h4>
 								<div class="row">
-									<select class="col-3" name="" id="410">
-										<option value="">1</option>
-										<option value="">2</option>
-									</select> <span class="col ms-2">Адрес устройства в сети Модбас</span>
+									<input class="col-3 " type="text" name="" id="410" value="1">
+								 <span class="col ms-1">Адрес устройства в сети Модбас (1 -247)</span>
 								</div>
 								<div class="row mt-2">
 									<select class="col-3" name="" id="411">
-										<option value="">38400</option>
-										<option value="">2</option>
-									</select> <span class="col ms-2">Скорость интерфейса RS485, бод</span>
+										<option value="600">600</option>
+										<option value="1200">1200</option>
+										<option value="2400">2400</option>
+										<option value="4800">4800</option>
+										<option value="9600">9600</option>
+										<option value="19200">19200</option>
+										<option value="38400" selected>38400</option>
+										<option value="57600">57600</option> <!-- ошибка? 38400*2 = 57800 -->
+										<option value="115200">115200</option>
+									</select> 
+									<span class="col ms-2">Скорость интерфейса RS485, бод</span>
 								</div>
 								<div class="row mt-2">
-									<select class="col-3" name="" id="" disabled>
+									<select class="col-3" name="" id="413" disabled>
+										<option value="">да</option>
 										<option value="">Нет</option>
 									</select> <span class="col ms-2">Четность для интерфейса RS485</span>
 								</div>
@@ -531,19 +633,19 @@
 									<div class="row mt-3">
 										<h4 class="pb-2">Установка времени</h4>
 										<div class="col tac">день
-											<input class="col-10 mt-1" type="text" name="" id="">
+											<input class="col-10 mt-1" type="text" name="" id="handleDay">
 										</div>
 										<div class="col tac">месяц
-											<input class=" col-10  mt-1" type="text" name="" id="">
+											<input class=" col-10  mt-1" type="text" name="" id="handleMounth">
 										</div>
 										<div class="col tac">год
-											<input class="col-10 mt-1" type="text" name="" id="">
+											<input class="col-10 mt-1" type="text" name="" id="handleYear">
 										</div>
 										<div class="col tac">часы
-											<input class="col-10 mt-1" type="text" name="" id="">
+											<input class="col-10 mt-1" type="text" name="" id="handleHour">
 										</div>
 										<div class="col tac">минуты
-											<input class="col-10 mt-1" type="text" name="" id="">
+											<input class="col-10 mt-1" type="text" name="" id="handleMin">
 										</div>
 									</div>
 									<div class="row mt-3 tac">
@@ -563,10 +665,11 @@
 					<div class="card mt-2">
 						<div class="card">
 							<div>
-								<div class="mb-2">Выбор используемых фаз выключателя:</div> <span class="ps-0"><input type="checkbox" name="" id=""> Фаза А</span>
-								<span class="mx-2"><input type="checkbox" name="" id=""> Фаза В</span>
-								<span><input type="checkbox" name="" id=""> Фаза С</span>
-							</div>
+								<div class="mb-2">Выбор используемых фаз выключателя:</div> <span class="ps-0"> 	<!-- 472 -->
+									<input type="checkbox" name="" id=""> Фаза А</span>
+									<span class="mx-2"><input type="checkbox" name="" id=""> Фаза В</span>
+									<span><input type="checkbox" name="" id=""> Фаза С</span>
+								</div>
 							<div class="mt-2 row justify-content-between col-6">Наличие подключения сигналов соленоидов
 								<div class="col-1">
 									<select name="" id="454">
@@ -577,9 +680,9 @@
 							</div>
 							<div class="mt-2 row justify-content-between col-6">Наличие обнаружения неполнофазного режима
 								<div class="col-1">
-									<select name="" id="">
-										<option value="">Да</option>
-										<option value="">Нет</option>
+									<select name="" id="471">
+										<option value="1">Да</option>
+										<option value="0">Нет</option>
 									</select>
 								</div>
 							</div>
@@ -594,7 +697,26 @@
 							</div>
 							<div class="mt-2 row justify-content-between col-9">Номинальный ток выключателя (действующее значение), А
 								<select class="col-1" name="" id="455">
-									<option value="">4000</option>
+									<option value="200">200</option>
+									<option value="400">400</option>
+									<option value="630">630</option>
+									<option value="800">800</option>
+									<option value="1000">1000</option>
+									<option value="1250">1250</option>
+									<option value="1600">1600</option>
+									<option value="2000">2000</option>
+									<option value="2500">2500</option>
+									<option value="3150">3150</option>
+									<option value="4000">4000</option>
+									<option value="5000">5000</option>
+									<option value="6300">6300</option>
+									<option value="8000">8000</option>
+									<option value="10000">10000</option>
+									<option value="12500">12500</option>
+									<option value="16000">16000</option>
+									<option value="20000">20000</option>
+									<option value="25000">25000</option>
+									<option value="31500">31500</option>
 								</select>
 							</div>
 							<div class="mt-2 row justify-content-between col-9">Номинальный ток короткого замыкания, А:
@@ -604,12 +726,12 @@
 								<input class="col-1 m-0" type="text" name="" value="200" id=""> 	<!-- 463 & 464 ? -->
 							</div>
 							<div class="mt-2 row justify-content-between col-9">Коммутационный ресурс при токе К3 для отключения (число операций):
-								<input class="col-1 m-0 " type="text" name="" value="14" id="">
+								<input class="col-1 m-0 " type="text" name="" value="14" id="467">
 							</div>
 							<div class="mt-2 row justify-content-between col-9">Признак наличия расчёта ресурса при включении
-								<select class="col-1" name="" id="">
-									<option value="">Да</option>
-									<option value="">Нет</option>
+								<select class="col-1" name="" id="473">
+									<option value="1">Да</option>
+									<option value="0">Нет</option>
 								</select>
 							</div>
 							<div class="mt-2 row justify-content-between col-9">Коммутационный ресурс при номинальном токе для включения (число операций):
@@ -644,32 +766,29 @@
 									</div>
 								</div>
 							</div>
-							<div class="mt-3 row justify-content-between col-7">Номинальный ток первичной обмотки ТТ энергообъекта, А:
-								<input class="col-1 m-0" type="text" name="" value="1000" id="">
+							<div class="mt-4 row justify-content-between col-4">Номинальный ток первичной обмотки ТТ энергообъекта, А:
+								<input class="col-1 m-0" type="text" name="" value="1000" id="462">
 							</div>
-							<div class="mt-2 row justify-content-between col-7">Порог уровня отсекаемых помех сигналов главных токов, А:
-								<input class="col-1 m-0" type="text" name="" value="500" id="">
+							<div class="mt-2 row justify-content-between col-4">Порог уровня отсекаемых помех сигналов главных токов, А:
+								<input class="col-1 m-0" type="text" name="" value="500" id="468">
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="configuration-content sub-content " id="configuration-alarm"> 		<!-- configuration alarm -->
 					<div class="card mt-2">
-						<div class="mt-2 row justify-content-between col-7">Предупредительный порог выработки ресурса (износ контакта), %
-							<select class="col-1" name="" id="">
-								<option value="">80</option>
-							</select>
+						<div class="mt-2 row justify-content-between col-7">Предупредительный порог выработки ресурса (износ контакта), 1 - 100% 
+							<input type="text" class="col-1 m-0" value="80" id="432">
 						</div>
-						<div class="mt-2 row justify-content-between col-7">Аварийный порог выработки ресурса (износ контакта), %
-							<select class="col-1" name="" id="">
-								<option value="">100</option>
-							</select>
+						<div class="mt-2 row justify-content-between col-7">Аварийный порог выработки ресурса (износ контакта), 1 - 200%
+					
+							<input type="text" class="col-1 m-0" value="100" id="433">
 						</div>
 						<div class="mt-4 row justify-content-between col-7">Предупредительный порог колличества операций:
-							<input class="col-1 ms-2 m-0" type="text" name="" value="8000" id="">
+							<input class="col-1 ms-2 m-0" type="text" name="" value="8000" id="434">
 						</div>
 						<div class="mt-2 row justify-content-between col-7">Аварийный порог колличества операций:
-							<input class="col-1 ms-2 m-0" type="text" name="" value="10000" id="">
+							<input class="col-1 ms-2 m-0" type="text" name="" value="10000" id="435">
 						</div>
 						<div class="mt-4 row justify-content-between col-7">Предупредительный порог собственного времени отключения, мс:
 							<input class="col-1 ms-2 m-0" type="text" name="" value="90" id="442">
@@ -707,6 +826,8 @@
 			</div>
 		</div>
 
+		
+
 
 			<button id="statusAlarm"> status alarm</button>
 			<button id="accidentAlarm"> accident alarm</button>
@@ -717,6 +838,101 @@
 			</div>
 
 
+			<div class="card mt-4" id="serviceModalContent" >
+				<div class="card">
+					<h4>Получить данные устройства</h4>
+					<div class="row justify-content-center pt-3">
+							<button class="py-2 col-3">Получить данные главного окна</button>
+							<button class="py-2 col mx-3">Получить данные сигнализации</button>
+							<button class="py-2 col ">Получить данные коммутации</button>
+							<button class="py-2 col ms-3">Получить все данные устройства</button>
+					</div>
+				</div>
+				<div class="card mt-2">
+					<h4>Задание данных устройства устройства</h4>
+					<div class="row mt-2 " >
+						<div class="col">
+						 <div>
+							<select class="py-1 col-1" name="" id="">
+								<option value="">0</option>
+						 </select>
+						 <button class="py-1 ms-2">Установить износ фазы А</button>
+						</div>
+						 <div class="my-2">
+							<select class="py-1 col-1" name="" id="">
+								<option value="">0</option>
+							</select>
+							<button class="py-1 ms-2">Установить износ фазы B</button>
+						 </div>
+							<div>
+								<select   class="py-1 col-1" name="" id="">
+									<option value="">0</option>
+								</select>
+								<button class="py-1 ms-2">Установить износ фазы C</button>
+							</div>
+							<div class="mt-2">
+								<input type="text" name="" id="" class="col-1 py-1">
+								<button class="py-1" id="0x108">Установить колличество включений</button>
+							</div>
+			
+							<div class="mt-2">
+								<input type="text" name="" id="" class="col-1 py-1">
+								<button class="py-1" id="0x109">Установить колличество отключений</button>
+							</div>
+					 </div>
+						<div class="col">
+							<div> <input type="text" name="" id="448" value='' class="col-1"> Коэффицент А фаза А</div>
+							<div> <input type="text" name="" id="450" value='' class="col-1 mt-2"> Коэффицент А фаза B</div>
+							<div> <input type="text" name="" id="452" value='' class="col-1 mt-2"> Коэффицент А фаза С</div>
+							<div> <input type="text" name="" id="449" value='' class="col-1 mt-2"> Коэффицент B фаза А</div>
+							<div> <input type="text" name="" id="451" value='' class="col-1 mt-2"> Коэффицент B фаза B</div>
+							<div> <input type="text" name="" id="453" value='' class="col-1 mt-2"> Коэффицент B фаза C</div>
+							<div class="row justify-content-start mt-2">
+								<button class="col py-1" id="0x10A"> Калибровка 1000 А</button>
+								<button class="col py-1 ms-2" id="0x10B"> Калибровка 10000 А</button>
+							</div>
+						</div>
+				 </div>
+						<div class="row mt-3">
+							<button class="col py-2 me-2">Установить сигнализацию</button>
+							<button class="col py-2">Сбросить сигнализацию</button>
+						</div>
+					</div>
+					<div class="card mt-2">
+						<h4 class="mt-2">Очистка данных устройства и программы</h4>
+						<div class="row mt-2 ">
+							<button class="col py-2 " id="0x100">  Очистить журнал измерений</button>
+							<button class="col  py-2 mx-2" id="0x101">Очистить журнал событий</button>
+							<button class="col py-2 " id="0x102">Очистить данные осцилограмм</button>
+						</div>
+						<div class="row mt-3 ">
+							<button class="col py-2 me-2" id="0x104"> Очистить все данные устройства</button>
+							<button class="col py-2" id="0x105">Установить конфигурацию по умолчанию</button>
+						</div>
+						<div class="row mt-4 ">
+							<button class="col py-2 ">  Очистить главное окно</button>
+							<button class="col  py-2 ms-2">Прервать опрос устройства</button>
+						</div>
+						<div class="row mt-3 ">
+							<button class="col py-2 me-2"> Очистить БД измерений</button>
+							<button class="col py-2 me-2">Очистить БД событий</button>
+							<button class="col py-2 ">Очистить БД осцилограмм</button>
+						</div>
+						<div class="row mt-4 justify-content-center">
+							<button class="col-5 ">Очистить данные устройства и БД</button>
+						</div>
+						<div class="row pt-5  me-2">
+							<button class="bold" id="serviceClose" style="color: red;">Закрыть</button>
+						</div>
+					</div>
+					
+			</div>
+					
+			
+
+
+	</div> 	<!-- container -->
 
 		<script src="main.js" id="script"></script>
 </body>
+</html>
