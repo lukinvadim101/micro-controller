@@ -120,11 +120,11 @@ let measurmentsTableCurrentObj = {
   '0228': null,
 
 
-}
+};
 
 const measurementsAllTableBody = document.getElementById('measurementsAllTableBody');
 const addCurrentEntryToMeasurementsAllTable = ()=> {
-  const obj = measurmentsTableCurrentObj
+  const obj = measurmentsTableCurrentObj;
   measurementsAllTableBody.insertAdjacentHTML("afterbegin", `
   <tr>
     <td>${obj['0201']}</td> 
@@ -152,7 +152,7 @@ const addCurrentEntryToMeasurementsAllTable = ()=> {
     <td>${obj['0228']}</td>
   </tr>
 `);
-}
+};
 
 // addCurrentEntryToMeasurementsAllTable()
 
@@ -181,10 +181,10 @@ let eventsTableCurrentObj = {
   '0309': null,
   '0310': null,
   '0311': null,
-}
+};
 const addCurrentEntryToEventsTable = ()=> {
   const eventsTableBody = document.querySelector('#eventsTableBody');
-  const obj = eventsTableCurrentObj
+  const obj = eventsTableCurrentObj;
   eventsTableBody.insertAdjacentHTML("beforeend", `
   <tr>
     <td>${obj['0301']}</td>
@@ -198,7 +198,7 @@ const addCurrentEntryToEventsTable = ()=> {
     <td>нужна таблица расшифровки</td>
   </tr>
   </tbody>`);
-}
+};
 
 // addCurrentEntryToEventsTable();
 
@@ -213,58 +213,53 @@ oscillogramsTabs.addEventListener('click', (e) => tabsSwitcher(e, oscillogramTab
 
 // oscillogram Canvas
 let oscilloCanvas=document.getElementById("oscilloCanvas");
-let ctx=oscilloCanvas.getContext("2d");
+let osCtx=oscilloCanvas.getContext("2d");
 
 
 const padding = {x: 60, y: 20};
 const dotRadius = 2;
 
-const aData = { values:[
-  { X: 0, Y: 140000 },
-  { X: 1, Y: 0 },
-  { X: 2, Y: -20000 },
-  { X: 3, Y: 28000 },
-  { X: 4, Y: 10034 },
-  { X: 5, Y: 14000 },
-  { X: 6, Y: 82000 },
-  { X: 7, Y: 82000 },
-  { X: 8, Y: 140000 },
-  { X: 9, Y: 0 },
-  { X: 10, Y: -20000 },
-  { X: 11, Y: 28000 },
-  { X: 12, Y: 10034 },
-  { X: 13, Y: 14000 },
-  { X: 14, Y: 82000 },
-  { X: 15, Y: 82000 },
-  { X: 16, Y: 140000 },
-  { X: 17, Y: 0 },
-  { X: 18, Y: -20000 },
-  { X: 19, Y: 28000 },
-  { X: 20, Y: 10034 },
-  { X: 21, Y: 14000 },
-  { X: 22, Y: 82000 },
-  { X: 23, Y: 82000 },
-]};
-
-const bData = { values:[
-  { X: 0, Y: -30000 },
-  { X: 1, Y: -110500 },
-  { X: 2, Y: 27000 },
-  { X: 3, Y: 1034 },
-  { X: 4, Y: 14000 },
-  { X: 5, Y: 2000 },
-]};
-
-const cData = { values:[
-  { X: 0, Y: -30000 },
-  { X: 1, Y: -110000 },
-  { X: 2, Y: 22000 },
-  { X: 3, Y: 1034 },
-  { X: 4, Y: 14000 },
-  { X: 5, Y: 151320 },
-  { X: 6, Y: 22000 },
-]};
-
+const osData = {
+  a: { values:[
+    { X: 0, Y: 140000 },
+    { X: 1, Y: 0 },
+    { X: 2, Y: -20000 },
+    { X: 3, Y: 28000 },
+    { X: 4, Y: 10034 },
+    { X: 5, Y: 14000 },
+    { X: 6, Y: 82000 },
+    { X: 7, Y: 82000 },
+    { X: 8, Y: 140000 },
+    { X: 9, Y: 0 },
+    { X: 10, Y: -20000 },
+    { X: 11, Y: 28000 },
+    { X: 12, Y: 10034 },
+    { X: 13, Y: 14000 },
+    { X: 14, Y: 82000 },
+    { X: 15, Y: 82000 },
+    { X: 16, Y: 140000 },
+    { X: 17, Y: 0 },
+  ]},
+  
+  b: { values:[
+    { X: 0, Y: -30000 },
+    { X: 1, Y: -110500 },
+    { X: 2, Y: 27000 },
+    { X: 3, Y: 1034 },
+    { X: 4, Y: 14000 },
+    { X: 5, Y: 2000 },
+  ]},
+  
+  c: { values:[
+    { X: 0, Y: -30000 },
+    { X: 1, Y: -110000 },
+    { X: 2, Y: 22000 },
+    { X: 3, Y: 1034 },
+    { X: 4, Y: 14000 },
+    { X: 5, Y: 151320 },
+    { X: 6, Y: 22000 },
+  ]},
+};
 
 function mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
   return mappedLow + (mappedHigh - mappedLow) * (value - sourceLow) / (sourceHigh - sourceLow);
@@ -283,8 +278,8 @@ function calcSourceMinMax(prop, ...arr){
   return({min,max});
 }
 
-let rangeY=calcSourceMinMax('Y',aData.values,bData.values, cData.values);
-let rangeX=calcSourceMinMax('X',aData.values,bData.values, cData.values);
+let rangeY=calcSourceMinMax('Y',osData.a.values,osData.b.values, osData.c.values);
+let rangeX=calcSourceMinMax('X',osData.a.values,osData.b.values, osData.c.values);
 
 
 // calc the drawable graph boundaries
@@ -299,7 +294,7 @@ function getDisplayXY(valueX,valueY){
   return({displayX:x,displayY:y});
 }
 
-function connector(starting,ending,color){
+function connector(ctx,starting,ending,color){
   ctx.beginPath();
   ctx.lineWidth = 2;
   ctx.moveTo(starting.displayX,starting.displayY);
@@ -307,31 +302,33 @@ function connector(starting,ending,color){
   ctx.strokeStyle=color;
   ctx.stroke();
 }
-function dot(position,radius){
+function dot(ctx,position,radius){
   ctx.beginPath();
   ctx.moveTo(position.displayX,position.displayY);
   ctx.arc(position.displayX,position.displayY,radius,0,Math.PI*2);
   ctx.closePath();
-
   ctx.fill();
 }
 
 const osciloCanvasDots = document.getElementById('osciloCanvasDots');
 const osciloCanvasDotsVal = document.getElementById('osciloCanvasDotsVal');
 
-const drawContent = (data, color) => {
+const drawContent = (ctx,data, color) => {
   let starting=getDisplayXY(data.values[0].X,data.values[0].Y);
-
   ctx.setLineDash([]);
 
-  for(let i=1;i<=data.values.length -1;i++){
+  if (osciloCanvasDots.checked) {
+    dot(ctx,starting,dotRadius);
+  }
+
+  for(let i=1;i<=data.values.length-1;i++){
     const ending=getDisplayXY(data.values[i].X,data.values[i].Y);
     if (osciloCanvasDotsVal.checked) {
       ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
     }
-    connector(starting,ending, color);
+    connector(ctx,starting,ending, color);
     if (osciloCanvasDots.checked) {
-      dot(ending,dotRadius);
+      dot(ctx,ending,dotRadius);
     }
     starting=ending;
   }
@@ -342,10 +339,8 @@ const drawContent = (data, color) => {
 };
 
 
-const y0=getDisplayXY(graphLeft,0).displayY;
-
 // axes
-const drawAxes = ()=> {
+const drawAxes = (ctx)=> {
 
   ctx.beginPath();
   ctx.moveTo(graphLeft,graphTop);
@@ -357,7 +352,7 @@ const drawAxes = ()=> {
 };
 
 // scale
-const drawDashedLine = (fromX, toX, fromY, toY)=> {
+const drawDashedLine = (ctx,fromX, toX, fromY, toY)=> {
   ctx.beginPath();
   ctx.setLineDash([8, 4]);
   ctx.moveTo(fromX, fromY);
@@ -365,7 +360,7 @@ const drawDashedLine = (fromX, toX, fromY, toY)=> {
   ctx.stroke();
 };
 
-const drawLine = (fromX, toX, fromY, toY)=> {
+const drawLine = (ctx,fromX, toX, fromY, toY)=> {
   ctx.beginPath();
   ctx.setLineDash([]);
   ctx.moveTo(fromX, fromY);
@@ -378,13 +373,13 @@ function roundToMultiple(num, multiple) {
   return Math.round(num/multiple)*multiple;
 }
 
-const drawYScale = ()=> {
+const drawYScale = (ctx)=> {
 
-  const maxRound1000 = roundToMultiple(rangeY.max, 10);
-  const minRound1000 = roundToMultiple( Math.abs(rangeY.min), 10);
+  const maxRound10 = roundToMultiple(rangeY.max, 10);
+  const minRound10 = roundToMultiple( Math.abs(rangeY.min), 10);
 
-  const yValuePositiveGap = (maxRound1000) / 5; // 5 я часть значения оси Y+
-  const yValueNegativeGap = (minRound1000) / 5; // 5 я часть значения оси Y-
+  const yValuePositiveGap = (maxRound10) / 5; // 5 я часть значения оси Y+
+  const yValueNegativeGap = (minRound10) / 5; // 5 я часть значения оси Y-
 
   ctx.textAlign='right';
   ctx.textBaseline='middle';
@@ -395,9 +390,9 @@ const drawYScale = ()=> {
     let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
     ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),graphLeft-10,scaleValPosY);
     if ( i === 0) {
-      drawLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+      drawLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
     } else {
-      drawDashedLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+      drawDashedLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
     }
   }
 
@@ -406,14 +401,14 @@ const drawYScale = ()=> {
     let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
     ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),graphLeft-10,scaleValPosY);
     if ( i=== 0) {
-      drawLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+      drawLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
     }else {
-      drawDashedLine(graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
+      drawDashedLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
     }
   }
 };
 
-const drawXScale = ()=> {
+const drawXScale = (ctx)=> {
   ctx.textAlign='center';
 
   for (let i = rangeX.min; i <= rangeX.max; i++) {
@@ -423,7 +418,7 @@ const drawXScale = ()=> {
       ctx.fillText(i/5 ,scaleValPosX, graphBottom + 10);
 
       if (i !== 0) {
-        drawDashedLine( scaleValPosX, scaleValPosX, graphBottom, graphTop); // сетка   Y
+        drawDashedLine(ctx, scaleValPosX, scaleValPosX, graphBottom, graphTop); // сетка   Y
       }
       ctx.setLineDash([]);
     }
@@ -433,81 +428,74 @@ const drawXScale = ()=> {
 // clear
 const clearCanvas = (ctx, canvas)=> { ctx.clearRect(0, 0, canvas.width, canvas.height);};
 
-const getWHContainer = () => {
-  let w = document.querySelector('#oscilloCanvasContainer').offsetWidth - 150;
-  let h = document.querySelector('#oscilloCanvasContainer').offsetHeight;
 
-  return({w,h})
-}
-
-
-const drawOscilloCanvas = ()=> {
+const drawOscilloCanvas = (ctx)=> {
   
   clearCanvas(ctx, oscilloCanvas);
   ctx.lineWidth = 1;
-  drawAxes();
-  drawXScale();
-  drawYScale();
+  drawAxes(ctx);
+  drawXScale(ctx);
+  drawYScale(ctx);
 };
 
-const oscilloInitrender = ()=> {
-  drawOscilloCanvas();
-  drawContent(aData, 'red');
-  drawContent(bData, 'blue');
-  drawContent(cData, 'green');
-}
+const oscilloInitrender = (ctx)=> {
+  drawOscilloCanvas(ctx);
+  drawContent(ctx,osData.a, 'red');
+  drawContent(ctx,osData.b, 'blue');
+  drawContent(ctx,osData.c, 'green');
+};
 
 document.getElementById('oscillograms-tab').addEventListener('click', ()=> {
-  oscilloInitrender();
-})
+  oscilloInitrender(osCtx);
+});
 oscilloViewbtn.addEventListener('click', ()=> {
-  oscilloInitrender();
-})
+  oscilloInitrender(osCtx);
+});
 const osciloCanvasRegim = document.getElementById('osciloCanvasRegim');
 
 const chooseOsciloCanvasRegim = (val)=> {
   switch(val) {
   case 'a':
-    rangeY=calcSourceMinMax('Y',aData.values);
-    rangeX=calcSourceMinMax('X',aData.values);
-    drawOscilloCanvas();
-    drawContent(aData, 'red');
+    rangeY=calcSourceMinMax('Y',osData.a.values);
+    rangeX=calcSourceMinMax('X',osData.a.values);
+    drawOscilloCanvas(osCtx);
+    drawContent(osCtx,osData.a, 'red');
     break;
   case 'b':
-    rangeY=calcSourceMinMax('Y',bData.values);
-    rangeX=calcSourceMinMax('X',bData.values);
-    drawOscilloCanvas();
-    drawContent(bData, 'blue');
+    rangeY=calcSourceMinMax('Y',osData.b.values);
+    rangeX=calcSourceMinMax('X',osData.b.values);
+    drawOscilloCanvas(osCtx);
+    drawContent(osCtx,osData.b, 'blue');
     break;
   case 'c':
-    rangeY=calcSourceMinMax('Y',cData.values);
-    rangeX=calcSourceMinMax('X',cData.values);
-    drawOscilloCanvas();
-    drawContent(cData, 'green');
+    rangeY=calcSourceMinMax('Y',osData.c.values);
+    rangeX=calcSourceMinMax('X',osData.c.values);
+    drawOscilloCanvas(osCtx);
+    drawContent(osCtx,osData.c, 'green');
     break;
   default:
-    rangeY=calcSourceMinMax('Y',aData.values,bData.values, cData.values);
-    rangeX=calcSourceMinMax('X',aData.values,bData.values, cData.values);
-    drawOscilloCanvas();
-    drawContent(aData, 'red');
-    drawContent(bData, 'blue');
-    drawContent(cData, 'green');
+    rangeY=calcSourceMinMax('Y',osData.a.values,osData.b.values, osData.c.values);
+    rangeX=calcSourceMinMax('X',osData.a.values,osData.b.values, osData.c.values);
+    drawOscilloCanvas(osCtx);
+    drawContent(osCtx,osData.a, 'red');
+    drawContent(osCtx,osData.b, 'blue');
+    drawContent(osCtx,osData.c, 'green');
 
   }
 };
 osciloCanvasRegim.addEventListener('change', (e) => {
 
-  drawOscilloCanvas();
+  drawOscilloCanvas(osCtx);
   chooseOsciloCanvasRegim(e.target.value);
 });
 
 osciloCanvasDots.addEventListener('change',()=> {
-  drawOscilloCanvas();
+  drawOscilloCanvas(osCtx);
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 });
 
 osciloCanvasDotsVal.addEventListener('change',()=> {
-  drawOscilloCanvas();
+  drawOscilloCanvas(osCtx);
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 });
 
@@ -520,205 +508,188 @@ const measurmentsDBTabs = document.querySelector('.measurmentsDB-tabs');
 const measurmentDBTab = document.querySelectorAll('.measurmentDB-tab');
 const measurmentsDBContent = document.querySelectorAll('.measurmentsDB-content');
 measurmentsDBTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentDBTab, measurmentsDBContent));
-// canvas
-class Chart {
-  constructor(con) {
-    this.canvas = document.getElementById(con.canvasId);
-    this.minX = con.minX;
-    this.minY = con.minY;
-    this.maxX = con.maxX;
-    this.maxY = con.maxY;
-    this.unitsPerTickX = con.unitsPerTickX;
-    this.unitsPerTickY = con.unitsPerTickY;
-    // constants
-    this.padding = 10;
-    this.tickSize = 10;
-    this.axisColor = "#555";
-    this.pointRadius = 4;
-    this.fontHeight = 12;
-    // relationships
-    this.context = this.canvas.getContext("2d");
-    this.rangeX = this.maxX - this.minY;
-    this.rangeY = this.maxY - this.minY;
-    this.numXTicks = Math.round(this.rangeX / this.unitsPerTickX);
-    this.numYTicks = Math.round(this.rangeY / this.unitsPerTickY);
-    this.x = this.getLongestValueWidth() + this.padding * 2;
-    this.y = this.padding * 2;
-    this.width = this.canvas.width - this.x - this.padding * 2;
-    this.height = this.canvas.height - this.y - this.padding - this.fontHeight;
-    this.scaleX = this.width / this.rangeX;
-    this.scaleY = this.height / this.rangeY;
-  }
+// TrendsCanvas
+let trendsCanvas = document.getElementById('trendsCanvas');
+let trCtx = trendsCanvas.getContext("2d");
 
-  drawXAxis() {
-    this.context.save();
-    this.context.beginPath();
-    this.context.moveTo(this.x, this.y + this.height);
-    this.context.lineTo(this.x + this.width, this.y + this.height);
-    this.context.strokeStyle = this.axisColor;
-    this.context.lineWidth = 2;
-    this.context.stroke();
-    // draw tick marks
-    for (let n = 0; n < this.numXTicks; n++) {
-      this.context.beginPath();
-      this.context.moveTo((n + 1) * this.width / this.numXTicks + this.x, this.y + this.height);
-      this.context.lineTo((n + 1) * this.width / this.numXTicks + this.x, this.y + this.height - this.tickSize);
-      this.context.stroke();
-    }
-    // draw labels
-    this.context.fillStyle = "black";
-    this.context.textAlign = "center";
-    this.context.textBaseline = "middle";
-    for (let n = 0; n < this.numXTicks; n++) {
-      const label = Math.round((n + 1) * this.maxX / this.numXTicks);
-      this.context.save();
-      this.context.translate((n + 1) * this.width / this.numXTicks + this.x, this.y + this.height + this.padding);
-      this.context.fillText(label, 0, 0);
-      this.context.restore();
-    }
-    this.context.restore();
-  };
-
-  drawYAxis() {
-    const {context} = this;
-    context.save();
-    context.save();
-    context.beginPath();
-    context.moveTo(this.x, this.y);
-    context.lineTo(this.x, this.y + this.height);
-    context.strokeStyle = this.axisColor;
-    context.lineWidth = 2;
-    context.stroke();
-    context.restore();
-    // draw tick marks
-    for (let n = 0; n < this.numYTicks; n++) {
-      context.beginPath();
-      context.moveTo(this.x, n * this.height / this.numYTicks + this.y);
-      context.lineTo(this.x + this.tickSize, n * this.height / this.numYTicks + this.y);
-      context.stroke();
-    }
-    // draw values
-    context.fillStyle = "black";
-    context.textAlign = "right";
-    context.textBaseline = "middle";
-    for (let n = 0; n < this.numYTicks; n++) {
-      const value = Math.round(this.maxY - n * this.maxY / this.numYTicks);
-      context.save();
-      context.translate(this.x - this.padding, n * this.height / this.numYTicks + this.y);
-      context.fillText(value, 0, 0);
-      context.restore();
-    }
-    context.restore();
-  };
-
-  getLongestValueWidth() {
-    this.context.font = this.font;
-    let longestValueWidth = 0;
-    for (let n = 0; n <= this.numYTicks; n++) {
-      const value = this.maxY - (n * this.unitsPerTickY);
-      longestValueWidth = Math.max(longestValueWidth, this.context.measureText(value).width);
-    }
-    return longestValueWidth;
-  };
-
-  drawLine(data, color, width) {
-    const {
-      context
-    } = this;
-    context.save();
-    this.transformContext();
-    context.lineWidth = width;
-    context.strokeStyle = color;
-    context.fillStyle = color;
-    context.beginPath();
-    context.moveTo(data[0].x * this.scaleX, data[0].y * this.scaleY);
-    for (let n = 0; n < data.length; n++) {
-      const point = data[n];
-      // draw segment
-      context.lineTo(point.x * this.scaleX, point.y * this.scaleY);
-      context.stroke();
-      context.closePath();
-      context.beginPath();
-      context.arc(point.x * this.scaleX, point.y * this.scaleY, this.pointRadius, 0, 2 * Math.PI, false);
-      context.fill();
-      context.closePath();
-      // position for next segment
-      context.beginPath();
-      context.moveTo(point.x * this.scaleX, point.y * this.scaleY);
-    }
-    context.restore();
-  };
-
-  transformContext() {
-    // move context to center of canvas
-    this.context.translate(this.x, this.y + this.height);
-    // invert the y scale so that that increments
-    // as you move upwards
-    this.context.scale(1, -1);
-  };
-}
-window.onload = () => {
-  const myLineChart = new Chart({
-    canvasId: "myCanvas",
-    minX: 0,
-    minY: 0,
-    maxX: 160,
-    maxY: 100,
-    unitsPerTickX: 10,
-    unitsPerTickY: 10
-  });
-  const data1 = [{
-    x: 0,
-    y: 0
-  }, {
-    x: 20,
-    y: 10
-  }, {
-    x: 40,
-    y: 15
-  }, {
-    x: 60,
-    y: 40
-  }, {
-    x: 80,
-    y: 60
-  }, {
-    x: 100,
-    y: 50
-  }, {
-    x: 120,
-    y: 85
-  }, {
-    x: 140,
-    y: 100
-  }];
-  myLineChart.drawLine(data1, "blue", 3);
-  myLineChart.drawXAxis();
-  myLineChart.drawYAxis();
-  const data2 = [{
-    x: 20,
-    y: 85
-  }, {
-    x: 40,
-    y: 75
-  }, {
-    x: 60,
-    y: 75
-  }, {
-    x: 80,
-    y: 45
-  }, {
-    x: 100,
-    y: 65
-  }, {
-    x: 120,
-    y: 40
-  }, {
-    x: 120,
-    y: 35
-  }];
-  myLineChart.drawLine(data2, "red", 3);
+let trData = {
+  a: {
+    values: [
+      { X: 0, Y: 0 },
+      { X: 1, Y: 9 },
+      { X: 2, Y: 2.20 },
+      { X: 3, Y: 4 }, ],
+    dates: [
+      '11.11.1111 01:01:01.1111',
+      '22.22.2222 02:02:02.2222',
+      '33.33.3333 03:03:03.3333',
+      '44.44.4444 44:44:44.4444'],
+  },
+  b: {values: [
+    { X: 1, Y: 4.20 },
+    { X: 2, Y: 1.2 },
+  ]},
+  c: {values: [
+    { X: 1, Y: 3.20 },
+    { X: 2, Y: 1 },
+  ]}
 };
+
+let trRangeY=calcSourceMinMax('Y',trData.a.values,trData.b.values,trData.c.values);
+let trRangeX=calcSourceMinMax('X',trData.a.values,trData.b.values,trData.c.values);
+
+const trPadding = {y:100};
+
+const trGraph = {
+  Left:padding.x,
+  Rigth:trendsCanvas.width-padding.x,
+  Top: padding.y,
+  Bottom: trendsCanvas.height-trPadding.y,
+};
+
+const drawTrAxes = (ctx, graph)=> {
+  ctx.beginPath();
+  ctx.moveTo(graph.Left,graph.Top);
+  ctx.lineTo(graph.Left,graph.Bottom);
+  ctx.moveTo(graph.Left,graph.Bottom);
+  ctx.lineTo(graph.Rigth,graph.Bottom);
+  ctx.strokeStyle='gray';
+  ctx.stroke();
+};
+
+function getTrDisplayXY(valueX,valueY){
+  const x = mapRange(valueX,trRangeX.min,trRangeX.max,trGraph.Left,trGraph.Rigth);
+  const y = mapRange(valueY,trRangeY.min,trRangeY.max,trGraph.Bottom,trGraph.Top);
+  return({displayX:x,displayY:y});
+}
+
+const trCanvasDots = document.getElementById('trCanvasDots');
+const trCanvasDotsVal = document.getElementById('trCanvasDotsVal');
+const trCanvasDates = document.getElementById('trCanvasDates');
+
+
+const drawTrContent = (ctx,data, color) => {
+  let starting=getTrDisplayXY(data.values[0].X,data.values[0].Y);
+  ctx.setLineDash([]);
+
+  if (trCanvasDots.checked) {
+    dot(ctx,starting,dotRadius);
+  }
+  
+  for(let i=1;i<=data.values.length-1;i++){
+    const ending=getTrDisplayXY(data.values[i].X,data.values[i].Y);
+    if (trCanvasDotsVal.checked) {
+      ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
+    }
+    
+    connector(ctx,starting,ending, color);
+    if (trCanvasDots.checked) {
+      dot(ctx,ending,dotRadius);
+    }
+
+    starting=ending;
+  }
+  if (trCanvasDotsVal.checked) {
+    ctx.fillText(data.values[data.values.length-1].Y,starting.displayX, starting.displayY-5);
+  }
+};
+
+const drawTrYScale = () => {
+  const maxRound = Math.ceil(trRangeY.max);
+  const yValueGap = maxRound / 5;
+
+  trCtx.textAlign='right';
+  trCtx.textBaseline='middle';
+
+  for (let i = trRangeY.max; i >= 0 ; i-=yValueGap) {
+    let scaleVal = Math.ceil(i);
+    let scaleValPosY = getTrDisplayXY(trGraph.Left-10, scaleVal).displayY;
+    trCtx.fillText(scaleVal,trGraph.Left-10,scaleValPosY);
+    
+    drawDashedLine(trCtx,trGraph.Left, trGraph.Rigth, scaleValPosY, scaleValPosY); // сетка  X+
+  }
+};
+
+const drawTrXScale = (ctx)=> {
+  ctx.textAlign='center';
+
+  for (let i = trRangeX.min; i <= trRangeX.max; i++) {
+ 
+    let scaleValPosX = getTrDisplayXY(i,trGraph.Bottom + 10).displayX;
+  
+    if (trCanvasDates.checked) {
+      // ctx.save();
+      // ctx.rotate(90*Math.PI/ 180);
+      // ctx.translate(-30, -400);
+      ctx.fillText(trData.a.dates[i] ,scaleValPosX, trGraph.Bottom + 10);
+      // ctx.restore();
+    } else {
+      ctx.fillText(i ,scaleValPosX, trGraph.Bottom + 10);
+    }
+   
+    
+    if (i !== 0 ) {
+      drawDashedLine(ctx, scaleValPosX, scaleValPosX, trGraph.Bottom, trGraph.Top); // сетка   Y
+    }
+    ctx.setLineDash([]);
+    
+  }
+};
+
+drawTrAxes(trCtx, trGraph);
+drawTrYScale();
+drawTrXScale(trCtx);
+drawTrContent(trCtx,trData.a, 'red');
+drawTrContent(trCtx,trData.b, 'blue');
+
+const drawTrCanvas = () => {
+  clearCanvas(trCtx, trendsCanvas);
+  trCtx.lineWidth = 1;
+  drawTrAxes(trCtx, trGraph);
+  drawTrYScale();
+  drawTrXScale(trCtx);
+};
+const trendsCanvasPhaseA = document.getElementById('trendsCanvasPhaseA');
+const trendsCanvasPhaseB = document.getElementById('trendsCanvasPhaseB');
+const trendsCanvasPhaseC = document.getElementById('trendsCanvasPhaseC');
+
+
+const trendsCanvasRegim = document.getElementById('trendsCanvasRegim');
+trendsCanvasRegim.addEventListener('change', ()=> {
+  let a = trendsCanvasPhaseA.checked;
+  let b = trendsCanvasPhaseB.checked;
+  let c = trendsCanvasPhaseC.checked;
+  if (a){
+    console.log(1);
+  }
+  
+});
+
+const trendsInitRender = ()=> {
+  drawTrContent(trCtx,trData.a, 'red');
+  drawTrContent(trCtx,trData.b, 'blue');
+};
+
+trCanvasDates.addEventListener('change',()=> {
+  drawTrCanvas();
+  trendsInitRender();
+  // + дата режим
+});
+
+trCanvasDotsVal.addEventListener('change',()=> {
+  drawTrCanvas();
+  trendsInitRender();
+  // + дата режим
+});
+trCanvasDots.addEventListener('change',()=> {
+  drawTrCanvas();
+  trendsInitRender();
+  // + дата режим
+});
+
+
+
+
 // eventsDB
 // oscilogramsDB
 // configyration-tab
@@ -743,12 +714,12 @@ function pcTime() {
   const minutes = addZero(currentDatetime.getMinutes());
   const seconds = addZero(currentDatetime.getSeconds());
 
-  return {day, month, year, hours, minutes, seconds}
+  return {day, month, year, hours, minutes, seconds};
 }
 setInterval(() => {
   document.getElementById('current_date_time_block').innerHTML = `
   ${pcTime().day}.${pcTime().month}.${pcTime().year}
-  ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`
+  ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`;
 }, 1000);
 
 setHadleTimeInput = ()=> {
@@ -757,10 +728,10 @@ setHadleTimeInput = ()=> {
   handleYear.value = pcTime().year;
   handleHour.value = pcTime().hours;
   handleMin.value = pcTime().minutes;
-}
-setHadleTimeInput()
+};
+setHadleTimeInput();
 
-setInterval(()=>setHadleTimeInput(),60000)
+setInterval(()=>setHadleTimeInput(),60000);
 
 
 // modal
@@ -923,7 +894,7 @@ const serviceModal = () => {
   serviceModalContent.style.display = "block";
   document.getElementById('serviceClose').addEventListener('click', ()=> {
     serviceModalContent.style.display = "none";
-  })
+  });
 };
 
 document.getElementById('serviceModal').addEventListener('click', ()=> serviceModal());
@@ -933,8 +904,16 @@ document.getElementById('serviceModal').addEventListener('click', ()=> serviceMo
 // data
 
 // helpers func
-const findReg = (regStr) =>  document.getElementById(`${regStr}`);
+const findReg = (regStr) => document.getElementById(`${regStr}`);
 const isEmpty = (obj)=> !Object.values(obj).some(x => x !== null && x !== '');
+
+let buff474475 = new ArrayBuffer(4);
+let view474475 = new DataView(buff474475);
+
+let buff477478 = new ArrayBuffer(4);
+let view477478 = new DataView(buff477478);
+
+let firmwareStr = '';
 
 function dbg_out(s){console.log(s);}
 
@@ -955,15 +934,15 @@ let upload_pointer = 0;
 let firmware_array = 0;
 
 const regArrayToSetValuesInSpan = [
-  10, 11, 12, // test date
-  0000,0001, 0002, 0003, //  конфиг
-  0010, 0011, 0012, 0013, 0014, 0015, //  время в конфиг
-  0109, 0110, 0012, 0014, 0016, // главное окно. выключатель, фазы
-  0200, // журнал измерений
-  0251, 0252,0253, 0254, 0255, 0256, 0257, //гл. окно. время последней коммутации
-  0258, 0260, 0261, 0262,0263,0264,0265,0266,0267, //гл. окно. данные последней коммутации
-  0300, // журнал событий
-  414,415, // конфиг 
+  '10', '11', '12', // test date
+  '0000','0001', '0002', '0003', //  конфиг
+  '0010', '0011', '0012', '0013', '0014', '0015', //  время в конфиг
+  '0109', '0110', '0012', '0014', '0016', // главное окно. выключатель, фазы
+  '0200', // журнал измерений
+  '0251', '0252','0253', '0254', '0255', '0256', '0257', // гл. окно. время последней коммутации
+  '0258', '0260', '0261', '0262','0263','0264','0265','0266','0267', // гл. окно. данные последней коммутации
+  '0300', // журнал событий
+  '414','415', // конфиг 
 
 ];
 
@@ -971,20 +950,26 @@ const regArrayToSetValuesInInput = [
   410, 411, 413, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447,
   448, 449, 450, 451, 452, 453, // service
   454, 455, 456, 457, 458, 459, 460, 461, 462, 467, 468, 471, 473, 476, // configuration control
-]
+];
+const regArrayToSetValuesTo32 = [474,475];
+const regToFirmwareArray = [
+  484,485,486,487 ,488 ,489 ,490 ,491 ,492 ,493 ,494 
+  ,495 ,496 ,497 ,498 ,499 ,500 ,501 ,502 ,503 ,504 ,
+  505 ,506 ,507 ,508 ,509,510 ,511 ,512 ,513 ,514 ,515 
+  ,516 ,517 ,518 ,519]; 
 
 const regArrayToSetValuesIfElse = [
-  0111, 0259,
-]
+  '0111', '0259',
+];
 
 const regArrayToSetValuesWithCoefficent = [
-  0113, 0115, 0117, //   расход ресурса фаз в %
- ]
+  '0113', '0115', '0117', //   расход ресурса фаз в %
+];
 
 
-const measurementsJournal = [0201,0204,0206, 0207,0208,0209,0210,0211,0212,0213,0214,0215,0216,0217,0218,0219,0220,0221,0222,0223,0224,0225,0226,0227,0228];
+const measurementsJournal = ['0201','0204','0206', '0207','0208','0209','0210','0211','0212','0213','0214','0215','0216','0217','0218','0219','0220','0221','0222','0223','0224','0225','0226','0227','0228'];
 
-const eventsJournal = [0301,0303,0304,0305,0306,0307,0308,0309,0310,0311];
+const eventsJournal = ['0301','0303','0304','0305','0306','0307','0308','0309','0310','0311'];
 
 
 
@@ -997,44 +982,68 @@ function recv(data){
 
     console.log(register);
 
-
-    if (regArrayToSetValues.includes(register)) {
+    if (regArrayToSetValuesInSpan.includes(`${register}`)) {
       findReg(`${register}`).textContent = value;
     }
 
-    if (register === 0111 && value === 1) {
-      findReg(`${register}`).textContent = 'Включено'
+    if (register === '0111' && value === 1) {
+      findReg(`${register}`).textContent = 'Включено';
     }
-    if (register === 0111 && value === 2) {
-      findReg(`${register}`).textContent = 'Отключено'
+    if (register === '0111' && value === 2) {
+      findReg(`${register}`).textContent = 'Отключено';
     }
 
-    if (register === 0113 || 0115 || 0017) { //  износ ресурса фаз
+    if (register === '0113' ||register === '0115' || register ==='0017') { //  износ ресурса фаз
       findReg(`${register}`).textContent = (value * 0.01).toFixed(2);
     }
 
-    if (register === 0259 && value === 1) {
-      findReg(`${register}`).textContent = 'ВКЛ.'
+    if (register === '0259' && value === 1) {
+      findReg(`${register}`).textContent = 'ВКЛ.';
     }
-    if (register === 0259 && value === 2) {
-      findReg(`${register}`).textContent = 'ОТКЛ.'
+    if (register === '0259' && value === 2) {
+      findReg(`${register}`).textContent = 'ОТКЛ.';
     }
 
     if (eventsJournal.includes(register)) {
-      eventsTableCurrentObj[`${register}`] = value
+      eventsTableCurrentObj[`${register}`] = value;
       if(!isEmpty(eventsTableCurrentObj)) {
         addCurrentEntryToEventsTable();
       }
     }
 
     if (measurementsJournal.includes(register)) {
-      measurmentsTableCurrentObj[`${register}`] = value
+      measurmentsTableCurrentObj[`${register}`] = value;
       if(!isEmpty(measurmentsTableCurrentObj)) {
         addCurrentEntryToEventsTable();
       }
     }
 
-    // if (register === 11) {findReg("0011").textContent = value; }
+    if (regArrayToSetValuesTo32.includes(register)) {
+      if (register === 474) {view474475.setInt16(0, value, false); }
+      if (register === 475) {
+        view474475.setInt16(2, value, false);
+        findReg('474-475').value = view474475.getFloat32(0, false);
+      }
+
+      if (register === 477) {view477478.setInt16(0, value, false); }
+      if (register === 478) {
+        view477478.setInt16(2, value, false);
+        findReg('477-478').value = view477478.getFloat32(0, false);
+      }
+    }
+
+    if (regToFirmwareArray.includes(register)) {
+      firmwareStr += value;
+      document.getElementById('484-519').textContent = firmwareStr;
+    }
+
+    // if (register >= 613 || register <= 4612) {
+    //   for (let i = 1; i < 1000; i++) {
+    //     if (register === i)
+    //   }
+    // }
+
+    // if (register === 474) {findReg("0011").textContent = value; }
     // if (register === 12) {findReg("0012").textContent = value; }
 
 
@@ -1067,19 +1076,11 @@ function send(operation, register, value){
       socket.send(sendArray);
 }
 
-// function data_read(){
-//   send(0, reg.value, val.value);
-// }
-
-// function data_write(){
-//   send(1, reg.value, val.value);
-// }
-
 const fff = ()=> {
   for (let i=10; i <= 12; i++) {
-    send (0, i, 0)
+    send (0, i, 0);
   }
-}
+};
 
 
 
@@ -1089,7 +1090,7 @@ script.onload = function() {
   // send(0, 11, 0);
   // send(0, 12, 0);
   fff();
-}
+};
 
 
 function setDate(){
@@ -1102,24 +1103,68 @@ document.getElementById('setDate').addEventListener('click', setDate);
 
 
 function read_file(inp){
-  f = inp.files[0];
-  r = new FileReader();
+  const f = inp.files[0];
+  const r = new FileReader();
 
   r.onload = function() {
-    data_array = new Uint8Array(r.result);
-    firmware_array = new Uint8Array(0x10000).fill(0xFF, 0, 0x10000);// #define FIRMWARE_SIZE 0x10000
-    firmware_array.set(data_array);
+    let data_array = new Uint8Array(r.result);
+    let firmwareArray = new Uint8Array(0x10000).fill(0xFF, 0, 0x10000);// #define FIRMWARE_SIZE 0x10000
+    firmwareArray.set(data_array);
 
-    int8_array = new Uint8Array(512).fill(0, 0, 512);
+    let int8_array = new Uint8Array(512).fill(0, 0, 512);
 
-    for (i = 0; i < f.name.length; i++)
+    for (let i = 0; i < f.name.length; i++)
       int8_array[i] = f.name.charCodeAt(i);
 
     if (socket)
-      if (socket.readyState == 1)
+      if (socket.readyState === 1)
         socket.send(int8_array);
   };
 
   r.readAsArrayBuffer(f);
 }
 
+// const bar = ['10', '0011', 12]
+
+// const foo = (num)=> {
+//   if (bar.includes(num)) {
+//     console.log(num);
+//   }
+// }
+// foo(0011)
+
+function d2h(d) { return (+d).toString(16).toUpperCase(); }
+function h2d(h) { return (+d).toString(16).toUpperCase(); }
+
+
+// console.log(d2h(29));
+
+
+// console.log('hexString', (251).toString(16));
+// console.log('hex2dec',parseInt(101, 16));
+
+
+
+const file = document.getElementById('file');
+file.addEventListener('change', ()=> {
+  read_file(this);
+});
+
+let aStart = 613;
+let bStart = 614;
+let cStart = 615;
+let bkStart = 616;
+
+const buzz = ()=> {
+  for(let i = 1; i < 10; i++) {
+    aStart+=4;
+    bStart+=4;
+    cStart+=4;
+    bkStart+=4;
+    console.log('aStart', aStart);
+  }
+
+
+};
+
+buzz();
