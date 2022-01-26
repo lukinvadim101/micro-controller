@@ -91,6 +91,10 @@ const measurementsAllTab = document.querySelector('#measurements-all');
 const measurementsSwitchTab = document.querySelector('#measurements-switch');
 measurmentsTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentTab, measurmentsContent));
 
+const measurementsAllTableBody = document.getElementById('measurementsAllTableBody');
+const measurementsSwitchTableBody = document.getElementById('measurementsSwitchTableBody');
+const refreshMeasurmentsTableData = document.getElementById('refreshMeasurmentsTableData'); // доббавить обновление data
+
 let measurmentsTableCurrentObj = {
   '0201': null,
   '0204': null,
@@ -122,10 +126,8 @@ let measurmentsTableCurrentObj = {
 
 };
 
-const measurementsAllTableBody = document.getElementById('measurementsAllTableBody');
-const addCurrentEntryToMeasurementsAllTable = ()=> {
-  const obj = measurmentsTableCurrentObj;
-  measurementsAllTableBody.insertAdjacentHTML("afterbegin", `
+const addRowToMeasurmentsTable = (table, obj) => {
+  table.insertAdjacentHTML("afterbegin", `
   <tr>
     <td>${obj['0201']}</td> 
     <td>
@@ -154,20 +156,10 @@ const addCurrentEntryToMeasurementsAllTable = ()=> {
 `);
 };
 
-// addCurrentEntryToMeasurementsAllTable()
+addRowToMeasurmentsTable(measurementsAllTableBody,measurmentsTableCurrentObj);
+// добавить фильтр переключений
+addRowToMeasurmentsTable(measurementsSwitchTableBody,measurmentsTableCurrentObj);
 
-
-measurementsSwitchTab.insertAdjacentHTML("afterbegin", `
-<table class="mt-4">
-  <thead>
-    <th>записи переключений</th>
-  </thead>
-  <tbody>
-    <tr>
-      <td>222</td>
-    </tr>
-  </tbody>
-</table>`);
 
 // events tab
 let eventsTableCurrentObj = {
@@ -196,13 +188,10 @@ const addCurrentEntryToEventsTable = ()=> {
     <td>${obj['0310'] === null ? obj['0310'] + ' (пришло)' : obj['0310'] + ' (ушло)' }</td>
     <td>${obj['0311']}</td>
     <td>нужна таблица расшифровки</td>
-  </tr>
-  </tbody>`);
+  </tr>`);
 };
 
 // addCurrentEntryToEventsTable();
-
-
 
 
 // oscillograms tab
@@ -227,18 +216,10 @@ const osData = {
     { X: 3, Y: 28000 },
     { X: 4, Y: 10034 },
     { X: 5, Y: 14000 },
-    { X: 6, Y: 82000 },
-    { X: 7, Y: 82000 },
-    { X: 8, Y: 140000 },
-    { X: 9, Y: 0 },
-    { X: 10, Y: -20000 },
-    { X: 11, Y: 28000 },
-    { X: 12, Y: 10034 },
-    { X: 13, Y: 14000 },
-    { X: 14, Y: 82000 },
-    { X: 15, Y: 82000 },
-    { X: 16, Y: 140000 },
-    { X: 17, Y: 0 },
+    { X: 6, Y: -20000 },
+    { X: 7, Y: 28000 },
+    { X: 8, Y: 10034 },
+    { X: 9, Y: 14000 },
   ]},
   
   b: { values:[
@@ -257,9 +238,43 @@ const osData = {
     { X: 3, Y: 1034 },
     { X: 4, Y: 14000 },
     { X: 5, Y: 151320 },
-    { X: 6, Y: 22000 },
+  ]},
+  bk: { values:[
+    { X: 0, Y: 1 },
+    { X: 1, Y: 1 },
+    { X: 2, Y: 0 },
+    { X: 3, Y: 1 },
+    { X: 4, Y: 1 },
+    { X: 5, Y: 1 },
   ]},
 };
+
+
+
+const oscilorgamsTableBody = document.getElementById('oscilorgamsTableBody');
+const addRowsToOscilorgamsTableBody = ()=> {
+
+  for(let i = osData.a.values[0].X; i < osData.a.values.length; i++) {
+    oscilorgamsTableBody.insertAdjacentHTML('beforeend',`
+    <tr>
+      <td>${i}</td>
+      <td>dd-mm-yyyy</td>
+     
+      <td>${osData.bk.values[i] ? osData.bk.values[i].Y : "-"}</td>
+      <td>${osData.a.values[i].Y}</td>
+      <td>${osData.b.values[i] ? osData.b.values[i].Y : "-"}</td>
+      <td>${osData.c.values[i] ? osData.c.values[i].Y : "-"}</td>
+
+   
+    </tr>
+    `);
+  }
+
+  
+   
+  
+};
+addRowsToOscilorgamsTableBody();
 
 function mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
   return mappedLow + (mappedHigh - mappedLow) * (value - sourceLow) / (sourceHigh - sourceLow);
@@ -313,8 +328,8 @@ function dot(ctx,position,radius){
 const osciloCanvasDots = document.getElementById('osciloCanvasDots');
 const osciloCanvasDotsVal = document.getElementById('osciloCanvasDotsVal');
 
-const drawContent = (ctx,data, color) => {
-  let starting=getDisplayXY(data.values[0].X,data.values[0].Y);
+const drawContent = (ctx,data, color, coefBk = 1) => {
+  let starting=getDisplayXY(data.values[0].X,data.values[0].Y * coefBk);
   ctx.setLineDash([]);
 
   if (osciloCanvasDots.checked) {
@@ -322,7 +337,7 @@ const drawContent = (ctx,data, color) => {
   }
 
   for(let i=1;i<=data.values.length-1;i++){
-    const ending=getDisplayXY(data.values[i].X,data.values[i].Y);
+    const ending=getDisplayXY(data.values[i].X,data.values[i].Y * coefBk);
     if (osciloCanvasDotsVal.checked) {
       ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
     }
@@ -400,7 +415,7 @@ const drawYScale = (ctx)=> {
     let scaleVal = roundToMultiple(i, 1000);
     let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
     ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),graphLeft-10,scaleValPosY);
-    if ( i=== 0) {
+    if ( i === 0) {
       drawLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
     }else {
       drawDashedLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
@@ -443,6 +458,7 @@ const oscilloInitrender = (ctx)=> {
   drawContent(ctx,osData.a, 'red');
   drawContent(ctx,osData.b, 'blue');
   drawContent(ctx,osData.c, 'green');
+  drawContent(ctx,osData.bk, 'purple', rangeY.max / 2);
 };
 
 document.getElementById('oscillograms-tab').addEventListener('click', ()=> {
@@ -460,18 +476,21 @@ const chooseOsciloCanvasRegim = (val)=> {
     rangeX=calcSourceMinMax('X',osData.a.values);
     drawOscilloCanvas(osCtx);
     drawContent(osCtx,osData.a, 'red');
+    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
     break;
   case 'b':
     rangeY=calcSourceMinMax('Y',osData.b.values);
     rangeX=calcSourceMinMax('X',osData.b.values);
     drawOscilloCanvas(osCtx);
     drawContent(osCtx,osData.b, 'blue');
+    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
     break;
   case 'c':
     rangeY=calcSourceMinMax('Y',osData.c.values);
     rangeX=calcSourceMinMax('X',osData.c.values);
     drawOscilloCanvas(osCtx);
     drawContent(osCtx,osData.c, 'green');
+    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
     break;
   default:
     rangeY=calcSourceMinMax('Y',osData.a.values,osData.b.values, osData.c.values);
@@ -480,6 +499,7 @@ const chooseOsciloCanvasRegim = (val)=> {
     drawContent(osCtx,osData.a, 'red');
     drawContent(osCtx,osData.b, 'blue');
     drawContent(osCtx,osData.c, 'green');
+    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
 
   }
 };
@@ -498,9 +518,6 @@ osciloCanvasDotsVal.addEventListener('change',()=> {
   drawOscilloCanvas(osCtx);
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 });
-
-
-
 
 
 // measurementsDB-tab
@@ -971,7 +988,9 @@ const measurementsJournal = ['0201','0204','0206', '0207','0208','0209','0210','
 
 const eventsJournal = ['0301','0303','0304','0305','0306','0307','0308','0309','0310','0311'];
 
+const oscilloPhaseAOpt = [1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97];
 
+const oscilloPhaseCOpt = [3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71, 75, 79, 83, 87, 91, 95, 99];
 
 function recv(data){
   const r = new FileReader();
@@ -1037,11 +1056,24 @@ function recv(data){
       document.getElementById('484-519').textContent = firmwareStr;
     }
 
-    // if (register >= 613 || register <= 4612) {
-    //   for (let i = 1; i < 1000; i++) {
-    //     if (register === i)
-    //   }
-    // }
+    if (register >= 613 && register <= 4616) {
+
+      if ( oscilloPhaseAOpt.includes(Number(value.toString().slice(-2))) )
+        osData.a.values.push({x:osData.a.values.length, y: value});
+      
+      if(register%2 === 0 && register%4 !== 0) {
+        osData.b.values.push({x:osData.b.values.length, y: value});
+      }
+          
+      if ( oscilloPhaseCOpt.includes(Number(value.toString().slice(-2))) )
+        osData.c.values.push({x:osData.c.values.length, y: value});
+      
+      if (register%4 === 0) {
+        osData.d.values.push({x:osData.d.values.length, y: value});
+      }
+    }
+        
+    
 
     // if (register === 474) {findReg("0011").textContent = value; }
     // if (register === 12) {findReg("0012").textContent = value; }
@@ -1124,14 +1156,6 @@ function read_file(inp){
   r.readAsArrayBuffer(f);
 }
 
-// const bar = ['10', '0011', 12]
-
-// const foo = (num)=> {
-//   if (bar.includes(num)) {
-//     console.log(num);
-//   }
-// }
-// foo(0011)
 
 function d2h(d) { return (+d).toString(16).toUpperCase(); }
 function h2d(h) { return (+d).toString(16).toUpperCase(); }
@@ -1149,22 +1173,3 @@ const file = document.getElementById('file');
 file.addEventListener('change', ()=> {
   read_file(this);
 });
-
-let aStart = 613;
-let bStart = 614;
-let cStart = 615;
-let bkStart = 616;
-
-const buzz = ()=> {
-  for(let i = 1; i < 10; i++) {
-    aStart+=4;
-    bStart+=4;
-    cStart+=4;
-    bkStart+=4;
-    console.log('aStart', aStart);
-  }
-
-
-};
-
-buzz();

@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>MicroDocument</title>
 	<link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="grid.css">
+	<!-- <link rel="stylesheet" href="grid.css"> -->
 </head>
 
 <body>
@@ -145,9 +145,9 @@
 						<div class="col-3">Записей в устройстве: <span id="0200"></span>
 						</div>
 						<div class="col-3 tac">
-							<button class="py-1">Обновить</button>
+							<button class="py-1" id="refreshMeasurmentsTableData">Обновить</button>
 						</div>
-						<div class="col-3">Время загрузки, сек <span></span>
+						<!-- <div class="col-3">Время загрузки, сек <span></span> -->
 						</div>
 					</div>
 					<div class="row card mt-4">
@@ -184,7 +184,32 @@
 							</table>
 						</div>
 						<div class="measurments-content sub-content" id="measurements-switch">
-							<!-- генерировать таблицу записей переключений -->
+							<table class="measurments-table mt-4 " >
+								<thead>
+									<th>№</th>
+									<th>Дата и время</th>
+									<th>Выключатель</th>
+									<th>№ сол. откл.</th>
+									<th>Износ ф.А, %</th>
+									<th>Износ ф.В, %</th>
+									<th>Износ ф.С, %</th>
+									<th>Кол-во вкл.</th>
+									<th>Кол-во откл.</th>
+									<th>Собств. вр., мс</th>
+									<th>Полное. вр., мс</th>
+									<th>Вр. дуги ф.А, мс</th>
+									<th>Вр. дуги ф.В, мс</th>
+									<th>Вр. дуги ф.С, мс</th>
+									<th>Износ за перекл. ф.А, %</th>
+									<th>Износ за перекл. ф.В, %</th>
+									<th>Износ за перекл. ф.С, %</th>
+									<th>Ток ф.А, А</th>
+									<th>Ток ф.В, А</th>
+									<th>Ток ф.С, А</th>
+								</thead>
+								<tbody id="measurementsSwitchTableBody">
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
@@ -243,8 +268,19 @@
 						<button class="py-2 oscillograms-tab active" data-id="oscillograms-canvas">Осцилограмма</button>
 					</ul>
 					<div class="card mt-4">
-						<div class="oscillograms-content sub-content" id="oscillograms-table">table
-							<!-- генерировать таблицу осцилограмм ? -->
+						<div class="oscillograms-content sub-content" id="oscillograms-table">
+							<table class=" mt-4 " >
+								<thead>
+									<th>№</th>
+									<th>Дата и время</th>
+									<th>Выключатель</th>
+									<th>Ток ф.А, А</th>
+									<th>Ток ф.В, А</th>
+									<th>Ток ф.С, А</th>
+								</thead>
+									<tbody id="oscilorgamsTableBody">
+								</tbody>
+							</table>
 						</div>
 						<div class="oscillograms-content sub-content active" id="oscillograms-canvas">
 							<div class="row justify-content-center">
@@ -264,14 +300,17 @@
 											<input type="checkbox" name="" id="osciloCanvasDotsVal">Значения точек</div>
 									</div>
 									<div class="col d-flex justify-content-between " >
-										<div class="phaseAOccilloColorWrap">Фаза А
+										<div class="phaseOccilloColorWrap">Фаза А
 											<div class="phaseAOccilloColor"></div>
 										</div>
-										<div class="phaseAOccilloColorWrap">Фаза B
+										<div class="phaseOccilloColorWrap">Фаза B
 											<div class="phaseBOccilloColor"></div>
 										</div>
-										<div class="phaseAOccilloColorWrap me-2">Фаза C
+										<div class="phaseOccilloColorWrap me-2">Фаза C
 											<div  class="phaseCOccilloColor"></div>
+										</div>
+										<div class="phaseOccilloColorWrap me-2"> Блок контакта
+											<div  class="phaseBkOccilloColor"></div>
 										</div>
 									</div>
 								</div>
@@ -417,7 +456,7 @@
 								</div>
 							</div>
 						</div>
-						<!-- measurementsDB-table -->
+						measurementsDB-table
 					</div>
 					<div class="measurmentsDB-content sub-content active" id="measurementsDB-trends"> <!--  measurementsDB-trends-->
 						<div class="row mt-2">
@@ -456,13 +495,13 @@
 										<input type="checkbox" name="" id="trCanvasDates" checked>Дата и время замера</div>
 									<div class="col d-flex justify-content-between ">
 											<!-- легенда -->
-											<div  class="phaseAOccilloColorWrap">Фаза А
+											<div  class="phaseOccilloColorWrap">Фаза А
 												<div  class="phaseAOccilloColor mt-3"></div>
 											</div>
-											<div  class="phaseAOccilloColorWrap">Фаза B
+											<div  class="phaseOccilloColorWrap">Фаза B
 												<div  class="phaseBOccilloColor mt-3"></div>
 											</div>
-											<div class="phaseAOccilloColorWrap me-2 ">Фаза C
+											<div class="phaseOccilloColorWrap me-2 ">Фаза C
 												<div class="phaseCOccilloColor mt-3"></div>
 											</div>
 									</div>
