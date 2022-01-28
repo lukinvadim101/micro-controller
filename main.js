@@ -1,7 +1,13 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable camelcase */
+
+const $id = ( id ) => document.getElementById( id );
+
+// console.log($id('476'));
+
 
 
 // main tabs
@@ -93,9 +99,9 @@ const measurementsAllTab = document.querySelector('#measurements-all');
 const measurementsSwitchTab = document.querySelector('#measurements-switch');
 measurmentsTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentTab, measurmentsContent));
 
-const measurementsAllTableBody = document.getElementById('measurementsAllTableBody');
-const measurementsSwitchTableBody = document.getElementById('measurementsSwitchTableBody');
-const refreshMeasurmentsTableData = document.getElementById('refreshMeasurmentsTableData'); // доббавить обновление data
+const measurementsAllTableBody = $id('measurementsAllTableBody');
+const measurementsSwitchTableBody = $id('measurementsSwitchTableBody');
+const refreshMeasurmentsTableData = $id('refreshMeasurmentsTableData'); // доббавить обновление data
 
 let measurmentsTableCurrentObj = {
   '0201': null,
@@ -209,17 +215,204 @@ const addOptToOscilloSelect = (data)=> {
   let str = `${+val(0) === 1 ? 'ВКЛ' : 'ОТКЛ'} ${val(4)}.${val(3)}.${val(2)} ${val(5)}:${val(6)}:${val(7)}.${val(8)}.${val(9)}`;// on? y.m.d h:m:sss
   opt.value = val(1); // номер (рег 0603)
   opt.innerHTML = str;
-  document.getElementById('oscillogramsSelect').appendChild(opt);
+  $id('oscillogramsSelect').appendChild(opt);
 };
 
+class Chart {
+  constructor(opt, data) {
+    this.cnv = $id(opt.canvasId);
+    this.ctx = this.cnv.getContext("2d");
+    this.rangeY = this.calcSourceMinMax('Y',data.a.values,data.b.values, data.c.values);
+    this.rangeX = this.calcSourceMinMax('X',data.a.values,data.b.values, data.c.values);
+    this.width = this.cnv.width;
+    this.height = this.cnv.height;
+    this.padding = {x: 60, y: 60};
+    this.dotRadius = 2;
+    this.left = this.padding.x;
+    this.right = this.width-this.padding.x;
+    this.top = this.padding.y;
+    this.bottom = this.height-this.padding.y;
 
-// oscillogram Canvas
-let oscilloCanvas=document.getElementById("oscilloCanvas");
-let osCtx=oscilloCanvas.getContext("2d");
+    this.dotsCheck = $id(opt.dotsCheck);
+    this.dotsValCheck = $id(opt.dotsValCheck);
+  }
+
+  mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
+    return mappedLow + (mappedHigh - mappedLow) * (value - sourceLow) / (sourceHigh - sourceLow);
+  }
+
+  calcSourceMinMax(prop, ...arr){
+    let min=Infinity;
+    let max=-Infinity;
+    arr.forEach(a => {
+      for(let i=0;i<a.length;i++){
+        const value=a[i][prop];
+        if(value<min){min=value;}
+        if(value>max){max=value;}
+      }
+    });
+    return({min,max});
+  }
+
+  getDisplayXY(valueX,valueY){
+    const x = this.mapRange(valueX,this.rangeX.min,this.rangeX.max,this.left,this.right);
+    const y = this.mapRange(valueY,this.rangeY.min,this.rangeY.max,this.bottom,this.top);
+    return({displayX:x,displayY:y});
+  }
+
+  roundToMultiple(num, multiple) {
+    return Math.round(num/multiple)*multiple;
+  }
+
+  connector(starting,ending,color){
+    const {ctx} = this;
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.moveTo(starting.displayX,starting.displayY);
+    ctx.lineTo(ending.displayX,ending.displayY);
+    ctx.strokeStyle=color;
+    ctx.stroke();
+  }
+
+  dot(position){
+    const {ctx} = this;
+    ctx.beginPath();
+    ctx.moveTo(position.displayX,position.displayY);
+    ctx.arc(position.displayX,position.displayY,this.dotRadius,0,Math.PI*2);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  drawAxes(){
+    const {ctx, left, right, top, bottom} = this;
+    ctx.beginPath();
+    ctx.moveTo(left,top);
+    ctx.lineTo(left,bottom);
+    ctx.moveTo(left,bottom);
+    ctx.lineTo(right,bottom);
+    ctx.strokeStyle='gray';
+    ctx.stroke();
+  };
+
+  drawDashedLine(fromX, toX, fromY, toY){
+    const {ctx} = this;
+    ctx.beginPath();
+    ctx.setLineDash([8, 4]);
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+  };
+
+  drawLine (fromX, toX, fromY, toY){
+    const {ctx} = this;
+    ctx.beginPath();
+    ctx.setLineDash([]);
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+  };
+
+  drawYScale () {
+    const {ctx, left, right} = this;
+
+    const maxRound10 = this.roundToMultiple(this.rangeY.max, 10);
+    const minRound10 = this.roundToMultiple( Math.abs(this.rangeY.min), 10);
+    const yValueGap = (maxRound10) / 5; // 5 я часть значения оси Y
+    // const yValueGap = (maxRound10 + minRound10)/10;
+
+    // разобраться с делением
+
+    ctx.textAlign='right';
+    ctx.textBaseline='middle';
+    const y0 = this.getDisplayXY(left-10, 0).displayY;
+
+    // сетка  X
+    for (let i = this.rangeY.max; i > this.rangeY.min ; i-=yValueGap) {
+      let scaleVal = this.roundToMultiple(i, 1000);
+      let scaleValPosY = this.getDisplayXY(left-10, scaleVal).displayY;
+      ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),left-10,scaleValPosY);
+      if ( i === 0) {
+        this.drawLine(left, right, scaleValPosY, scaleValPosY); 
+      } else {
+        this.drawDashedLine(left, right, scaleValPosY, scaleValPosY);
+      }
+    }
+    ctx.fillText(new Intl.NumberFormat('ru-RU').format(this.rangeY.min),left-10,this.bottom);
+
+    this.drawLine(left, right, y0, y0); 
+    ctx.fillText(0,left-10,y0);
+  };
 
 
-const padding = {x: 60, y: 20};
-const dotRadius = 2;
+  drawXScale () {
+    const {ctx, bottom} = this;
+    ctx.textAlign='center';
+
+    for (let i = this.rangeX.min; i <= this.rangeX.max; i++) {
+
+      if (i/5 % 1 === 0 ) { // 200 мс
+        let scaleValPosX = this.getDisplayXY(i,bottom + 10).displayX;
+        ctx.fillText(i/5 ,scaleValPosX, bottom + 10);
+
+        if (i !== 0) {
+          this.drawDashedLine(scaleValPosX, scaleValPosX, bottom, top); // сетка   Y
+        }
+        ctx.setLineDash([]);
+      }
+    }
+  };
+
+  drawContent (data, color, coefBk = 1) {
+    const {ctx} = this;
+    let starting=this.getDisplayXY(data.values[0].X,data.values[0].Y * coefBk);
+    ctx.setLineDash([]);
+
+    if (this.dotsCheck.checked) {
+      this.dot(starting);
+    }
+
+    for(let i=1;i<=data.values.length-1;i++){
+      const ending = this.getDisplayXY(data.values[i].X,data.values[i].Y * coefBk);
+
+      if (this.dotsValCheck.checked) {
+        ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
+      }
+      this.connector(starting, ending, color);
+      if (this.dotsCheck.checked) {
+        this.dot(ending);
+      }
+      starting = ending;
+    }
+
+    if (this.dotsValCheck.checked) {
+      ctx.fillText(data.values[data.values.length-1].Y,starting.displayX-5, starting.displayY-5);
+    }
+  };
+
+  clearCanvas() {
+    const {ctx} = this;
+    ctx.clearRect(0, 0, this.width, this.height);
+  };
+
+  drawOscilloCanvas () {
+    const {ctx} = this;
+    this.clearCanvas();
+    ctx.lineWidth = 1;
+    this.drawAxes();
+    this.drawXScale();
+    this.drawYScale();
+  };
+
+  oscilloInitrender(data){
+    this.drawOscilloCanvas();
+    this.drawContent(data.a, 'red');
+    this.drawContent(data.b, 'blue');
+    this.drawContent(data.c, 'green');
+    this.drawContent(data.bk, 'purple', this.rangeY.max / 2);
+  };
+
+
+}
 
 const osData = {
   info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
@@ -263,9 +456,15 @@ const osData = {
   ]},
 };
 
+const osChrt = new Chart({
+  canvasId: "oscilloCanvas",
+  dotsCheck: 'osciloCanvasDots',
+  dotsValCheck: 'osciloCanvasDotsVal'
+}, osData);
+
 addOptToOscilloSelect(osData);
 
-const oscilorgamsTableBody = document.getElementById('oscilorgamsTableBody');
+const oscilorgamsTableBody = $id('oscilorgamsTableBody');
 const addRowsToOscilorgamsTableBody = ()=> {
 
   for(let i = osData.a.values[0].X; i < osData.a.values.length; i++) {
@@ -286,245 +485,62 @@ const addRowsToOscilorgamsTableBody = ()=> {
 };
 addRowsToOscilorgamsTableBody();
 
-function mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
-  return mappedLow + (mappedHigh - mappedLow) * (value - sourceLow) / (sourceHigh - sourceLow);
-}
-// максимальные значения XY
-function calcSourceMinMax(prop, ...arr){
-  let min=Infinity;
-  let max=-Infinity;
-  arr.forEach(a => {
-    for(let i=0;i<a.length;i++){
-      const value=a[i][prop];
-      if(value<min){min=value;}
-      if(value>max){max=value;}
-    }
-  });
-  return({min,max});
-}
-
-let rangeY=calcSourceMinMax('Y',osData.a.values,osData.b.values, osData.c.values);
-let rangeX=calcSourceMinMax('X',osData.a.values,osData.b.values, osData.c.values);
-
-
-// calc the drawable graph boundaries
-const graphLeft=padding.x;
-const graphRight=oscilloCanvas.width-padding.x;
-const graphTop=padding.y;
-const graphBottom=oscilloCanvas.height-padding.y;
-
-function getDisplayXY(valueX,valueY){
-  const x = mapRange(valueX,rangeX.min,rangeX.max,graphLeft,graphRight);
-  const y = mapRange(valueY,rangeY.min,rangeY.max,graphBottom,graphTop);
-  return({displayX:x,displayY:y});
-}
-
-function connector(ctx,starting,ending,color){
-  ctx.beginPath();
-  ctx.lineWidth = 2;
-  ctx.moveTo(starting.displayX,starting.displayY);
-  ctx.lineTo(ending.displayX,ending.displayY);
-  ctx.strokeStyle=color;
-  ctx.stroke();
-}
-function dot(ctx,position,radius){
-  ctx.beginPath();
-  ctx.moveTo(position.displayX,position.displayY);
-  ctx.arc(position.displayX,position.displayY,radius,0,Math.PI*2);
-  ctx.closePath();
-  ctx.fill();
-}
 
 const osciloCanvasDots = document.getElementById('osciloCanvasDots');
 const osciloCanvasDotsVal = document.getElementById('osciloCanvasDotsVal');
 
-const drawContent = (ctx,data, color, coefBk = 1) => {
-  let starting=getDisplayXY(data.values[0].X,data.values[0].Y * coefBk);
-  ctx.setLineDash([]);
 
-  if (osciloCanvasDots.checked) {
-    dot(ctx,starting,dotRadius);
-  }
-
-  for(let i=1;i<=data.values.length-1;i++){
-    const ending=getDisplayXY(data.values[i].X,data.values[i].Y * coefBk);
-    if (osciloCanvasDotsVal.checked) {
-      ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
-    }
-    connector(ctx,starting,ending, color);
-    if (osciloCanvasDots.checked) {
-      dot(ctx,ending,dotRadius);
-    }
-    starting=ending;
-  }
-  if (osciloCanvasDotsVal.checked) {
-    ctx.fillText(data.values[data.values.length-1].Y,starting.displayX-5, starting.displayY-5);
-  }
-
-};
-
-
-// axes
-const drawAxes = (ctx)=> {
-  ctx.beginPath();
-  ctx.moveTo(graphLeft,graphTop);
-  ctx.lineTo(graphLeft,graphBottom);
-  ctx.moveTo(graphLeft,graphBottom);
-  ctx.lineTo(graphRight,graphBottom);
-  ctx.strokeStyle='gray';
-  ctx.stroke();
-};
-
-// scale
-const drawDashedLine = (ctx,fromX, toX, fromY, toY)=> {
-  ctx.beginPath();
-  ctx.setLineDash([8, 4]);
-  ctx.moveTo(fromX, fromY);
-  ctx.lineTo(toX, toY);
-  ctx.stroke();
-};
-
-const drawLine = (ctx,fromX, toX, fromY, toY)=> {
-  ctx.beginPath();
-  ctx.setLineDash([]);
-  ctx.moveTo(fromX, fromY);
-  ctx.lineTo(toX, toY);
-  ctx.stroke();
-};
-
-// helper округление
-function roundToMultiple(num, multiple) {
-  return Math.round(num/multiple)*multiple;
-}
-
-const drawYScale = (ctx)=> {
-
-  const maxRound10 = roundToMultiple(rangeY.max, 10);
-  const minRound10 = roundToMultiple( Math.abs(rangeY.min), 10);
-
-  const yValuePositiveGap = (maxRound10) / 5; // 5 я часть значения оси Y+
-  const yValueNegativeGap = (minRound10) / 5; // 5 я часть значения оси Y-
-
-  ctx.textAlign='right';
-  ctx.textBaseline='middle';
-
-
-  for (let i = rangeY.max; i >= 0 ; i-=yValuePositiveGap) {
-    let scaleVal = roundToMultiple(i, 1000);
-    let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
-    ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),graphLeft-10,scaleValPosY);
-    if ( i === 0) {
-      drawLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
-    } else {
-      drawDashedLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
-    }
-  }
-
-  for (let i = 0; i >= rangeY.min ; i-=yValueNegativeGap) {
-    let scaleVal = roundToMultiple(i, 1000);
-    let scaleValPosY = getDisplayXY(graphLeft-10, scaleVal).displayY;
-    ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),graphLeft-10,scaleValPosY);
-    if ( i === 0) {
-      drawLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
-    }else {
-      drawDashedLine(osCtx,graphLeft, graphRight, scaleValPosY, scaleValPosY); // сетка  X+
-    }
-  }
-};
-
-const drawXScale = (ctx)=> {
-  ctx.textAlign='center';
-
-  for (let i = rangeX.min; i <= rangeX.max; i++) {
-
-    if (i/5 % 1 === 0 ) { // 200 мс
-      let scaleValPosX = getDisplayXY(i,graphBottom + 10).displayX;
-      ctx.fillText(i/5 ,scaleValPosX, graphBottom + 10);
-
-      if (i !== 0) {
-        drawDashedLine(ctx, scaleValPosX, scaleValPosX, graphBottom, graphTop); // сетка   Y
-      }
-      ctx.setLineDash([]);
-    }
-  }
-};
-
-// clear
-const clearCanvas = (ctx, canvas)=> { ctx.clearRect(0, 0, canvas.width, canvas.height);};
-
-
-const drawOscilloCanvas = (ctx)=> {
-  
-  clearCanvas(ctx, oscilloCanvas);
-  ctx.lineWidth = 1;
-  drawAxes(ctx);
-  drawXScale(ctx);
-  drawYScale(ctx);
-};
-
-const oscilloInitrender = (ctx)=> {
-  drawOscilloCanvas(ctx);
-  drawContent(ctx,osData.a, 'red');
-  drawContent(ctx,osData.b, 'blue');
-  drawContent(ctx,osData.c, 'green');
-  drawContent(ctx,osData.bk, 'purple', rangeY.max / 2);
-};
-
-document.getElementById('oscillograms-tab').addEventListener('click', ()=> {
-  oscilloInitrender(osCtx);
+$id('oscillograms-tab').addEventListener('click', ()=> {
+  osChrt.oscilloInitrender(osData);
 });
 oscilloViewbtn.addEventListener('click', ()=> {
-  oscilloInitrender(osCtx);
+  osChrt.oscilloInitrender(osData);
 });
-const osciloCanvasRegim = document.getElementById('osciloCanvasRegim');
+const osciloCanvasRegim = $id('osciloCanvasRegim');
 
 const chooseOsciloCanvasRegim = (val)=> {
   switch(val) {
   case 'a':
-    rangeY=calcSourceMinMax('Y',osData.a.values);
-    rangeX=calcSourceMinMax('X',osData.a.values);
-    drawOscilloCanvas(osCtx);
-    drawContent(osCtx,osData.a, 'red');
-    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
+    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.a.values);
+    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.a.values);
+    osChrt.drawOscilloCanvas();
+    osChrt.drawContent(osData.a, 'red');
+    osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
     break;
   case 'b':
-    rangeY=calcSourceMinMax('Y',osData.b.values);
-    rangeX=calcSourceMinMax('X',osData.b.values);
-    drawOscilloCanvas(osCtx);
-    drawContent(osCtx,osData.b, 'blue');
-    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
+    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.b.values);
+    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.b.values);
+    osChrt.drawOscilloCanvas();
+    osChrt.drawContent(osData.b, 'blue');
+    osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
     break;
   case 'c':
-    rangeY=calcSourceMinMax('Y',osData.c.values);
-    rangeX=calcSourceMinMax('X',osData.c.values);
-    drawOscilloCanvas(osCtx);
-    drawContent(osCtx,osData.c, 'green');
-    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
+    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.c.values);
+    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.c.values);
+    osChrt.drawOscilloCanvas();
+    osChrt.drawContent(osData.c, 'green');
+    osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
     break;
   default:
-    rangeY=calcSourceMinMax('Y',osData.a.values,osData.b.values, osData.c.values);
-    rangeX=calcSourceMinMax('X',osData.a.values,osData.b.values, osData.c.values);
-    drawOscilloCanvas(osCtx);
-    drawContent(osCtx,osData.a, 'red');
-    drawContent(osCtx,osData.b, 'blue');
-    drawContent(osCtx,osData.c, 'green');
-    drawContent(osCtx,osData.bk, 'purple', rangeY.max / 2);
+    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.a.values,osData.b.values, osData.c.values);
+    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.a.values,osData.b.values, osData.c.values);
+    osChrt.oscilloInitrender(osData);
 
   }
 };
 osciloCanvasRegim.addEventListener('change', (e) => {
-
-  drawOscilloCanvas(osCtx);
+  osChrt.drawOscilloCanvas();
   chooseOsciloCanvasRegim(e.target.value);
 });
 
 osciloCanvasDots.addEventListener('change',()=> {
-  drawOscilloCanvas(osCtx);
+  console.log(1);
+  osChrt.drawOscilloCanvas();
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 });
 
 osciloCanvasDotsVal.addEventListener('change',()=> {
-  drawOscilloCanvas(osCtx);
+  osChrt.drawOscilloCanvas();
   chooseOsciloCanvasRegim(osciloCanvasRegim.value);
 });
 
@@ -535,8 +551,6 @@ const measurmentDBTab = document.querySelectorAll('.measurmentDB-tab');
 const measurmentsDBContent = document.querySelectorAll('.measurmentsDB-content');
 measurmentsDBTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentDBTab, measurmentsDBContent));
 // TrendsCanvas
-let trendsCanvas = document.getElementById('trendsCanvas');
-let trCtx = trendsCanvas.getContext("2d");
 
 let trData = {
   a: {
@@ -560,131 +574,77 @@ let trData = {
     { X: 2, Y: 1 },
   ]}
 };
-
-let trRangeY=calcSourceMinMax('Y',trData.a.values,trData.b.values,trData.c.values);
-let trRangeX=calcSourceMinMax('X',trData.a.values,trData.b.values,trData.c.values);
-
-const trPadding = {y:100};
-
-const trGraph = {
-  Left:padding.x,
-  Rigth:trendsCanvas.width-padding.x,
-  Top: padding.y,
-  Bottom: trendsCanvas.height-trPadding.y,
-};
-
-const drawTrAxes = (ctx, graph)=> {
-  ctx.beginPath();
-  ctx.moveTo(graph.Left,graph.Top);
-  ctx.lineTo(graph.Left,graph.Bottom);
-  ctx.moveTo(graph.Left,graph.Bottom);
-  ctx.lineTo(graph.Rigth,graph.Bottom);
-  ctx.strokeStyle='gray';
-  ctx.stroke();
-};
-
-function getTrDisplayXY(valueX,valueY){
-  const x = mapRange(valueX,trRangeX.min,trRangeX.max,trGraph.Left,trGraph.Rigth);
-  const y = mapRange(valueY,trRangeY.min,trRangeY.max,trGraph.Bottom,trGraph.Top);
-  return({displayX:x,displayY:y});
-}
-
-const trCanvasDots = document.getElementById('trCanvasDots');
-const trCanvasDotsVal = document.getElementById('trCanvasDotsVal');
-const trCanvasDates = document.getElementById('trCanvasDates');
+const trndsChrt = new Chart({
+  canvasId: "trendsCanvas",
+  dotsCheck: 'trCanvasDots',
+  dotsValCheck: 'trCanvasDotsVal'
+}, trData);
 
 
-const drawTrContent = (ctx,data, color) => {
-  let starting=getTrDisplayXY(data.values[0].X,data.values[0].Y);
-  ctx.setLineDash([]);
+// const trPadding = {y:100};
 
-  if (trCanvasDots.checked) {
-    dot(ctx,starting,dotRadius);
-  }
-  
-  for(let i=1;i<=data.values.length-1;i++){
-    const ending=getTrDisplayXY(data.values[i].X,data.values[i].Y);
-    if (trCanvasDotsVal.checked) {
-      ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
-    }
+// const trCanvasDots = document.getElementById('trCanvasDots');
+// const trCanvasDotsVal = document.getElementById('trCanvasDotsVal');
+// const trCanvasDates = document.getElementById('trCanvasDates');
+
+// const drawTrYScale = () => {
+//   const maxRound = Math.ceil(trRangeY.max);
+//   const yValueGap = maxRound / 5;
+
+//   trCtx.textAlign='right';
+//   trCtx.textBaseline='middle';
+
+//   for (let i = trRangeY.max; i >= 0 ; i-=yValueGap) {
+//     let scaleVal = Math.ceil(i);
+//     let scaleValPosY = getTrDisplayXY(trGraph.Left-10, scaleVal).displayY;
+//     trCtx.fillText(scaleVal,trGraph.Left-10,scaleValPosY);
     
-    connector(ctx,starting,ending, color);
-    if (trCanvasDots.checked) {
-      dot(ctx,ending,dotRadius);
-    }
+//     drawDashedLine(trCtx,trGraph.Left, trGraph.Rigth, scaleValPosY, scaleValPosY); // сетка  X+
+//   }
+// };
 
-    starting=ending;
-  }
-  if (trCanvasDotsVal.checked) {
-    ctx.fillText(data.values[data.values.length-1].Y,starting.displayX, starting.displayY-5);
-  }
-};
+// const drawTrXScale = (ctx)=> {
+//   ctx.textAlign='center';
 
-const drawTrYScale = () => {
-  const maxRound = Math.ceil(trRangeY.max);
-  const yValueGap = maxRound / 5;
-
-  trCtx.textAlign='right';
-  trCtx.textBaseline='middle';
-
-  for (let i = trRangeY.max; i >= 0 ; i-=yValueGap) {
-    let scaleVal = Math.ceil(i);
-    let scaleValPosY = getTrDisplayXY(trGraph.Left-10, scaleVal).displayY;
-    trCtx.fillText(scaleVal,trGraph.Left-10,scaleValPosY);
-    
-    drawDashedLine(trCtx,trGraph.Left, trGraph.Rigth, scaleValPosY, scaleValPosY); // сетка  X+
-  }
-};
-
-const drawTrXScale = (ctx)=> {
-  ctx.textAlign='center';
-
-  for (let i = trRangeX.min; i <= trRangeX.max; i++) {
+//   for (let i = trRangeX.min; i <= trRangeX.max; i++) {
  
-    let scaleValPosX = getTrDisplayXY(i,trGraph.Bottom + 10).displayX;
+//     let scaleValPosX = getTrDisplayXY(i,trGraph.Bottom + 10).displayX;
   
-    if (trCanvasDates.checked) {
-      // ctx.save();
-      // ctx.rotate(90*Math.PI/ 180);
-      // ctx.translate(-30, -400);
-      ctx.fillText(trData.a.dates[i] ,scaleValPosX, trGraph.Bottom + 10);
-      // ctx.restore();
-    } else {
-      ctx.fillText(i ,scaleValPosX, trGraph.Bottom + 10);
-    }
+//     if (trCanvasDates.checked) {
+//       // ctx.save();
+//       // ctx.rotate(90*Math.PI/ 180);
+//       // ctx.translate(-30, -400);
+//       ctx.fillText(trData.a.dates[i] ,scaleValPosX, trGraph.Bottom + 10);
+//       // ctx.restore();
+//     } else {
+//       ctx.fillText(i ,scaleValPosX, trGraph.Bottom + 10);
+//     }
    
     
-    if (i !== 0 ) {
-      drawDashedLine(ctx, scaleValPosX, scaleValPosX, trGraph.Bottom, trGraph.Top); // сетка   Y
-    }
-    ctx.setLineDash([]);
+//     if (i !== 0 ) {
+//       drawDashedLine(ctx, scaleValPosX, scaleValPosX, trGraph.Bottom, trGraph.Top); // сетка   Y
+//     }
+//     ctx.setLineDash([]);
     
-  }
-};
+//   }
+// };
 
-drawTrAxes(trCtx, trGraph);
-drawTrYScale();
-drawTrXScale(trCtx);
-drawTrContent(trCtx,trData.a, 'red');
-drawTrContent(trCtx,trData.b, 'blue');
-
-const drawTrCanvas = () => {
-  clearCanvas(trCtx, trendsCanvas);
-  trCtx.lineWidth = 1;
-  drawTrAxes(trCtx, trGraph);
-  drawTrYScale();
-  drawTrXScale(trCtx);
-};
-const trendsCanvasPhaseA = document.getElementById('trendsCanvasPhaseA');
-const trendsCanvasPhaseB = document.getElementById('trendsCanvasPhaseB');
-const trendsCanvasPhaseC = document.getElementById('trendsCanvasPhaseC');
+trndsChrt.drawAxes();
+trndsChrt.drawYScale();
+trndsChrt.drawXScale();
+trndsChrt.drawContent(trData.a, 'red');
 
 
-const trendsCanvasRegim = document.getElementById('trendsCanvasRegim');
+const trndsCnvPhseA = $id('trendsCanvasPhaseA');
+const trndsCnvPhseB = $id('trendsCanvasPhaseB');
+const trndsCnvPhseC = $id('trendsCanvasPhaseC');
+
+
+const trendsCanvasRegim = $id('trendsCanvasRegim');
 trendsCanvasRegim.addEventListener('change', ()=> {
-  let a = trendsCanvasPhaseA.checked;
-  let b = trendsCanvasPhaseB.checked;
-  let c = trendsCanvasPhaseC.checked;
+  let a = trndsCnvPhseA.checked;
+  let b = trndsCnvPhseB.checked;
+  let c = trndsCnvPhseC.checked;
   if (a){
     console.log(1);
   }
@@ -707,6 +667,7 @@ trCanvasDotsVal.addEventListener('change',()=> {
   trendsInitRender();
   // + дата режим
 });
+
 trCanvasDots.addEventListener('change',()=> {
   drawTrCanvas();
   trendsInitRender();
@@ -744,26 +705,25 @@ function pcTime() {
   return {day, month, year, hours, minutes, seconds};
 }
 setInterval(() => {
-  document.getElementById('current_date_time_block').innerHTML = `
+  $id('current_date_time_block').innerHTML = `
   ${pcTime().day}.${pcTime().month}.${pcTime().year}
   ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`;
 }, 1000);
 
 const setHadleTimeInput = ()=> {
-  document.getElementById('handleDay').value = pcTime().day;
-  document.getElementById('handleMounth').value = pcTime().month;
-  document.getElementById('handleYear').value = pcTime().year;
-  document.getElementById('handleHour').value = pcTime().hours;
-  document.getElementById('handleMin').value = pcTime().minutes;
+  $id('handleDay').value = pcTime().day;
+  $id('handleMounth').value = pcTime().month;
+  $id('handleYear').value = pcTime().year;
+  $id('handleHour').value = pcTime().hours;
+  $id('handleMin').value = pcTime().minutes;
 };
 setHadleTimeInput();
 
 setInterval(()=>setHadleTimeInput(),30000);
 
-
 // modal
-const modal = document.getElementById("myModal");
-const modalBtn = document.getElementById("modalBtn");
+const modal = $id("myModal");
+const modalBtn = $id("modalBtn");
 const closeModal = document.getElementsByClassName("close")[0];
 
 closeModal.onclick = () => {modal.style.display = "none";};
@@ -910,39 +870,39 @@ const selfDiagnosisAlarm = () => {
 };
 // selfDiagnosisAlarm(); // вызов самодиагностики
 
-document.getElementById('statusAlarm').addEventListener('click', ()=>statusAlarmSignal(''));
-document.getElementById('accidentAlarm').addEventListener('click', ()=>accidentModal());
-document.getElementById('generalAlarm').addEventListener('click', ()=>generalAlarm());
-document.getElementById('selfDiagnosislAlarm').addEventListener('click', ()=>selfDiagnosisAlarm());
+$id('statusAlarm').addEventListener('click', ()=>statusAlarmSignal(''));
+$id('accidentAlarm').addEventListener('click', ()=>accidentModal());
+$id('generalAlarm').addEventListener('click', ()=>generalAlarm());
+$id('selfDiagnosislAlarm').addEventListener('click', ()=>selfDiagnosisAlarm());
 
 // servise
 const serviceModal = () => {
-  const serviceModalContent = document.getElementById('serviceModalContent');
+  const serviceModalContent = document.$id('serviceModalContent');
   serviceModalContent.style.display = "block";
-  document.getElementById('serviceClose').addEventListener('click', ()=> {
+  document.$id('serviceClose').addEventListener('click', ()=> {
     serviceModalContent.style.display = "none";
   });
 };
 
-document.getElementById('serviceModal').addEventListener('click', ()=> serviceModal());
+$id('serviceModal').addEventListener('click', ()=> serviceModal());
 
 
 // cmd btns
-const resetEventsJournal = document.getElementById('0x100');
-const resetMeassurmentsJournal = document.getElementById('0x101');
-const resetOscillogramms = document.getElementById('0x102');
-const resetAccumulatedMeasurements = document.getElementById('0x103');
-const setDefaultConfiguration = document.getElementById('0x104');
-const calibrationFor1000 = document.getElementById('0x10A');
-const calibrationFor10000 = document.getElementById('0x10B');
-const setAlarm = document.getElementById('0x10C');
-const resetAlarm = document.getElementById('0x10D');
+const resetEventsJournal = $id('0x100');
+const resetMeassurmentsJournal = $id('0x101');
+const resetOscillogramms = $id('0x102');
+const resetAccumulatedMeasurements = $id('0x103');
+const setDefaultConfiguration = $id('0x104');
+const calibrationFor1000 = $id('0x10A');
+const calibrationFor10000 = $id('0x10B');
+const setAlarm = $id('0x10C');
+const resetAlarm = $id('0x10D');
 // cmd btns with arg
-const setPhaseAWear = document.getElementById('0x105');
-const setPhaseBWear = document.getElementById('0x106');
-const setPhaseCWear = document.getElementById('0x107');
-const setNumberOfTurns = document.getElementById('0x108');
-const setNumberOfShutdowns = document.getElementById('0x109');
+const setPhaseAWear = $id('0x105');
+const setPhaseBWear = $id('0x106');
+const setPhaseCWear = $id('0x107');
+const setNumberOfTurns = $id('0x108');
+const setNumberOfShutdowns = $id('0x109');
 
 
 const sendCommand = (e)=> {
@@ -974,7 +934,7 @@ comandBtnsWithArg.forEach(btn => btn.addEventListener('click', (e)=> sendCommand
 // data
 
 // helpers func
-const findReg = (regStr) => document.getElementById(`${regStr}`);
+const findReg = (regStr) => $id(`${regStr}`);
 const findRegDataId = (regStr) => document.querySelectorAll(`[data-id='${regStr}']`);
 
 
@@ -1129,7 +1089,7 @@ function recv(data){
 
     if (regToFirmwareArray.includes(register)) {
       firmwareStr += value;
-      document.getElementById('484-519').textContent = firmwareStr;
+      $id('484-519').textContent = firmwareStr;
     }
     if (register === '0600' || register === '0601' ) { // число осцилограмм
       oscilloNumSum += value;
@@ -1205,7 +1165,7 @@ function setDate(){
   send(0, 12, 0);
 }
 
-document.getElementById('setDate').addEventListener('click', setDate);
+$id('setDate').addEventListener('click', setDate);
 
 
 function read_file(inp){
@@ -1243,7 +1203,6 @@ function read_file(inp){
 
 
 
-const file = document.getElementById('file');
-file.addEventListener('change', ()=> {
+$id('file').addEventListener('change', ()=> {
   read_file(this);
 });

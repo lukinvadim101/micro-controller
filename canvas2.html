@@ -30,9 +30,6 @@
 
         this.dotsCheck = document.getElementById(opt.dotsCheck).checked;
         this.dotsValCheck = document.getElementById(opt.dotsValCheck).checked;
-
-
- 
       }
 
       mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
@@ -58,6 +55,10 @@
       return({displayX:x,displayY:y});
     }
 
+    roundToMultiple(num, multiple) {
+      return Math.round(num/multiple)*multiple;
+    }
+
     connector(starting,ending,color){
       const {ctx} = this;
       ctx.beginPath();
@@ -76,35 +77,6 @@
       ctx.closePath();
       ctx.fill();
     }
-
-    
-
-    drawContent (data, color, coefBk = 1) {
-      const {ctx} = this;
-      let starting=this.getDisplayXY(data.values[0].X,data.values[0].Y * coefBk);
-      ctx.setLineDash([]);
-
-      if (this.dotsCheck) {
-        this.dot(starting);
-      }
-
-      for(let i=1;i<=data.values.length-1;i++){
-        const ending = this.getDisplayXY(data.values[i].X,data.values[i].Y * coefBk);
-
-        if (this.dotsValCheck) {
-          ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
-        }
-        this.connector(starting, ending, color);
-        if (this.dotsCheck) {
-          this.dot(ending);
-        }
-        starting = ending;
-      }
-
-      if (this.dotsValCheck) {
-        ctx.fillText(data.values[data.values.length-1].Y,starting.displayX-5, starting.displayY-5);
-      }
-    };
 
     drawAxes(){
       const {ctx, left, right, top, bottom} = this;
@@ -135,10 +107,6 @@
       ctx.stroke();
     };
 
-    roundToMultiple(num, multiple) {
-      return Math.round(num/multiple)*multiple;
-    }
-
     drawYScale () {
       const {ctx, left, right} = this;
 
@@ -151,7 +119,6 @@
 
       // сетка  X
       for (let i = this.rangeY.max; i > this.rangeY.min ; i-=yValueGap) {
-        console.log(i);
         let scaleVal = this.roundToMultiple(i, 1000);
         let scaleValPosY = this.getDisplayXY(left-10, scaleVal).displayY;
         ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),left-10,scaleValPosY);
@@ -180,6 +147,33 @@
           }
           ctx.setLineDash([]);
         }
+      }
+    };
+
+    drawContent (data, color, coefBk = 1) {
+      const {ctx} = this;
+      let starting=this.getDisplayXY(data.values[0].X,data.values[0].Y * coefBk);
+      ctx.setLineDash([]);
+
+      if (this.dotsCheck) {
+        this.dot(starting);
+      }
+
+      for(let i=1;i<=data.values.length-1;i++){
+        const ending = this.getDisplayXY(data.values[i].X,data.values[i].Y * coefBk);
+
+        if (this.dotsValCheck) {
+          ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
+        }
+        this.connector(starting, ending, color);
+        if (this.dotsCheck) {
+          this.dot(ending);
+        }
+        starting = ending;
+      }
+
+      if (this.dotsValCheck) {
+        ctx.fillText(data.values[data.values.length-1].Y,starting.displayX-5, starting.displayY-5);
       }
     };
 
@@ -260,7 +254,7 @@ window.onload = () => {
   );
   myChart.drawAxes();
   myChart.drawYScale()
-  myChart.drawXScale()
+  myChart.drawOscilloCanvas()
   myChart.drawContent(data1.b)
 
 };
