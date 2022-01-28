@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable camelcase */
 
@@ -200,6 +202,17 @@ const oscillogramTab = document.querySelectorAll('.oscillograms-tab');
 const oscillogramsContent = document.querySelectorAll('.oscillograms-content');
 oscillogramsTabs.addEventListener('click', (e) => tabsSwitcher(e, oscillogramTab, oscillogramsContent));
 
+
+const addOptToOscilloSelect = (data)=> {
+  let opt = document.createElement('option');
+  const val = (num)=> Object.values(data.info[num]);
+  let str = `${+val(0) === 1 ? 'ВКЛ' : 'ОТКЛ'} ${val(4)}.${val(3)}.${val(2)} ${val(5)}:${val(6)}:${val(7)}.${val(8)}.${val(9)}`;// on? y.m.d h:m:sss
+  opt.value = val(1); // номер (рег 0603)
+  opt.innerHTML = str;
+  document.getElementById('oscillogramsSelect').appendChild(opt);
+};
+
+
 // oscillogram Canvas
 let oscilloCanvas=document.getElementById("oscilloCanvas");
 let osCtx=oscilloCanvas.getContext("2d");
@@ -209,6 +222,7 @@ const padding = {x: 60, y: 20};
 const dotRadius = 2;
 
 const osData = {
+  info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
   a: { values:[
     { X: 0, Y: 140000 },
     { X: 1, Y: 0 },
@@ -249,7 +263,7 @@ const osData = {
   ]},
 };
 
-
+addOptToOscilloSelect(osData);
 
 const oscilorgamsTableBody = document.getElementById('oscilorgamsTableBody');
 const addRowsToOscilorgamsTableBody = ()=> {
@@ -257,15 +271,11 @@ const addRowsToOscilorgamsTableBody = ()=> {
   for(let i = osData.a.values[0].X; i < osData.a.values.length; i++) {
     oscilorgamsTableBody.insertAdjacentHTML('beforeend',`
     <tr>
-      <td>${i}</td>
-      <td>dd-mm-yyyy</td>
-     
+      <td>${i}</td>     
       <td>${osData.bk.values[i] ? osData.bk.values[i].Y : "-"}</td>
       <td>${osData.a.values[i].Y}</td>
       <td>${osData.b.values[i] ? osData.b.values[i].Y : "-"}</td>
       <td>${osData.c.values[i] ? osData.c.values[i].Y : "-"}</td>
-
-   
     </tr>
     `);
   }
@@ -356,7 +366,6 @@ const drawContent = (ctx,data, color, coefBk = 1) => {
 
 // axes
 const drawAxes = (ctx)=> {
-
   ctx.beginPath();
   ctx.moveTo(graphLeft,graphTop);
   ctx.lineTo(graphLeft,graphBottom);
@@ -717,6 +726,7 @@ configurationTabs.addEventListener('click', (e) => tabsSwitcher(e, configuration
 
 function addZero(value) {
   if (value < 10) {
+    // eslint-disable-next-line no-param-reassign
     value = '0' + value;
   }
   return value;
@@ -739,16 +749,16 @@ setInterval(() => {
   ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`;
 }, 1000);
 
-setHadleTimeInput = ()=> {
-  handleDay.value = pcTime().day;
-  handleMounth.value = pcTime().month;
-  handleYear.value = pcTime().year;
-  handleHour.value = pcTime().hours;
-  handleMin.value = pcTime().minutes;
+const setHadleTimeInput = ()=> {
+  document.getElementById('handleDay').value = pcTime().day;
+  document.getElementById('handleMounth').value = pcTime().month;
+  document.getElementById('handleYear').value = pcTime().year;
+  document.getElementById('handleHour').value = pcTime().hours;
+  document.getElementById('handleMin').value = pcTime().minutes;
 };
 setHadleTimeInput();
 
-setInterval(()=>setHadleTimeInput(),60000);
+setInterval(()=>setHadleTimeInput(),30000);
 
 
 // modal
@@ -905,7 +915,7 @@ document.getElementById('accidentAlarm').addEventListener('click', ()=>accidentM
 document.getElementById('generalAlarm').addEventListener('click', ()=>generalAlarm());
 document.getElementById('selfDiagnosislAlarm').addEventListener('click', ()=>selfDiagnosisAlarm());
 
-
+// servise
 const serviceModal = () => {
   const serviceModalContent = document.getElementById('serviceModalContent');
   serviceModalContent.style.display = "block";
@@ -917,25 +927,83 @@ const serviceModal = () => {
 document.getElementById('serviceModal').addEventListener('click', ()=> serviceModal());
 
 
+// cmd btns
+const resetEventsJournal = document.getElementById('0x100');
+const resetMeassurmentsJournal = document.getElementById('0x101');
+const resetOscillogramms = document.getElementById('0x102');
+const resetAccumulatedMeasurements = document.getElementById('0x103');
+const setDefaultConfiguration = document.getElementById('0x104');
+const calibrationFor1000 = document.getElementById('0x10A');
+const calibrationFor10000 = document.getElementById('0x10B');
+const setAlarm = document.getElementById('0x10C');
+const resetAlarm = document.getElementById('0x10D');
+// cmd btns with arg
+const setPhaseAWear = document.getElementById('0x105');
+const setPhaseBWear = document.getElementById('0x106');
+const setPhaseCWear = document.getElementById('0x107');
+const setNumberOfTurns = document.getElementById('0x108');
+const setNumberOfShutdowns = document.getElementById('0x109');
+
+
+const sendCommand = (e)=> {
+  const code = e.target.id;
+  console.log('code ', code);
+  send(1, 551, code);
+  send(1, 550, code);
+};
+
+const sendCommandWithArg = (e)=> {
+  const code = e.target.id;
+
+  const val = document.querySelector(`[data-id='${code}']`).value;
+  console.log('code arg', code);
+  console.log('val arg', val);
+  send(1, 551, code);
+  send(1, 550, val);
+};
+
+const comandBtns = [resetEventsJournal, resetMeassurmentsJournal,resetOscillogramms, setDefaultConfiguration, resetAccumulatedMeasurements, calibrationFor1000, calibrationFor10000, setAlarm, resetAlarm];
+
+const comandBtnsWithArg = [setPhaseAWear, setPhaseBWear, setPhaseCWear, setNumberOfTurns, setNumberOfShutdowns];
+
+comandBtns.forEach(btn => btn.addEventListener('click', (e)=> sendCommand(e)));
+
+comandBtnsWithArg.forEach(btn => btn.addEventListener('click', (e)=> sendCommandWithArg(e)));
+
 
 // data
 
 // helpers func
 const findReg = (regStr) => document.getElementById(`${regStr}`);
+const findRegDataId = (regStr) => document.querySelectorAll(`[data-id='${regStr}']`);
+
+
 const isEmpty = (obj)=> !Object.values(obj).some(x => x !== null && x !== '');
 
-let buff474475 = new ArrayBuffer(4);
-let view474475 = new DataView(buff474475);
-
-let buff477478 = new ArrayBuffer(4);
-let view477478 = new DataView(buff477478);
+let view474475 = new DataView(new ArrayBuffer(4));
+let view477478 = new DataView(new ArrayBuffer(4));
 
 let firmwareStr = '';
+let oscilloNumSum = 0;
+
 
 function dbg_out(s){console.log(s);}
 
 const socket = new WebSocket("ws://127.0.0.1:8080", 76);
-socket.onopen = function(e){
+
+function send(operation, register, value){
+  let sendArray = new Uint16Array(64);
+
+  sendArray[0] = operation;
+  sendArray[1] = register;
+  sendArray[2] = value;
+
+  if (socket)
+    if (socket.readyState === 1)
+      socket.send(sendArray);
+}
+
+socket.onopen = (e)=>{
 
   console.log('o');
   send(0, 10, 0);
@@ -943,9 +1011,7 @@ socket.onopen = function(e){
   send(0, 12, 0);
 
 };
-socket.onmessage = function(e){recv(e.data);};
-socket.onclose = function(e){if (e.wasClean){dbg_out("Соединение закрыто нормально");}else{dbg_out("Соединение закрыто экстренно");}};
-socket.onerror = function(e){dbg_out("Ошибка соединения: " + e.message);};
+
 
 let upload_pointer = 0;
 let firmware_array = 0;
@@ -955,13 +1021,15 @@ const regArrayToSetValuesInSpan = [
   '0000','0001', '0002', '0003', //  конфиг
   '0010', '0011', '0012', '0013', '0014', '0015', //  время в конфиг
   '0109', '0110', '0012', '0014', '0016', // главное окно. выключатель, фазы
-  '0200', // журнал измерений
   '0251', '0252','0253', '0254', '0255', '0256', '0257', // гл. окно. время последней коммутации
   '0258', '0260', '0261', '0262','0263','0264','0265','0266','0267', // гл. окно. данные последней коммутации
-  '0300', // журнал событий
   '414','415', // конфиг 
-
 ];
+
+const regArrayToSetValuesInSpanDataId = [ // встречается дважды id атрибут
+  '0200', // записи в журнале измерений
+  '0300' // записи в журнале событий
+]; 
 
 const regArrayToSetValuesInInput = [
   410, 411, 413, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447,
@@ -988,9 +1056,13 @@ const measurementsJournal = ['0201','0204','0206', '0207','0208','0209','0210','
 
 const eventsJournal = ['0301','0303','0304','0305','0306','0307','0308','0309','0310','0311'];
 
-const oscilloPhaseAOpt = [1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97];
+const oscilloPhaseASign = [1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97];
 
-const oscilloPhaseCOpt = [3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71, 75, 79, 83, 87, 91, 95, 99];
+const oscilloPhaseCSign = [3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71, 75, 79, 83, 87, 91, 95, 99];
+
+const oscillosJournal = ['0600', '0601' ];
+
+const osciloCurrentInfo = ['0602', '0603', '0605', '0606','0607','0608','0609','0610','0611','0612'];
 
 function recv(data){
   const r = new FileReader();
@@ -1003,6 +1075,10 @@ function recv(data){
 
     if (regArrayToSetValuesInSpan.includes(`${register}`)) {
       findReg(`${register}`).textContent = value;
+    }
+
+    if (regArrayToSetValuesInSpanDataId.includes(`${register}`)) {
+      [...findRegDataId(`${register}`)].forEach(t=> {t.textContent = value;});
     }
 
     if (register === '0111' && value === 1) {
@@ -1055,32 +1131,37 @@ function recv(data){
       firmwareStr += value;
       document.getElementById('484-519').textContent = firmwareStr;
     }
+    if (register === '0600' || register === '0601' ) { // число осцилограмм
+      oscilloNumSum += value;
+      findReg("600-601").textContent = oscilloNumSum; }
+    if (osciloCurrentInfo.includes(register)) {
+      osData.info.push({register:value}); 
+    }
 
     if (register >= 613 && register <= 4616) {
 
-      if ( oscilloPhaseAOpt.includes(Number(value.toString().slice(-2))) )
+      if ( oscilloPhaseASign.includes(Number(value.toString().slice(-2))) )
         osData.a.values.push({x:osData.a.values.length, y: value});
       
       if(register%2 === 0 && register%4 !== 0) {
         osData.b.values.push({x:osData.b.values.length, y: value});
       }
           
-      if ( oscilloPhaseCOpt.includes(Number(value.toString().slice(-2))) )
+      if ( oscilloPhaseCSign.includes(Number(value.toString().slice(-2))) )
         osData.c.values.push({x:osData.c.values.length, y: value});
       
       if (register%4 === 0) {
-        osData.d.values.push({x:osData.d.values.length, y: value});
+        osData.bk.values.push({x:osData.bk.values.length, y: value});
       }
-    }
-        
+    } 
     
-
     // if (register === 474) {findReg("0011").textContent = value; }
     // if (register === 12) {findReg("0012").textContent = value; }
 
 
     if (int16_array[1] === 398)// #define FIRMWARE_UPLOAD 398
     {
+      // eslint-disable-next-line no-bitwise
       upload_pointer = int16_array[2] + (int16_array[3] << 16);
 
       if (upload_pointer < 0x10000) {// #define FIRMWARE_SIZE 0x10000
@@ -1096,17 +1177,10 @@ function recv(data){
 
 }
 
-function send(operation, register, value){
-  let sendArray = new Uint16Array(64);
+socket.onmessage = (e)=>{recv(e.data);};
+socket.onclose = (e)=>{if (e.wasClean){dbg_out("Соединение закрыто нормально");}else{dbg_out("Соединение закрыто экстренно");}};
+socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message);};
 
-  sendArray[0] = operation;
-  sendArray[1] = register;
-  sendArray[2] = value;
-
-  if (socket)
-    if (socket.readyState === 1)
-      socket.send(sendArray);
-}
 
 const fff = ()=> {
   for (let i=10; i <= 12; i++) {
@@ -1117,7 +1191,7 @@ const fff = ()=> {
 
 
 const script = document.getElementById('script');
-script.onload = function() {
+script.onload = ()=> {
   // send(0, 10, 0);
   // send(0, 11, 0);
   // send(0, 12, 0);
@@ -1138,7 +1212,7 @@ function read_file(inp){
   const f = inp.files[0];
   const r = new FileReader();
 
-  r.onload = function() {
+  r.onload = ()=> {
     let data_array = new Uint8Array(r.result);
     let firmwareArray = new Uint8Array(0x10000).fill(0xFF, 0, 0x10000);// #define FIRMWARE_SIZE 0x10000
     firmwareArray.set(data_array);
@@ -1157,8 +1231,8 @@ function read_file(inp){
 }
 
 
-function d2h(d) { return (+d).toString(16).toUpperCase(); }
-function h2d(h) { return (+d).toString(16).toUpperCase(); }
+// function d2h(d) { return (+d).toString(16).toUpperCase(); }
+// function h2d(h) { return (+d).toString(16).toUpperCase(); }
 
 
 // console.log(d2h(29));

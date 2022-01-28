@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" opttent="IE=edge">
+  <meta name="viewport" opttent="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1></h1>
+  <input type="checkbox" id="osciloCanvasDots" checked>Точки</div>
+  <input type="checkbox" id="osciloCanvasDotsVal" checked>Значения точек</div>
+  <canvas id="canvas" width="1200" height="600"></canvas>
+  <canvas id="canvas2" width="1200" height="600"></canvas>
+  <script>
+    class Chart {
+      constructor(opt, data) {
+        this.cnv    = document.getElementById(opt.canvasId);
+        this.ctx    = this.cnv.getContext("2d");
+        this.rangeY = this.calcSourceMinMax('Y',data.a.values,data.b.values, data.c.values);
+        this.rangeX = this.calcSourceMinMax('X',data.a.values,data.b.values, data.c.values);
+        this.width  = this.cnv.width;
+        this.height = this.cnv.height;
+        this.padding = {x: 60, y: 60};
+        this.dotRadius = 2;
+        this.left = this.padding.x;
+        this.right = this.width-this.padding.x;
+        this.top = this.padding.y;
+        this.bottom = this.height-this.padding.y;
+
+        this.dotsCheck = document.getElementById(opt.dotsCheck).checked;
+        this.dotsValCheck = document.getElementById(opt.dotsValCheck).checked;
+
+
+ 
+      }
+
+      mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
+        return mappedLow + (mappedHigh - mappedLow) * (value - sourceLow) / (sourceHigh - sourceLow);
+      }
+
+    calcSourceMinMax(prop, ...arr){
+      let min=Infinity;
+      let max=-Infinity;
+      arr.forEach(a => {
+        for(let i=0;i<a.length;i++){
+          const value=a[i][prop];
+          if(value<min){min=value;}
+          if(value>max){max=value;}
+        }
+      });
+      return({min,max});
+    }
+
+    getDisplayXY(valueX,valueY){
+      const x = this.mapRange(valueX,this.rangeX.min,this.rangeX.max,this.left,this.right);
+      const y = this.mapRange(valueY,this.rangeY.min,this.rangeY.max,this.bottom,this.top);
+      return({displayX:x,displayY:y});
+    }
+
+    connector(starting,ending,color){
+      const {ctx} = this;
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.moveTo(starting.displayX,starting.displayY);
+      ctx.lineTo(ending.displayX,ending.displayY);
+      ctx.strokeStyle=color;
+      ctx.stroke();
+    }
+
+    dot(position){
+      const {ctx} = this;
+      ctx.beginPath();
+      ctx.moveTo(position.displayX,position.displayY);
+      ctx.arc(position.displayX,position.displayY,this.dotRadius,0,Math.PI*2);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    
+
+    drawContent (data, color, coefBk = 1) {
+      const {ctx} = this;
+      let starting=this.getDisplayXY(data.values[0].X,data.values[0].Y * coefBk);
+      ctx.setLineDash([]);
+
+      if (this.dotsCheck) {
+        this.dot(starting);
+      }
+
+      for(let i=1;i<=data.values.length-1;i++){
+        const ending = this.getDisplayXY(data.values[i].X,data.values[i].Y * coefBk);
+
+        if (this.dotsValCheck) {
+          ctx.fillText(data.values[i-1].Y,starting.displayX, starting.displayY-5);
+        }
+        this.connector(starting, ending, color);
+        if (this.dotsCheck) {
+          this.dot(ending);
+        }
+        starting = ending;
+      }
+
+      if (this.dotsValCheck) {
+        ctx.fillText(data.values[data.values.length-1].Y,starting.displayX-5, starting.displayY-5);
+      }
+    };
+
+    drawAxes(){
+      const {ctx, left, right, top, bottom} = this;
+      ctx.beginPath();
+      ctx.moveTo(left,top);
+      ctx.lineTo(left,bottom);
+      ctx.moveTo(left,bottom);
+      ctx.lineTo(right,bottom);
+      ctx.strokeStyle='gray';
+      ctx.stroke();
+    };
+
+    drawDashedLine(fromX, toX, fromY, toY){
+      const {ctx} = this;
+      ctx.beginPath();
+      ctx.setLineDash([8, 4]);
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+    };
+
+    drawLine (fromX, toX, fromY, toY){
+      const {ctx} = this;
+      ctx.beginPath();
+      ctx.setLineDash([]);
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+    };
+
+    roundToMultiple(num, multiple) {
+      return Math.round(num/multiple)*multiple;
+    }
+
+    drawYScale () {
+      const {ctx, left, right} = this;
+
+      const maxRound10 = this.roundToMultiple(this.rangeY.max, 10);
+      const minRound10 = this.roundToMultiple( Math.abs(this.rangeY.min), 10);
+      const yValueGap = (maxRound10) / 5; // 5 я часть значения оси Y
+
+      ctx.textAlign='right';
+      ctx.textBaseline='middle';
+
+      // сетка  X
+      for (let i = this.rangeY.max; i > this.rangeY.min ; i-=yValueGap) {
+        console.log(i);
+        let scaleVal = this.roundToMultiple(i, 1000);
+        let scaleValPosY = this.getDisplayXY(left-10, scaleVal).displayY;
+        ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),left-10,scaleValPosY);
+        if ( i === 0) {
+          this.drawLine(left, right, scaleValPosY, scaleValPosY); 
+        } else {
+          this.drawDashedLine(left, right, scaleValPosY, scaleValPosY);
+        }
+      }
+      ctx.fillText(new Intl.NumberFormat('ru-RU').format(this.rangeY.min),left-10,this.bottom);
+    };
+
+
+    drawXScale () {
+      const {ctx, bottom} = this;
+      ctx.textAlign='center';
+
+      for (let i = this.rangeX.min; i <= this.rangeX.max; i++) {
+
+        if (i/5 % 1 === 0 ) { // 200 мс
+          let scaleValPosX = this.getDisplayXY(i,bottom + 10).displayX;
+          ctx.fillText(i/5 ,scaleValPosX, bottom + 10);
+
+          if (i !== 0) {
+            this.drawDashedLine(scaleValPosX, scaleValPosX, bottom, top); // сетка   Y
+          }
+          ctx.setLineDash([]);
+        }
+      }
+    };
+
+    clearCanvas() {
+      const {ctx} = this;
+      ctx.clearRect(0, 0, this.width, this.height);
+    };
+
+    drawOscilloCanvas () {
+      const {ctx} = this;
+      this.clearCanvas();
+      ctx.lineWidth = 1;
+      this.drawAxes();
+      this.drawXScale();
+      this.drawYScale();
+    };
+
+    oscilloInitrender(data){
+      this.drawOscilloCanvas();
+      this.drawContent(data.a,  'red');
+      this.drawContent(data.b,  'blue');
+      this.drawContent(data.c,  'green');
+      this.drawContent(data.bk, 'purple', this.rangeY.max / 2);
+    };
+
+
+}
+
+const data1 = {
+  info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
+  a: { values:[
+    { X: 0, Y: 140000 },
+    { X: 1, Y: 0 },
+    { X: 2, Y: -20000 },
+    { X: 3, Y: 28000 },
+    { X: 4, Y: 10034 },
+    { X: 5, Y: 14000 },
+    { X: 6, Y: -20000 },
+    { X: 7, Y: 28000 },
+    { X: 8, Y: 10034 },
+    { X: 9, Y: 14000 },
+  ]},
+  
+  b: { values:[
+    { X: 0, Y: -30000 },
+    { X: 1, Y: -110500 },
+    { X: 2, Y: 27000 },
+    { X: 3, Y: 1034 },
+    { X: 4, Y: 14000 },
+    { X: 5, Y: 2000 },
+  ]},
+  
+  c: { values:[
+    { X: 0, Y: -30000 },
+    { X: 1, Y: -110000 },
+    { X: 2, Y: 22000 },
+    { X: 3, Y: 1034 },
+    { X: 4, Y: 14000 },
+    { X: 5, Y: 151320 },
+  ]},
+  bk: { values:[
+    { X: 0, Y: 1 },
+    { X: 1, Y: 1 },
+    { X: 2, Y: 0 },
+    { X: 3, Y: 1 },
+    { X: 4, Y: 1 },
+    { X: 5, Y: 1 },
+  ]},
+}
+
+window.onload = () => {
+  const myChart = new Chart({
+    canvasId: "canvas",
+    dotsCheck: 'osciloCanvasDots',
+    dotsValCheck: 'osciloCanvasDotsVal'
+  }, data1
+  
+  );
+  myChart.drawAxes();
+  myChart.drawYScale()
+  myChart.drawXScale()
+  myChart.drawContent(data1.b)
+
+};
+
+
+  </script>
+</body>
+
+</html>
+
