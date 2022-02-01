@@ -1,3 +1,6 @@
+/* eslint-disable no-bitwise */
+/* eslint-disable no-constant-condition */
+/* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
@@ -6,18 +9,13 @@
 
 const $id = ( id ) => document.getElementById( id );
 
-// console.log($id('476'));
-
-
-
 // main tabs
 const navTabs = document.querySelector(".nav-tabs");
 const navTabButton = document.querySelectorAll(".nav-tab");
 const mainContents = document.querySelectorAll(".main-content");
+
 const tabsSwitcher = (e, tabs, contents) => {
-  const {
-    id
-  } = e.target.dataset;
+  const {id} = e.target.dataset;
   if (id) {
     tabs.forEach(btn => {
       btn.classList.remove("active");
@@ -74,10 +72,6 @@ const markElemInDiagramm = (diagrammId, value) => {
 
   // return elem;
 };
-// specific el add style
-markElemInDiagramm('#phaseDiagrammA', 49); //  0012 амперы?
-markElemInDiagramm('#phaseDiagrammB', 119); //  0014
-markElemInDiagramm('#phaseDiagrammC', 89); // 0016
 
 const oscilloViewbtn = document.getElementById('oscilloViewbtn');
 oscilloViewbtn.addEventListener('click', () => {
@@ -102,6 +96,35 @@ measurmentsTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentTab, 
 const measurementsAllTableBody = $id('measurementsAllTableBody');
 const measurementsSwitchTableBody = $id('measurementsSwitchTableBody');
 const refreshMeasurmentsTableData = $id('refreshMeasurmentsTableData'); // доббавить обновление data
+
+
+[...document.querySelectorAll('.measurments-table')].forEach(th => { // measurmentsTablesHead
+  th.insertAdjacentHTML("afterBegin", `
+    <thead>
+      <th>№</th>
+      <th>Дата и время</th>
+      <th>Выключатель</th>
+      <th>№ сол. откл.</th>
+      <th>Износ ф.А, %</th>
+      <th>Износ ф.В, %</th>
+      <th>Износ ф.С, %</th>
+      <th>Кол-во вкл.</th>
+      <th>Кол-во откл.</th>
+      <th>Собств. вр., мс</th>
+      <th>Полное. вр., мс</th>
+      <th>Вр. дуги ф.А, мс</th>
+      <th>Вр. дуги ф.В, мс</th>
+      <th>Вр. дуги ф.С, мс</th>
+      <th>Износ за перекл. ф.А, %</th>
+      <th>Износ за перекл. ф.В, %</th>
+      <th>Износ за перекл. ф.С, %</th>
+      <th>Ток ф.А, А</th>
+      <th>Ток ф.В, А</th>
+      <th>Ток ф.С, А</th>
+    </thead>
+    `);
+});
+  
 
 let measurmentsTableCurrentObj = {
   '0201': null,
@@ -144,9 +167,9 @@ const addRowToMeasurmentsTable = (table, obj) => {
     </td>
     <td>${obj['0211']}</td>
     <td>${obj['0212']}</td>
-    <td>${obj['0213']}</td>
-    <td>${obj['0214']}</td>
-    <td>${obj['0215']}</td>
+    <td>${obj['0213'] * 0.01}</td>
+    <td>${obj['0214'] * 0.01}</td>
+    <td>${obj['0215'] * 0.01}</td>
     <td>${obj['0216']}</td>
     <td>${obj['0217']}</td>
     <td>${obj['0218']}</td>
@@ -154,9 +177,9 @@ const addRowToMeasurmentsTable = (table, obj) => {
     <td>${obj['0220']}</td>
     <td>${obj['0221']}</td>
     <td>${obj['0222']}</td>
-    <td>${obj['0223']}</td>
-    <td>${obj['0224']}</td>
-    <td>${obj['0225']}</td>
+    <td>${obj['0223'] * 0.01}</td>
+    <td>${obj['0224'] * 0.01}</td>
+    <td>${obj['0225'] * 0.01}</td>
     <td>${obj['0226']}</td>
     <td>${obj['0227']}</td>
     <td>${obj['0228']}</td>
@@ -182,6 +205,59 @@ let eventsTableCurrentObj = {
   '0310': null,
   '0311': null,
 };
+
+const evtCode = {
+  1	:'Рестарт программы',
+  2	:'Ошибка считывания конфигурации. Принята конфигурация по умолчанию',
+  3	:'Изменена конфигурация',
+  4	:'Неисправность внутренней FLASH-памяти',
+  5	:'Неисправность внутренней SRAM-памяти',
+  6	:'Неисправность АЦП',
+  7	:'Неисправность Ethernet',
+  8	:'Неисправность датчика температуры внутри модуля',
+  9	:'Неисправность датчика температуры ШУ ВВ',
+  10:	'Неисправность датчика температуры окружающей среды',
+  11:	'Ошибка считывания FRAM (энергонезависимых данных). Приняты данные по умолчанию',
+  12:	'Пользователем задано значение расхода коммутационного ресурса ф. А',
+  13:	'Пользователем задано значение расхода коммутационного ресурса ф. B',
+  14:	'Пользователем задано значение расхода коммутационного ресурса ф. C',
+  15:	'Пользователем задано значение количества включений',
+  16:	'Пользователем задано значение количества отключений',
+  30:	'Количество операций более порогового предупредительного значения',
+  31:	'Температура в шкафу управления больше порогового предупредительного значения',
+  32:	'Температура в шкафу управления меньше порогового предупредительного значения',
+  33:	'Температура внутри блока больше порогового предупредительного значения',
+  34:	'Температура внутри блока меньше порогового предупредительного значения',
+  35:	'Собственное время отключения более порогового предупредительного значения',
+  36:	'Полное время отключения более порогового предупредительного значения',
+  37:	'Собственное время включения более порогового предупредительного значения',
+  38: 'Время включения более порогового предупредительного значения',
+  39: 'Невыполненная команда на соленоид включения',
+  40:	"Невыполненная команда на соленоид отключения 1",
+  41:	"Невыполненная команда на соленоид отключения 2",
+  50:	"Количество операций более порогового аварийного значения",
+  51:	"Температура в шкафу управления больше порогового аварийного значения",
+  52:	"Температура в шкафу управления меньше порогового аварийного значения",
+  53:	"Отказ соленоида",
+  54:	"Неполнофазный режим работы",
+  100:	"Повторное зажигание дуги для фазы А",
+  101:	"Износ контактов более порогового предупредительного значения для фазы А",
+  102:	"Время горения дуги более порогового предупредительного значения для фазы А",
+  151:	"Износ контактов более порогового аварийного значения для фазы А",
+  200:	"Повторное зажигание дуги для фазы В",
+  201:	"Износ контактов более порогового предупредительного значения для фазы В",
+  202:	"Время горения дуги более порогового предупредительного значения для фазы В",
+  251:	"Износ контактов более порогового аварийного значения для фазы В",
+  300:	"Повторное зажигание дуги для фазы С",
+  301:	"Износ контактов более порогового предупредительного значения для фазы С",
+  302:	"Время горения дуги более порогового предупредительного значения для фазы С",
+  351:	"Износ контактов более порогового аварийного значения для фазы С",
+  1000:	"Ошибка установления связи с устройством",
+  1050:	"Связь с устройством установлена",
+  17:	"Пользователем сброшены аварии и тревоги",
+  18:	"Пользователем установлена сигнализация",
+  19:	"Пользователем сброшена сигнализация",
+};
 const addCurrentEntryToEventsTable = ()=> {
   const eventsTableBody = document.querySelector('#eventsTableBody');
   const obj = eventsTableCurrentObj;
@@ -195,7 +271,7 @@ const addCurrentEntryToEventsTable = ()=> {
     </td>
     <td>${obj['0310'] === null ? obj['0310'] + ' (пришло)' : obj['0310'] + ' (ушло)' }</td>
     <td>${obj['0311']}</td>
-    <td>нужна таблица расшифровки</td>
+    <td>${evtCode[obj['0311']]}</td>
   </tr>`);
 };
 
@@ -215,7 +291,9 @@ const addOptToOscilloSelect = (data)=> {
   let str = `${+val(0) === 1 ? 'ВКЛ' : 'ОТКЛ'} ${val(4)}.${val(3)}.${val(2)} ${val(5)}:${val(6)}:${val(7)}.${val(8)}.${val(9)}`;// on? y.m.d h:m:sss
   opt.value = val(1); // номер (рег 0603)
   opt.innerHTML = str;
-  $id('oscillogramsSelect').appendChild(opt);
+  let clone = opt.cloneNode(true);
+  $id('jsOsSelect1').appendChild(opt);
+  $id('jsOsSelect2').appendChild(clone);
 };
 
 class Chart {
@@ -312,22 +390,9 @@ class Chart {
     ctx.stroke();
   };
 
-  drawYScale () {
+  drawScaleGrid (from, to, gap) {
     const {ctx, left, right} = this;
-
-    const maxRound10 = this.roundToMultiple(this.rangeY.max, 10);
-    const minRound10 = this.roundToMultiple( Math.abs(this.rangeY.min), 10);
-    const yValueGap = (maxRound10) / 5; // 5 я часть значения оси Y
-    // const yValueGap = (maxRound10 + minRound10)/10;
-
-    // разобраться с делением
-
-    ctx.textAlign='right';
-    ctx.textBaseline='middle';
-    const y0 = this.getDisplayXY(left-10, 0).displayY;
-
-    // сетка  X
-    for (let i = this.rangeY.max; i > this.rangeY.min ; i-=yValueGap) {
+    for (let i = from; i > to ; i-=gap) {
       let scaleVal = this.roundToMultiple(i, 1000);
       let scaleValPosY = this.getDisplayXY(left-10, scaleVal).displayY;
       ctx.fillText(new Intl.NumberFormat('ru-RU').format(scaleVal),left-10,scaleValPosY);
@@ -337,29 +402,54 @@ class Chart {
         this.drawDashedLine(left, right, scaleValPosY, scaleValPosY);
       }
     }
-    ctx.fillText(new Intl.NumberFormat('ru-RU').format(this.rangeY.min),left-10,this.bottom);
+  }
 
+  drawYScale () {
+    const {ctx, left, right} = this;
+    const maxRound10 = this.roundToMultiple(this.rangeY.max, 10);
+    const minRound10 = this.roundToMultiple( Math.abs(this.rangeY.min), 10);
+    const yValueGapPosGap = (maxRound10) / 5;
+    const yValueGapNegGap = (minRound10) / 5;
+    
+    ctx.textAlign='right';
+    ctx.textBaseline='middle';
+    const y0 = this.getDisplayXY(left-10, 0).displayY;
+
+    this.drawScaleGrid( this.rangeY.max, 0, yValueGapPosGap );
+    if (this.rangeY.min < 0) {
+      this.drawScaleGrid( 0, this.rangeY.min, yValueGapNegGap );
+    }
+    
+    ctx.fillText(new Intl.NumberFormat('ru-RU').format(this.rangeY.min),left-10,this.bottom);
+    ctx.setLineDash([]);
     this.drawLine(left, right, y0, y0); 
-    ctx.fillText(0,left-10,y0);
+
   };
 
 
   drawXScale () {
-    const {ctx, bottom} = this;
+    const {cnv, ctx, bottom, top} = this;
     ctx.textAlign='center';
-
-    for (let i = this.rangeX.min; i <= this.rangeX.max; i++) {
-
-      if (i/5 % 1 === 0 ) { // 200 мс
-        let scaleValPosX = this.getDisplayXY(i,bottom + 10).displayX;
-        ctx.fillText(i/5 ,scaleValPosX, bottom + 10);
-
+    let scaleValPosX;
+    if (cnv === $id('osCnv')) {
+      for (let i = this.rangeX.min; i <= this.rangeX.max; i++) {
+        if (i/5 % 1 === 0 ) { // 200 мс
+          scaleValPosX = this.getDisplayXY(i,bottom + 10).displayX;
+          ctx.fillText(i/5 ,scaleValPosX, bottom + 10);
+        } if (i !== 0) {
+          this.drawDashedLine(scaleValPosX, scaleValPosX, bottom, top); // сетка   Y
+        }
+      }
+    } else {
+      for (let i = this.rangeX.min; i <= this.rangeX.max; i++) {
+        scaleValPosX = this.getDisplayXY(i,bottom + 10).displayX;
+        ctx.fillText(i ,scaleValPosX, bottom + 10);
         if (i !== 0) {
           this.drawDashedLine(scaleValPosX, scaleValPosX, bottom, top); // сетка   Y
         }
-        ctx.setLineDash([]);
       }
     }
+    ctx.setLineDash([]);
   };
 
   drawContent (data, color, coefBk = 1) {
@@ -394,7 +484,7 @@ class Chart {
     ctx.clearRect(0, 0, this.width, this.height);
   };
 
-  drawOscilloCanvas () {
+  drawCanvas () {
     const {ctx} = this;
     this.clearCanvas();
     ctx.lineWidth = 1;
@@ -404,63 +494,95 @@ class Chart {
   };
 
   oscilloInitrender(data){
-    this.drawOscilloCanvas();
+    this.rangeY=this.calcSourceMinMax('Y',data.a.values,data.b.values, data.c.values);
+    this.rangeX=this.calcSourceMinMax('X',data.a.values,data.b.values, data.c.values);
+    this.drawCanvas();
     this.drawContent(data.a, 'red');
     this.drawContent(data.b, 'blue');
     this.drawContent(data.c, 'green');
     this.drawContent(data.bk, 'purple', this.rangeY.max / 2);
-  };
+  }
 
-
+  choosePhRegim(val, data, color) {
+    this.rangeY=this.calcSourceMinMax('Y',data[val].values);
+    this.rangeX=this.calcSourceMinMax('X',data[val].values);
+    this.drawCanvas();
+    this.drawContent(data[val], color);
+  }
 }
 
-const osData = {
+let osData = {
   info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
   a: { values:[
-    { X: 0, Y: 140000 },
+    { X: 0, Y: 120000 },
     { X: 1, Y: 0 },
-    { X: 2, Y: -20000 },
-    { X: 3, Y: 28000 },
-    { X: 4, Y: 10034 },
-    { X: 5, Y: 14000 },
-    { X: 6, Y: -20000 },
-    { X: 7, Y: 28000 },
-    { X: 8, Y: 10034 },
-    { X: 9, Y: 14000 },
   ]},
   
   b: { values:[
     { X: 0, Y: -30000 },
+    { X: 1, Y: -1100 },
+  ]},
+  
+  c: { values:[
+    { X: 0, Y: -50000 },
+    { X: 1, Y: -10000 },
+  ]},
+  bk: { values:[
+    { X: 0, Y: 1 },
+    { X: 1, Y: 1 },
+  ]},
+};
+
+const osFullData = [{
+  info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
+  a: { values:[
+    { X: 0, Y: 1200 },
+    { X: 1, Y: 0 },
+  ]},
+  
+  b: { values:[
+    { X: 0, Y: -3000 },
     { X: 1, Y: -110500 },
-    { X: 2, Y: 27000 },
-    { X: 3, Y: 1034 },
-    { X: 4, Y: 14000 },
-    { X: 5, Y: 2000 },
   ]},
   
   c: { values:[
     { X: 0, Y: -30000 },
     { X: 1, Y: -110000 },
-    { X: 2, Y: 22000 },
-    { X: 3, Y: 1034 },
-    { X: 4, Y: 14000 },
-    { X: 5, Y: 151320 },
   ]},
   bk: { values:[
     { X: 0, Y: 1 },
     { X: 1, Y: 1 },
-    { X: 2, Y: 0 },
-    { X: 3, Y: 1 },
-    { X: 4, Y: 1 },
-    { X: 5, Y: 1 },
   ]},
-};
+},
+{
+  info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
+  a: { values:[
+    { X: 0, Y: 1200 },
+    { X: 1, Y: 0 },
+  ]},
+  
+  b: { values:[
+    { X: 0, Y: -3000 },
+    { X: 1, Y: -110500 },
+  ]},
+  
+  c: { values:[
+    { X: 0, Y: -30000 },
+    { X: 1, Y: -110000 },
+  ]},
+  bk: { values:[
+    { X: 0, Y: 1 },
+    { X: 1, Y: 1 },
+  ]},
+},];
 
-const osChrt = new Chart({
-  canvasId: "oscilloCanvas",
-  dotsCheck: 'osciloCanvasDots',
-  dotsValCheck: 'osciloCanvasDotsVal'
+let osChrt = new Chart({
+  canvasId: "osCnv",
+  dotsCheck: 'osCnvDots',
+  dotsValCheck: 'osCnvDotsVal'
 }, osData);
+
+
 
 addOptToOscilloSelect(osData);
 
@@ -478,70 +600,50 @@ const addRowsToOscilorgamsTableBody = ()=> {
     </tr>
     `);
   }
-
-  
-   
-  
 };
 addRowsToOscilorgamsTableBody();
-
-
-const osciloCanvasDots = document.getElementById('osciloCanvasDots');
-const osciloCanvasDotsVal = document.getElementById('osciloCanvasDotsVal');
 
 
 $id('oscillograms-tab').addEventListener('click', ()=> {
   osChrt.oscilloInitrender(osData);
 });
+
 oscilloViewbtn.addEventListener('click', ()=> {
   osChrt.oscilloInitrender(osData);
 });
-const osciloCanvasRegim = $id('osciloCanvasRegim');
+
 
 const chooseOsciloCanvasRegim = (val)=> {
   switch(val) {
   case 'a':
-    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.a.values);
-    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.a.values);
-    osChrt.drawOscilloCanvas();
-    osChrt.drawContent(osData.a, 'red');
+    osChrt.choosePhRegim('a',osData,'red');
     osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
     break;
   case 'b':
-    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.b.values);
-    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.b.values);
-    osChrt.drawOscilloCanvas();
-    osChrt.drawContent(osData.b, 'blue');
+    osChrt.choosePhRegim('b',osData,'blue');
     osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
     break;
   case 'c':
-    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.c.values);
-    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.c.values);
-    osChrt.drawOscilloCanvas();
-    osChrt.drawContent(osData.c, 'green');
+    osChrt.choosePhRegim('c',osData,'green');
     osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
     break;
   default:
-    osChrt.rangeY=osChrt.calcSourceMinMax('Y',osData.a.values,osData.b.values, osData.c.values);
-    osChrt.rangeX=osChrt.calcSourceMinMax('X',osData.a.values,osData.b.values, osData.c.values);
     osChrt.oscilloInitrender(osData);
-
   }
 };
-osciloCanvasRegim.addEventListener('change', (e) => {
-  osChrt.drawOscilloCanvas();
+$id('osciloCanvasRegim').addEventListener('change', (e) => {
+  osChrt.drawCanvas();
   chooseOsciloCanvasRegim(e.target.value);
 });
 
-osciloCanvasDots.addEventListener('change',()=> {
-  console.log(1);
-  osChrt.drawOscilloCanvas();
-  chooseOsciloCanvasRegim(osciloCanvasRegim.value);
+$id('osCnvDots').addEventListener('change',()=> {
+  osChrt.drawCanvas();
+  chooseOsciloCanvasRegim($id('osciloCanvasRegim').value);
 });
 
-osciloCanvasDotsVal.addEventListener('change',()=> {
-  osChrt.drawOscilloCanvas();
-  chooseOsciloCanvasRegim(osciloCanvasRegim.value);
+$id('osCnvDotsVal').addEventListener('change',()=> {
+  osChrt.drawCanvas();
+  chooseOsciloCanvasRegim($id('osciloCanvasRegim').value);
 });
 
 
@@ -555,10 +657,9 @@ measurmentsDBTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentDBT
 let trData = {
   a: {
     values: [
-      { X: 0, Y: 0 },
-      { X: 1, Y: 9 },
-      { X: 2, Y: 2.20 },
-      { X: 3, Y: 4 }, ],
+      { X: 0, Y: 140000 },
+      { X: 1, Y: 0 },
+      { X: 3, Y: 28000 }, ],
     dates: [
       '11.11.1111 01:01:01.1111',
       '22.22.2222 02:02:02.2222',
@@ -566,42 +667,26 @@ let trData = {
       '44.44.4444 44:44:44.4444'],
   },
   b: {values: [
-    { X: 1, Y: 4.20 },
-    { X: 2, Y: 1.2 },
+    { X: 0, Y: 120000 },
+    { X: 1, Y: 0 },
+    { X: 2, Y: -20000 },
+    { X: 3, Y: 28000 },
   ]},
   c: {values: [
-    { X: 1, Y: 3.20 },
-    { X: 2, Y: 1 },
+    { X: 0, Y: 10000 },
+    { X: 1, Y: 0 },
+    { X: 2, Y: -20000 },
+    { X: 3, Y: 28000 },
   ]}
 };
-const trndsChrt = new Chart({
-  canvasId: "trendsCanvas",
-  dotsCheck: 'trCanvasDots',
-  dotsValCheck: 'trCanvasDotsVal'
+const trChrt = new Chart({
+  canvasId: "trndsCnv",
+  dotsCheck: 'trCnvDts',
+  dotsValCheck: 'trCnvDtsVal'
 }, trData);
 
 
 // const trPadding = {y:100};
-
-// const trCanvasDots = document.getElementById('trCanvasDots');
-// const trCanvasDotsVal = document.getElementById('trCanvasDotsVal');
-// const trCanvasDates = document.getElementById('trCanvasDates');
-
-// const drawTrYScale = () => {
-//   const maxRound = Math.ceil(trRangeY.max);
-//   const yValueGap = maxRound / 5;
-
-//   trCtx.textAlign='right';
-//   trCtx.textBaseline='middle';
-
-//   for (let i = trRangeY.max; i >= 0 ; i-=yValueGap) {
-//     let scaleVal = Math.ceil(i);
-//     let scaleValPosY = getTrDisplayXY(trGraph.Left-10, scaleVal).displayY;
-//     trCtx.fillText(scaleVal,trGraph.Left-10,scaleValPosY);
-    
-//     drawDashedLine(trCtx,trGraph.Left, trGraph.Rigth, scaleValPosY, scaleValPosY); // сетка  X+
-//   }
-// };
 
 // const drawTrXScale = (ctx)=> {
 //   ctx.textAlign='center';
@@ -629,52 +714,58 @@ const trndsChrt = new Chart({
 //   }
 // };
 
-trndsChrt.drawAxes();
-trndsChrt.drawYScale();
-trndsChrt.drawXScale();
-trndsChrt.drawContent(trData.a, 'red');
 
 
-const trndsCnvPhseA = $id('trendsCanvasPhaseA');
-const trndsCnvPhseB = $id('trendsCanvasPhaseB');
-const trndsCnvPhseC = $id('trendsCanvasPhaseC');
+const trndsInitRndr = ()=> {
+  trChrt.drawCanvas();
+  trChrt.drawContent(trData.a, 'red');
+  trChrt.drawContent(trData.b, 'blue');
+  trChrt.drawContent(trData.c, 'green');
+};
+trndsInitRndr();
 
-
-const trendsCanvasRegim = $id('trendsCanvasRegim');
-trendsCanvasRegim.addEventListener('change', ()=> {
-  let a = trndsCnvPhseA.checked;
-  let b = trndsCnvPhseB.checked;
-  let c = trndsCnvPhseC.checked;
-  if (a){
-    console.log(1);
-  }
-  
-});
-
-const trendsInitRender = ()=> {
-  drawTrContent(trCtx,trData.a, 'red');
-  drawTrContent(trCtx,trData.b, 'blue');
+const colors = {
+  'a': 'red',
+  'b': 'blue',
+  'c': 'green',
 };
 
-trCanvasDates.addEventListener('change',()=> {
-  drawTrCanvas();
-  trendsInitRender();
+
+const chooseTrPh = (val) => {
+  switch(val) {
+  case 'all':
+    trndsInitRndr();
+    break;
+  default:
+    trChrt.choosePhRegim(val,trData,colors[val]);
+  }
+};
+
+$id('trCnvRegim').addEventListener('change', ()=> {
+  chooseTrPh($id('trPhses').value);
+});
+
+$id('trPhses').addEventListener('change', (e)=> {
+  chooseTrPh(e.target.value);
+});
+
+$id('trCnvDates').addEventListener('change',()=> {
+  trChrt.drawCanvas();
+  chooseTrPh($id('trPhses').value);
   // + дата режим
 });
 
-trCanvasDotsVal.addEventListener('change',()=> {
-  drawTrCanvas();
-  trendsInitRender();
+$id('trCnvDtsVal').addEventListener('change',()=> {
+  trChrt.drawCanvas();
+  chooseTrPh($id('trPhses').value);
   // + дата режим
 });
 
-trCanvasDots.addEventListener('change',()=> {
-  drawTrCanvas();
-  trendsInitRender();
+$id('trCnvDts').addEventListener('change',()=> {
+  trChrt.drawCanvas();
+  chooseTrPh($id('trPhses').value);
   // + дата режим
 });
-
-
 
 
 // eventsDB
@@ -742,20 +833,25 @@ const setModalContent = (HTMLcontent) => {
 
 // сигнализации
 // status alarm
+const statusAlarm = document.querySelector('.status-alarm');
 const statusAlarmSignal = (status) => {
-  const statusAlarm = document.querySelector('.status-alarm');
+  
   statusAlarm.classList.remove('d-none');
   // statusAlarm.classList.add('blink');
   if (status === 'warning') {
     statusAlarm.textContent = 'Внимание';
+    statusAlarm.classList.remove('accident-signal');
     statusAlarm.classList.add('warning-signal', 'blink');
-    document.querySelector('.warnong-signal').classList.add('blink');
+    document.querySelector('.warning-signal').classList.add('blink');
   } else {
     statusAlarm.textContent = 'Авария';
+    statusAlarm.classList.remove('warning-signal');
     statusAlarm.classList.add('accident-signal', 'blink');
     document.querySelector('.accident-signal').classList.add('blink');
   }
 };
+
+
 
 
 const accidentModal = () => {
@@ -870,16 +966,16 @@ const selfDiagnosisAlarm = () => {
 };
 // selfDiagnosisAlarm(); // вызов самодиагностики
 
-$id('statusAlarm').addEventListener('click', ()=>statusAlarmSignal(''));
+$id('statusAlarm').addEventListener('click', ()=>statusAlarmSignal());
 $id('accidentAlarm').addEventListener('click', ()=>accidentModal());
 $id('generalAlarm').addEventListener('click', ()=>generalAlarm());
 $id('selfDiagnosislAlarm').addEventListener('click', ()=>selfDiagnosisAlarm());
 
 // servise
 const serviceModal = () => {
-  const serviceModalContent = document.$id('serviceModalContent');
+  const serviceModalContent = $id('serviceModalContent');
   serviceModalContent.style.display = "block";
-  document.$id('serviceClose').addEventListener('click', ()=> {
+  $id('serviceClose').addEventListener('click', ()=> {
     serviceModalContent.style.display = "none";
   });
 };
@@ -905,42 +1001,51 @@ const setNumberOfTurns = $id('0x108');
 const setNumberOfShutdowns = $id('0x109');
 
 
-const sendCommand = (e)=> {
-  const code = e.target.id;
-  console.log('code ', code);
-  send(1, 551, code);
-  send(1, 550, code);
-};
-
-const sendCommandWithArg = (e)=> {
-  const code = e.target.id;
-
-  const val = document.querySelector(`[data-id='${code}']`).value;
-  console.log('code arg', code);
-  console.log('val arg', val);
-  send(1, 551, code);
-  send(1, 550, val);
-};
-
+// +
 const comandBtns = [resetEventsJournal, resetMeassurmentsJournal,resetOscillogramms, setDefaultConfiguration, resetAccumulatedMeasurements, calibrationFor1000, calibrationFor10000, setAlarm, resetAlarm];
-
 const comandBtnsWithArg = [setPhaseAWear, setPhaseBWear, setPhaseCWear, setNumberOfTurns, setNumberOfShutdowns];
-
-comandBtns.forEach(btn => btn.addEventListener('click', (e)=> sendCommand(e)));
-
-comandBtnsWithArg.forEach(btn => btn.addEventListener('click', (e)=> sendCommandWithArg(e)));
-
 
 // data
 
 // helpers func
-const findReg = (regStr) => $id(`${regStr}`);
-const findRegDataId = (regStr) => document.querySelectorAll(`[data-id='${regStr}']`);
-
-
+const $DataId = (regStr) => document.querySelectorAll(`[data-id='${regStr}']`);
 const isEmpty = (obj)=> !Object.values(obj).some(x => x !== null && x !== '');
 
-let view474475 = new DataView(new ArrayBuffer(4));
+const ab2str = (buf) => String.fromCharCode.apply(null, new Uint16Array(buf));
+const str2ab = (str) => {
+  let buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+  let bufView = new Uint16Array(buf);
+  for (let i=0, strLen=str.length; i < strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
+};
+const ab2int = (data)=> [].reduce.call(data, (r, a) => (r << 8) + a, 0) & ((1 << 15) - 1);;
+
+// let a = ab2str([0x02, 0x01, 0x03, 0x07]);
+// let b = str2ab('z2s');
+
+// let buff = str2ab('4942');
+// console.log(buff);
+// let data = new Uint16Array(buff);
+// console.log(data[0]);
+
+
+// let view474475 = new Uint8Array([03,4]);
+let $0001_0002 = [];
+let $411_412 = [];
+let $463_464 = [];
+let $465_466 = [];
+let $474_475 = [];
+let $477_478 = [];
+
+
+
+
+// console.log((231232).toString(16));
+// console.log(str2ab((231232).toString(16)));
+// console.log(ab2str(str2ab((231232).toString(16))));
+
 let view477478 = new DataView(new ArrayBuffer(4));
 
 let firmwareStr = '';
@@ -963,19 +1068,30 @@ function send(operation, register, value){
       socket.send(sendArray);
 }
 
-socket.onopen = (e)=>{
-
-  console.log('o');
-  send(0, 10, 0);
-  send(0, 11, 0);
-  send(0, 12, 0);
-
+const sendCommand = (e)=> {
+  const code = e.target.id;
+  console.log('code ', code);
+  send(1, 551, code);
+  send(1, 550, code);
 };
+
+const sendCommandWithArg = (e)=> {
+  const code = e.target.id;
+
+  const val = document.querySelector(`[data-id='${code}']`).value;
+  console.log('code arg', code);
+  console.log('val arg', val);
+  send(1, 551, code);
+  send(1, 550, val);
+};
+
+comandBtns.forEach(btn => btn.addEventListener('click', (e)=> sendCommand(e)));
+comandBtnsWithArg.forEach(btn => btn.addEventListener('click', (e)=> sendCommandWithArg(e)));
 
 
 let upload_pointer = 0;
 let firmware_array = 0;
-
+// +
 const regArrayToSetValuesInSpan = [
   '10', '11', '12', // test date
   '0000','0001', '0002', '0003', //  конфиг
@@ -985,43 +1101,45 @@ const regArrayToSetValuesInSpan = [
   '0258', '0260', '0261', '0262','0263','0264','0265','0266','0267', // гл. окно. данные последней коммутации
   '414','415', // конфиг 
 ];
-
+// +
 const regArrayToSetValuesInSpanDataId = [ // встречается дважды id атрибут
-  '0200', // записи в журнале измерений
-  '0300' // записи в журнале событий
+  '0200', // записей в журнале измерений
+  '0300', // записей в журнале событий
+  '0600-0601' // число осцилограмм
 ]; 
 
+// +
 const regArrayToSetValuesInInput = [
   410, 411, 413, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447,
   448, 449, 450, 451, 452, 453, // service
   454, 455, 456, 457, 458, 459, 460, 461, 462, 467, 468, 471, 473, 476, // configuration control
 ];
-const regArrayToSetValuesTo32 = [474,475];
+
+const regArrayToSetValuesFromBuff = ['0001', '0002', 411, 412, 463, 464, 465,466, 474,475, 477, 478];
+
+// +
 const regToFirmwareArray = [
   484,485,486,487 ,488 ,489 ,490 ,491 ,492 ,493 ,494 
   ,495 ,496 ,497 ,498 ,499 ,500 ,501 ,502 ,503 ,504 ,
   505 ,506 ,507 ,508 ,509,510 ,511 ,512 ,513 ,514 ,515 
   ,516 ,517 ,518 ,519]; 
-
+// +
 const regArrayToSetValuesIfElse = [
   '0111', '0259',
 ];
-
-const regArrayToSetValuesWithCoefficent = [
+// +
+const phasesCoefficent = [
   '0113', '0115', '0117', //   расход ресурса фаз в %
 ];
 
-
+// +
 const measurementsJournal = ['0201','0204','0206', '0207','0208','0209','0210','0211','0212','0213','0214','0215','0216','0217','0218','0219','0220','0221','0222','0223','0224','0225','0226','0227','0228'];
-
+// +
 const eventsJournal = ['0301','0303','0304','0305','0306','0307','0308','0309','0310','0311'];
-
+// принадлежность к фазе осцилограмм
 const oscilloPhaseASign = [1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97];
-
 const oscilloPhaseCSign = [3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71, 75, 79, 83, 87, 91, 95, 99];
-
-const oscillosJournal = ['0600', '0601' ];
-
+// +
 const osciloCurrentInfo = ['0602', '0603', '0605', '0606','0607','0608','0609','0610','0611','0612'];
 
 function recv(data){
@@ -1034,29 +1152,42 @@ function recv(data){
     console.log(register);
 
     if (regArrayToSetValuesInSpan.includes(`${register}`)) {
-      findReg(`${register}`).textContent = value;
+      if (register === '0265' || '0265' || '0267') {
+        $id(`${register}`).textContent = value * 0.01;
+      }
+      $id(`${register}`).textContent = value;
     }
 
     if (regArrayToSetValuesInSpanDataId.includes(`${register}`)) {
-      [...findRegDataId(`${register}`)].forEach(t=> {t.textContent = value;});
+      [...$DataId(`${register}`)].forEach(t=> {t.textContent = value;});
     }
 
     if (register === '0111' && value === 1) {
-      findReg(`${register}`).textContent = 'Включено';
+      $id(`${register}`).textContent = 'Включено';
     }
     if (register === '0111' && value === 2) {
-      findReg(`${register}`).textContent = 'Отключено';
+      $id(`${register}`).textContent = 'Отключено';
     }
 
-    if (register === '0113' ||register === '0115' || register ==='0017') { //  износ ресурса фаз
-      findReg(`${register}`).textContent = (value * 0.01).toFixed(2);
+    if (phasesCoefficent.includes(`${register}`)) { //  износ ресурса фаз
+      $id(`${register}`).textContent = (value * 0.01).toFixed(2);
+      if (register === '0113') {
+        markElemInDiagramm('#phaseDiagrammA', value * 0.01);
+      }
+      if (register === '0115') {
+        markElemInDiagramm('#phaseDiagrammB', value * 0.01);
+      }
+      if (register === '0117') {
+        markElemInDiagramm('#phaseDiagrammC', value * 0.01);
+      }
     }
+
 
     if (register === '0259' && value === 1) {
-      findReg(`${register}`).textContent = 'ВКЛ.';
+      $id(`${register}`).textContent = 'ВКЛ.';
     }
     if (register === '0259' && value === 2) {
-      findReg(`${register}`).textContent = 'ОТКЛ.';
+      $id(`${register}`).textContent = 'ОТКЛ.';
     }
 
     if (eventsJournal.includes(register)) {
@@ -1073,19 +1204,69 @@ function recv(data){
       }
     }
 
-    if (regArrayToSetValuesTo32.includes(register)) {
-      if (register === 474) {view474475.setInt16(0, value, false); }
-      if (register === 475) {
-        view474475.setInt16(2, value, false);
-        findReg('474-475').value = view474475.getFloat32(0, false);
+    if (regArrayToSetValuesFromBuff.includes(register)) {
+      if (register === '0001') $0001_0002[0] = value; // ст
+      if (register === '0002') {
+        $0001_0002[1] = value;
+        $id('0001-0002').textContent = ab2int($0001_0002);
       }
 
-      if (register === 477) {view477478.setInt16(0, value, false); }
+      if (register === 411) $411_412[0] = value; // c
+      if (register === 412) {
+        $411_412[1] = value;
+        $id('411-412').value = ab2int($411_412);
+      }
+
+      if (register === 463) $463_464[0] = value; // c
+      if (register === 464) {
+        $463_464[1] = value;
+        $id('463-464').value = ab2int($463_464);
+      }
+
+      if (register === 465) $465_466[0] = value; // c
+      if (register === 466) {
+        $465_466[1] = value;
+        $id('465-466').value = ab2int($465_466);
+      }
+
+      if (register === 474) $474_475[0] = value; // c
+      if (register === 475) {
+        $474_475[1] = value;
+        $id('474-475').value = ab2int($474_475);
+      }
+
+      if (register === 477) $477_478[0] = value; // c
       if (register === 478) {
-        view477478.setInt16(2, value, false);
-        findReg('477-478').value = view477478.getFloat32(0, false);
+        $477_478[1] = value;
+        $id('477-478').value = ab2int($477_478);
       }
     }
+
+    if(regArrayToSetValuesInInput.includes(register)) {
+      if (register === 448 ||450 || 452) {
+        value *= 0.001;
+      }
+      if (register >= 456 &&register <= 461 ) {
+        value *= 0.1;
+      }
+      $id(`${register}`).value = value;
+    }
+
+    if (register === 472) {
+      let arr = new Uint16Array(value);
+      if (arr[0] === 1 ){
+        $id('472a').checked = true;
+      } 
+      if (arr[1] === 1 ){
+        $id('472b').checked = true;
+      }  
+      if (arr[2] === 1 ){
+        $id('472c').checked = true;
+      }      
+    }
+
+
+
 
     if (regToFirmwareArray.includes(register)) {
       firmwareStr += value;
@@ -1093,7 +1274,8 @@ function recv(data){
     }
     if (register === '0600' || register === '0601' ) { // число осцилограмм
       oscilloNumSum += value;
-      findReg("600-601").textContent = oscilloNumSum; }
+      $id("0600-0601").textContent = oscilloNumSum; }
+
     if (osciloCurrentInfo.includes(register)) {
       osData.info.push({register:value}); 
     }
@@ -1101,23 +1283,20 @@ function recv(data){
     if (register >= 613 && register <= 4616) {
 
       if ( oscilloPhaseASign.includes(Number(value.toString().slice(-2))) )
-        osData.a.values.push({x:osData.a.values.length, y: value});
+        osData.a.values.push({x:osData.a.values.length, y: value*10});
       
       if(register%2 === 0 && register%4 !== 0) {
-        osData.b.values.push({x:osData.b.values.length, y: value});
+        osData.b.values.push({x:osData.b.values.length, y: value*10});
       }
           
       if ( oscilloPhaseCSign.includes(Number(value.toString().slice(-2))) )
-        osData.c.values.push({x:osData.c.values.length, y: value});
+        osData.c.values.push({x:osData.c.values.length, y: value*10});
       
       if (register%4 === 0) {
         osData.bk.values.push({x:osData.bk.values.length, y: value});
       }
     } 
     
-    // if (register === 474) {findReg("0011").textContent = value; }
-    // if (register === 12) {findReg("0012").textContent = value; }
-
 
     if (int16_array[1] === 398)// #define FIRMWARE_UPLOAD 398
     {
@@ -1137,27 +1316,50 @@ function recv(data){
 
 }
 
+socket.onopen = (e)=>{
+  // данные главного окна
+  regArrayToSetValuesInSpan.forEach( i => send (0, i, 0)); // данные гл. окна при старте
+  phasesCoefficent.forEach( i => send (0, i, 0)); // диагнаммы гл. она и сигнализация
+  regArrayToSetValuesIfElse.forEach( i => send (0, i, 0)); 
+};
+
 socket.onmessage = (e)=>{recv(e.data);};
 socket.onclose = (e)=>{if (e.wasClean){dbg_out("Соединение закрыто нормально");}else{dbg_out("Соединение закрыто экстренно");}};
 socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message);};
 
+//  возможность получения при загрузке сркипта 
+// $id('script').onload = ()=> {};
 
-const fff = ()=> {
-  for (let i=10; i <= 12; i++) {
-    send (0, i, 0);
-  }
-};
+// при переходе на вкладку конфигурация 
+$id('configuration').addEventListener('click', ()=> {
+  regArrayToSetValuesInInput.forEach(i => send(0, i, 0));
+  regToFirmwareArray.forEach(i => send(0, i, 0));
+  send(0,472,0);
+});
+// вкладки осцилогамм
+[...$DataId('oscillograms'), ...$DataId('oscillogramsDB')].forEach(tab => {
+  tab.addEventListener('click', ()=> {
+    oscilloNumSum = 0;
+    send(0, '0600', 0);// число осцилограмм
+    send(0, '0601', 0);
+    osciloCurrentInfo.forEach(i => send(0, i, 0));
+  });
+});
 
-
-
-const script = document.getElementById('script');
-script.onload = ()=> {
-  // send(0, 10, 0);
-  // send(0, 11, 0);
-  // send(0, 12, 0);
-  fff();
-};
-
+// вкладки событий
+[...$DataId('eventsDB'),...$DataId('events')].forEach(tab => {
+  tab.addEventListener('click', ()=> {
+    send(0, '0300', 0); // записей в журнале событий
+    eventsJournal.forEach(i => send(0, i, 0));
+  });
+});
+// вкладки измерений
+[...$DataId('measurementsDB'),...$DataId('measurements')].forEach(tab => {
+  tab.addEventListener('click', ()=> {
+    send(0, '0200', 0); // записей в журнале измерений
+    measurementsJournal.forEach(i => send(0, i, 0));
+  });
+});
 
 function setDate(){
   send(0, 10, 0);
@@ -1189,18 +1391,6 @@ function read_file(inp){
 
   r.readAsArrayBuffer(f);
 }
-
-
-// function d2h(d) { return (+d).toString(16).toUpperCase(); }
-// function h2d(h) { return (+d).toString(16).toUpperCase(); }
-
-
-// console.log(d2h(29));
-
-
-// console.log('hexString', (251).toString(16));
-// console.log('hex2dec',parseInt(101, 16));
-
 
 
 $id('file').addEventListener('change', ()=> {
