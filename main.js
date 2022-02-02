@@ -3,14 +3,16 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-plusplus */
-/* eslint-disable no-unused-vars */
+
 /* eslint-disable prefer-const */
 /* eslint-disable camelcase */
 
 const $id = ( id ) => document.getElementById( id );
+const delAllNodes = (node) => {
+  while (node.firstChild) node.removeChild(node.lastChild);
+};
 
 // main tabs
-const navTabs = document.querySelector(".nav-tabs");
 const navTabButton = document.querySelectorAll(".nav-tab");
 const mainContents = document.querySelectorAll(".main-content");
 
@@ -28,14 +30,14 @@ const tabsSwitcher = (e, tabs, contents) => {
     element.classList.add("active");
   };
 };
-navTabs.addEventListener('click', (e) => tabsSwitcher(e, navTabButton, mainContents));
+$id('nav-tabs').addEventListener('click', (e) => tabsSwitcher(e, navTabButton, mainContents));
 // phase diagramm
 const fillDiagramms = (diagramm) => {
   for (let i = 20; i >= 0; i--) {
     const scale = document.createElement("DIV");
     const node = document.createElement("DIV");
     scale.append(node);
-    scale.setAttribute('class', 'd-flex justify-content-end '); // шкала
+    scale.setAttribute('class', 'd-flex jcend '); // шкала
     node.setAttribute('data-value', i * 10); // атрибут для текущего значения
     if (i === 20) {
       scale.insertAdjacentHTML('afterbegin', '<div class="phase-scale ">200</div>');
@@ -188,8 +190,7 @@ const addRowToMeasurmentsTable = (table, obj) => {
 };
 
 addRowToMeasurmentsTable(measurementsAllTableBody,measurmentsTableCurrentObj);
-// добавить фильтр переключений
-addRowToMeasurmentsTable(measurementsSwitchTableBody,measurmentsTableCurrentObj);
+
 
 
 // events tab
@@ -291,9 +292,7 @@ const addOptToOscilloSelect = (data)=> {
   let str = `${+val(0) === 1 ? 'ВКЛ' : 'ОТКЛ'} ${val(4)}.${val(3)}.${val(2)} ${val(5)}:${val(6)}:${val(7)}.${val(8)}.${val(9)}`;// on? y.m.d h:m:sss
   opt.value = val(1); // номер (рег 0603)
   opt.innerHTML = str;
-  let clone = opt.cloneNode(true);
-  $id('jsOsSelect1').appendChild(opt);
-  $id('jsOsSelect2').appendChild(clone);
+  $id('jsOsSelect').appendChild(opt);
 };
 
 class Chart {
@@ -311,7 +310,7 @@ class Chart {
     this.right = this.width-this.padding.x;
     this.top = this.padding.y;
     this.bottom = this.height-this.padding.y;
-
+    this.bk = true;
     this.phClrs = {'a': 'red','b': 'blue','c': 'green',};
 
     this.dotsCheck = $id(opt.dotsCheck);
@@ -497,7 +496,7 @@ class Chart {
     this.drawYScale();
   };
 
-  oscilloInitrender(){
+  initRndr(){
     const {data} = this;
     this.rangeY=this.calcSourceMinMax('Y',data.a.values,data.b.values, data.c.values);
     this.rangeX=this.calcSourceMinMax('X',data.a.values,data.b.values, data.c.values);
@@ -506,7 +505,10 @@ class Chart {
     this.drawContent(data.a, 'red');
     this.drawContent(data.b, 'blue');
     this.drawContent(data.c, 'green');
-    this.drawContent(data.bk, 'purple', this.rangeY.max / 2);
+    if (this.bk) {
+      this.drawContent(data.bk, 'purple', this.rangeY.max / 2);
+    }
+    
   }
 
   choosePhRegim(val, color) {
@@ -520,11 +522,14 @@ class Chart {
   chooseOsciloCanvasRegim(val) {
     switch(val) {
     case 'all':
-      this.oscilloInitrender();
+      this.initRndr();
       break;
     default:
       this.choosePhRegim(val,this.phClrs[val]);
-      this.drawContent(this.data.bk, 'purple', this.rangeY.max / 2);
+      if (this.bk) {
+        this.drawContent(this.data.bk, 'purple', this.rangeY.max / 2);
+      }
+      
     }
   };
 
@@ -539,7 +544,7 @@ class Chart {
       this.chooseOsciloCanvasRegim(this.phRegim.value);
     });
 
-    this.phRegim.addEventListener('change', (e) => {
+    this.phRegim.addEventListener('change', () => {
       this.drawCanvas();
       this.chooseOsciloCanvasRegim(this.phRegim.value);
     });
@@ -547,7 +552,7 @@ class Chart {
 }
 
 let osData = [{
-  info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
+  info: [{f:1},{1: 0},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
   a: { values:[
     { X: 0, Y: 12000 },
     { X: 1, Y: 0 },
@@ -568,7 +573,7 @@ let osData = [{
   ]},
 },
 {
-  info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
+  info: [{f:0},{1: 1},{2:3033},{3:33},{4:'33'},{5:16},{6:20},{7:1},{8:999},{9:0}],
   a: { values:[
     { X: 0, Y: 16000 },
     { X: 1, Y: 0 },
@@ -596,20 +601,13 @@ let osChrt = new Chart({
   phRegim: 'osCnvPh',
 }, osData[0]);
 
-osChrt.oscilloInitrender();
+
 osChrt.eventsListen();
 
 
-
-
-
-addOptToOscilloSelect(osData[0]);
-
-const oscilorgamsTableBody = $id('oscilorgamsTableBody');
 const addRowsToOscilorgamsTableBody = (data)=> {
-
   for(let i = data.a.values[0].X; i < data.a.values.length; i++) {
-    oscilorgamsTableBody.insertAdjacentHTML('beforeend',`
+    $id('oscilorgamsTableBody').insertAdjacentHTML('beforeend',`
     <tr>
       <td>${i}</td>     
       <td>${data.bk.values[i] ? data.bk.values[i].Y : "-"}</td>
@@ -620,29 +618,28 @@ const addRowsToOscilorgamsTableBody = (data)=> {
     `);
   }
 };
-addRowsToOscilorgamsTableBody(osData[0]);
-addRowsToOscilorgamsTableBody(osData[1]);
 
 
-$id('oscillograms-tab').addEventListener('click', ()=> {
-  osChrt.oscilloInitrender(osData);
+
+$id('jsOsSelect').addEventListener('click', (e)=> {
+  const idx = e.target.value;
+  osChrt.data = osData[idx];
+  delAllNodes($id('oscilorgamsTableBody'));
+  addRowsToOscilorgamsTableBody(osData[idx]);
+  osChrt.initRndr();
 });
 
-oscilloViewbtn.addEventListener('click', ()=> {
-  osChrt.oscilloInitrender(osData);
-});
+const refreshOsData = (newData)=> {
+  delAllNodes($id('jsOsSelect'));
+  newData.forEach(i => addOptToOscilloSelect(i)); // опции
+};
+
+refreshOsData(osData);
 
 
-
-
-// measurementsDB-tab
-const measurmentsDBTabs = document.querySelector('.measurmentsDB-tabs');
-const measurmentDBTab = document.querySelectorAll('.measurmentDB-tab');
-const measurmentsDBContent = document.querySelectorAll('.measurmentsDB-content');
-measurmentsDBTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentDBTab, measurmentsDBContent));
 // TrendsCanvas
 
-let trData = {
+let trData = [{
   a: {
     values: [
       { X: 0, Y: 140000 },
@@ -666,15 +663,40 @@ let trData = {
     { X: 2, Y: -20000 },
     { X: 3, Y: 28000 },
   ]}
-};
+},
+{
+  a: {
+    values: [
+      { X: 0, Y: 140000 },
+      { X: 1, Y: 0 },
+      { X: 3, Y: 28000 }, ],
+    dates: [
+      '11.11.1111 01:01:01.1111',
+      '22.22.2222 02:02:02.2222',
+      '33.33.3333 03:03:03.3333',
+      '44.44.4444 44:44:44.4444'],
+  },
+  b: {values: [
+    { X: 0, Y: 120000 },
+    { X: 1, Y: 0 },
+    { X: 2, Y: -20000 },
+    { X: 3, Y: 28000 },
+  ]},
+  c: {values: [
+    { X: 0, Y: 10000 },
+    { X: 1, Y: 0 },
+    { X: 2, Y: -20000 },
+    { X: 3, Y: 28000 },
+  ]}
+}]
+;
 const trChrt = new Chart({
   canvasId: "trndsCnv",
   dotsCheck: 'trCnvDts',
-  dotsValCheck: 'trCnvDtsVal'
-}, trData);
+  dotsValCheck: 'trCnvDtsVal',
+  phRegim: 'trPhses',
+}, trData[1]);
 
-
-// const trPadding = {y:100};
 
 // const drawTrXScale = (ctx)=> {
 //   ctx.textAlign='center';
@@ -704,69 +726,34 @@ const trChrt = new Chart({
 
 
 
-const trndsInitRndr = ()=> {
-  trChrt.drawCanvas();
-  trChrt.drawContent(trData.a, 'red');
-  trChrt.drawContent(trData.b, 'blue');
-  trChrt.drawContent(trData.c, 'green');
-};
-trndsInitRndr();
 
-const colors = {
-  'a': 'red',
-  'b': 'blue',
-  'c': 'green',
-};
+trChrt.bk = false;
+// trChrt.padding.y = 200;
+trChrt.initRndr();
+
+trChrt.eventsListen();
 
 
-const chooseTrPh = (val) => {
-  switch(val) {
-  case 'all':
-    trndsInitRndr();
-    break;
-  default:
-    trChrt.choosePhRegim(val,trData,colors[val]);
-  }
-};
+// $id('trCnvRegim').addEventListener('change', ()=> {
+//   chooseTrPh($id('trPhses').value);
+// });
 
-$id('trCnvRegim').addEventListener('change', ()=> {
-  chooseTrPh($id('trPhses').value);
-});
-
-$id('trPhses').addEventListener('change', (e)=> {
-  chooseTrPh(e.target.value);
-});
-
-$id('trCnvDates').addEventListener('change',()=> {
-  trChrt.drawCanvas();
-  chooseTrPh($id('trPhses').value);
-  // + дата режим
-});
-
-$id('trCnvDtsVal').addEventListener('change',()=> {
-  trChrt.drawCanvas();
-  chooseTrPh($id('trPhses').value);
-  // + дата режим
-});
-
-$id('trCnvDts').addEventListener('change',()=> {
-  trChrt.drawCanvas();
-  chooseTrPh($id('trPhses').value);
-  // + дата режим
-});
+// $id('trCnvDates').addEventListener('change',()=> {
+//   trChrt.drawCanvas();
+//   chooseTrPh($id('trPhses').value);
+//   // + дата режим
+// });
 
 
-// eventsDB
-// oscilogramsDB
-// configyration-tab
-const configurationTabs = document.querySelector('.configuration-tabs');
-const configurationTab = document.querySelectorAll('.configuration-tab');
-const configurationContent = document.querySelectorAll('.configuration-content');
-configurationTabs.addEventListener('click', (e) => tabsSwitcher(e, configurationTab, configurationContent));
+
+// config-tab
+const cnfTabs = document.querySelector('.cnf-tabs');
+const cnfTab = document.querySelectorAll('.cnf-tab');
+const cnfContent = document.querySelectorAll('.cnf-content');
+cnfTabs.addEventListener('click', (e) => tabsSwitcher(e, cnfTab, cnfContent));
 
 function addZero(value) {
   if (value < 10) {
-    // eslint-disable-next-line no-param-reassign
     value = '0' + value;
   }
   return value;
@@ -802,7 +789,6 @@ setInterval(()=>setHadleTimeInput(),30000);
 
 // modal
 const modal = $id("myModal");
-const modalBtn = $id("modalBtn");
 const closeModal = document.getElementsByClassName("close")[0];
 
 closeModal.onclick = () => {modal.style.display = "none";};
@@ -976,7 +962,7 @@ const resetEventsJournal = $id('0x100');
 const resetMeassurmentsJournal = $id('0x101');
 const resetOscillogramms = $id('0x102');
 const resetAccumulatedMeasurements = $id('0x103');
-const setDefaultConfiguration = $id('0x104');
+const setDefaultcnf = $id('0x104');
 const calibrationFor1000 = $id('0x10A');
 const calibrationFor10000 = $id('0x10B');
 const setAlarm = $id('0x10C');
@@ -990,7 +976,7 @@ const setNumberOfShutdowns = $id('0x109');
 
 
 // +
-const comandBtns = [resetEventsJournal, resetMeassurmentsJournal,resetOscillogramms, setDefaultConfiguration, resetAccumulatedMeasurements, calibrationFor1000, calibrationFor10000, setAlarm, resetAlarm];
+const comandBtns = [resetEventsJournal, resetMeassurmentsJournal,resetOscillogramms, setDefaultcnf, resetAccumulatedMeasurements, calibrationFor1000, calibrationFor10000, setAlarm, resetAlarm];
 const comandBtnsWithArg = [setPhaseAWear, setPhaseBWear, setPhaseCWear, setNumberOfTurns, setNumberOfShutdowns];
 
 // data
@@ -1100,7 +1086,7 @@ const regArrayToSetValuesInSpanDataId = [ // встречается дважды
 const regArrayToSetValuesInInput = [
   410, 411, 413, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447,
   448, 449, 450, 451, 452, 453, // service
-  454, 455, 456, 457, 458, 459, 460, 461, 462, 467, 468, 471, 473, 476, // configuration control
+  454, 455, 456, 457, 458, 459, 460, 461, 462, 467, 468, 471, 473, 476, // cnf control
 ];
 
 const regArrayToSetValuesFromBuff = ['0001', '0002', 411, 412, 463, 464, 465,466, 474,475, 477, 478];
@@ -1319,13 +1305,13 @@ socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message
 // $id('script').onload = ()=> {};
 
 // при переходе на вкладку конфигурация 
-$id('configuration').addEventListener('click', ()=> {
+$id('cnf').addEventListener('click', ()=> {
   regArrayToSetValuesInInput.forEach(i => send(0, i, 0));
   regToFirmwareArray.forEach(i => send(0, i, 0));
   send(0,472,0);
 });
 // вкладки осцилогамм
-[...$DataId('oscillograms'), ...$DataId('oscillogramsDB')].forEach(tab => {
+[...$DataId('oscillograms')].forEach(tab => {
   tab.addEventListener('click', ()=> {
     oscilloNumSum = 0;
     send(0, '0600', 0);// число осцилограмм
@@ -1335,14 +1321,14 @@ $id('configuration').addEventListener('click', ()=> {
 });
 
 // вкладки событий
-[...$DataId('eventsDB'),...$DataId('events')].forEach(tab => {
+[...$DataId('events')].forEach(tab => {
   tab.addEventListener('click', ()=> {
     send(0, '0300', 0); // записей в журнале событий
     eventsJournal.forEach(i => send(0, i, 0));
   });
 });
 // вкладки измерений
-[...$DataId('measurementsDB'),...$DataId('measurements')].forEach(tab => {
+[...$DataId('measurements')].forEach(tab => {
   tab.addEventListener('click', ()=> {
     send(0, '0200', 0); // записей в журнале измерений
     measurementsJournal.forEach(i => send(0, i, 0));
