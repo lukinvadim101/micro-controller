@@ -300,8 +300,9 @@ class Chart {
   constructor(opt, data) {
     this.cnv = $id(opt.canvasId);
     this.ctx = this.cnv.getContext("2d");
-    this.rangeY = this.calcSourceMinMax('Y',data.a.values,data.b.values, data.c.values);
-    this.rangeX = this.calcSourceMinMax('X',data.a.values,data.b.values, data.c.values);
+    this.data = data;
+    this.rangeY = this.calcSourceMinMax('Y',this.data.a.values,this.data.b.values, this.data.c.values);
+    this.rangeX = this.calcSourceMinMax('X',this.data.a.values,this.data.b.values, this.data.c.values);
     this.width = this.cnv.width;
     this.height = this.cnv.height;
     this.padding = {x: 60, y: 60};
@@ -311,8 +312,11 @@ class Chart {
     this.top = this.padding.y;
     this.bottom = this.height-this.padding.y;
 
+    this.phClrs = {'a': 'red','b': 'blue','c': 'green',};
+
     this.dotsCheck = $id(opt.dotsCheck);
     this.dotsValCheck = $id(opt.dotsValCheck);
+    this.phRegim = $id(opt.phRegim);
   }
 
   mapRange(value, sourceLow, sourceHigh, mappedLow, mappedHigh) {
@@ -493,9 +497,11 @@ class Chart {
     this.drawYScale();
   };
 
-  oscilloInitrender(data){
+  oscilloInitrender(){
+    const {data} = this;
     this.rangeY=this.calcSourceMinMax('Y',data.a.values,data.b.values, data.c.values);
     this.rangeX=this.calcSourceMinMax('X',data.a.values,data.b.values, data.c.values);
+    this.phRegim.value = 'all';
     this.drawCanvas();
     this.drawContent(data.a, 'red');
     this.drawContent(data.b, 'blue');
@@ -503,51 +509,58 @@ class Chart {
     this.drawContent(data.bk, 'purple', this.rangeY.max / 2);
   }
 
-  choosePhRegim(val, data, color) {
+  choosePhRegim(val, color) {
+    const {data} = this;
     this.rangeY=this.calcSourceMinMax('Y',data[val].values);
     this.rangeX=this.calcSourceMinMax('X',data[val].values);
     this.drawCanvas();
     this.drawContent(data[val], color);
   }
+
+  chooseOsciloCanvasRegim(val) {
+    switch(val) {
+    case 'all':
+      this.oscilloInitrender();
+      break;
+    default:
+      this.choosePhRegim(val,this.phClrs[val]);
+      this.drawContent(this.data.bk, 'purple', this.rangeY.max / 2);
+    }
+  };
+
+  eventsListen(){
+    this.dotsCheck.addEventListener('change',()=> {
+      this.drawCanvas();
+      this.chooseOsciloCanvasRegim(this.phRegim.value);
+    });
+
+    this.dotsValCheck.addEventListener('change',()=> {
+      this.drawCanvas();
+      this.chooseOsciloCanvasRegim(this.phRegim.value);
+    });
+
+    this.phRegim.addEventListener('change', (e) => {
+      this.drawCanvas();
+      this.chooseOsciloCanvasRegim(this.phRegim.value);
+    });
+  }
 }
 
-let osData = {
+let osData = [{
   info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
   a: { values:[
-    { X: 0, Y: 120000 },
+    { X: 0, Y: 12000 },
     { X: 1, Y: 0 },
   ]},
   
   b: { values:[
-    { X: 0, Y: -30000 },
-    { X: 1, Y: -1100 },
+    { X: 0, Y: 3000 },
+    { X: 1, Y: -11500 },
   ]},
   
   c: { values:[
-    { X: 0, Y: -50000 },
-    { X: 1, Y: -10000 },
-  ]},
-  bk: { values:[
-    { X: 0, Y: 1 },
-    { X: 1, Y: 1 },
-  ]},
-};
-
-const osFullData = [{
-  info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
-  a: { values:[
-    { X: 0, Y: 1200 },
-    { X: 1, Y: 0 },
-  ]},
-  
-  b: { values:[
-    { X: 0, Y: -3000 },
-    { X: 1, Y: -110500 },
-  ]},
-  
-  c: { values:[
-    { X: 0, Y: -30000 },
-    { X: 1, Y: -110000 },
+    { X: 0, Y: 10000 },
+    { X: 1, Y: -11000 },
   ]},
   bk: { values:[
     { X: 0, Y: 1 },
@@ -557,18 +570,18 @@ const osFullData = [{
 {
   info: [{f:1},{1: 666},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
   a: { values:[
-    { X: 0, Y: 1200 },
+    { X: 0, Y: 16000 },
     { X: 1, Y: 0 },
   ]},
   
   b: { values:[
     { X: 0, Y: -3000 },
-    { X: 1, Y: -110500 },
+    { X: 1, Y: -1000 },
   ]},
   
   c: { values:[
-    { X: 0, Y: -30000 },
-    { X: 1, Y: -110000 },
+    { X: 0, Y: -4000 },
+    { X: 1, Y: -1000 },
   ]},
   bk: { values:[
     { X: 0, Y: 1 },
@@ -579,29 +592,36 @@ const osFullData = [{
 let osChrt = new Chart({
   canvasId: "osCnv",
   dotsCheck: 'osCnvDots',
-  dotsValCheck: 'osCnvDotsVal'
-}, osData);
+  dotsValCheck: 'osCnvDotsVal',
+  phRegim: 'osCnvPh',
+}, osData[0]);
+
+osChrt.oscilloInitrender();
+osChrt.eventsListen();
 
 
 
-addOptToOscilloSelect(osData);
+
+
+addOptToOscilloSelect(osData[0]);
 
 const oscilorgamsTableBody = $id('oscilorgamsTableBody');
-const addRowsToOscilorgamsTableBody = ()=> {
+const addRowsToOscilorgamsTableBody = (data)=> {
 
-  for(let i = osData.a.values[0].X; i < osData.a.values.length; i++) {
+  for(let i = data.a.values[0].X; i < data.a.values.length; i++) {
     oscilorgamsTableBody.insertAdjacentHTML('beforeend',`
     <tr>
       <td>${i}</td>     
-      <td>${osData.bk.values[i] ? osData.bk.values[i].Y : "-"}</td>
-      <td>${osData.a.values[i].Y}</td>
-      <td>${osData.b.values[i] ? osData.b.values[i].Y : "-"}</td>
-      <td>${osData.c.values[i] ? osData.c.values[i].Y : "-"}</td>
+      <td>${data.bk.values[i] ? data.bk.values[i].Y : "-"}</td>
+      <td>${data.a.values[i].Y}</td>
+      <td>${data.b.values[i] ? data.b.values[i].Y : "-"}</td>
+      <td>${data.c.values[i] ? data.c.values[i].Y : "-"}</td>
     </tr>
     `);
   }
 };
-addRowsToOscilorgamsTableBody();
+addRowsToOscilorgamsTableBody(osData[0]);
+addRowsToOscilorgamsTableBody(osData[1]);
 
 
 $id('oscillograms-tab').addEventListener('click', ()=> {
@@ -613,38 +633,6 @@ oscilloViewbtn.addEventListener('click', ()=> {
 });
 
 
-const chooseOsciloCanvasRegim = (val)=> {
-  switch(val) {
-  case 'a':
-    osChrt.choosePhRegim('a',osData,'red');
-    osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
-    break;
-  case 'b':
-    osChrt.choosePhRegim('b',osData,'blue');
-    osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
-    break;
-  case 'c':
-    osChrt.choosePhRegim('c',osData,'green');
-    osChrt.drawContent(osData.bk, 'purple', osChrt.rangeY.max / 2);
-    break;
-  default:
-    osChrt.oscilloInitrender(osData);
-  }
-};
-$id('osciloCanvasRegim').addEventListener('change', (e) => {
-  osChrt.drawCanvas();
-  chooseOsciloCanvasRegim(e.target.value);
-});
-
-$id('osCnvDots').addEventListener('change',()=> {
-  osChrt.drawCanvas();
-  chooseOsciloCanvasRegim($id('osciloCanvasRegim').value);
-});
-
-$id('osCnvDotsVal').addEventListener('change',()=> {
-  osChrt.drawCanvas();
-  chooseOsciloCanvasRegim($id('osciloCanvasRegim').value);
-});
 
 
 // measurementsDB-tab
