@@ -21,7 +21,7 @@
 		<div class=" d-flex jcst mt-2 " id="nav-tabs">
 			<button class="nav-tab col " data-id="main">Главное окно</button>
 			<button class="nav-tab col " data-id="measurements">Журнал измерений</button>
-			<button class="nav-tab col " data-id="events">Журнал событий</button>
+			<button class="nav-tab col " data-id="events" id="events-tab">Журнал событий</button>
 			<button class="nav-tab col " data-id="oscillograms" id="oscillograms-tab">Осцилограммы</button>
 			<button class="nav-tab col " data-id="cnf">Конфигурирование</button>
 		</div>
@@ -135,7 +135,7 @@
 				</div>
 			</div> <!-- main tab end -->
 
-			<div class="main-content active" id="measurements"> 	<!-- measurements start-->
+			<div class="main-content " id="measurements"> 	<!-- measurements start-->
 				<div class="mt-4">
 					<div class="row card flex-row jcc aic">
 						<div class="col-3">Записей в устройстве: <span data-id="0200"></span>
@@ -146,7 +146,7 @@
 					</div>
 					</div>
 					<div class="row card mt-4">
-						<ul class="measurments-tabs">
+						<ul id="measurments-tabs">
 							<button class="py-2 measurment-tab " data-id="measurements-all">Все записи</button>
 							<button class="py-2 measurment-tab active" data-id="measurements-trends">Тренды</button>
 						</ul>
@@ -219,7 +219,7 @@
 						<div class="col-3">Записей в устройстве: <span data-id="0300"></span>
 						</div>
 						<div class="col-3 tac">
-							<button class="py-1" >Обновить</button>
+							<button class="py-1" id="refreshEventsTable">Обновить</button>
 						</div>
 					</div>
 				<div class="row card mt-4">
@@ -238,11 +238,11 @@
 				</div>
 			</div> 	<!-- events end -->
 
-			<div class="main-content " id="oscillograms"> 	<!-- oscillograms start-->
+			<div class="main-content active" id="oscillograms"> 	<!-- oscillograms start-->
 				<div class="card ">
 					<div class="row flex-row jcc aic mt-2">
 						<div class="col-3 tac">
-							<button class="py-1">Обновить список осцилограмм</button>
+							<button class="py-1" data-id="oscillograms">Обновить список осцилограмм</button>
 						</div>
 						<div class="col-2 ms-1">Число осцилограмм: <span data-id="0600-0601"></span>
 						</div>
@@ -254,7 +254,7 @@
 					</div>
 				</div>
 				<div class="row card mt-4">
-					<ul class="oscillograms-tabs">
+					<ul id="oscillograms-tabs">
 						<button class="py-2 oscillograms-tab " data-id="oscillograms-table">Таблица</button>
 						<button class="py-2 oscillograms-tab active" data-id="oscillograms-canvas">Осцилограмма</button>
 					</ul>
@@ -521,10 +521,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="mt-4 row jcbtw col-4">Номинальный ток первичной обмотки ТТ энергообъекта, А:
+							<div class="mt-4 row jcbtw col-5">Номинальный ток первичной обмотки ТТ  энергообъекта, А:
 								<input class="col-1 m-0" type="text"  value="1000" id="462">
 							</div>
-							<div class="mt-2 row jcbtw col-4">Порог уровня отсекаемых помех сигналов главных токов, А:
+							<div class="mt-2 row jcbtw col-5">Порог уровня отсекаемых помех сигналов главных токов, А:
 								<input class="col-1 m-0" type="text"  value="500" id="468">
 							</div>
 						</div>

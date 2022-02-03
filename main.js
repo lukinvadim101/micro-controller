@@ -3,7 +3,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-plusplus */
-
 /* eslint-disable prefer-const */
 /* eslint-disable camelcase */
 
@@ -75,30 +74,27 @@ const markElemInDiagramm = (diagrammId, value) => {
   // return elem;
 };
 
-const oscilloViewbtn = document.getElementById('oscilloViewbtn');
-oscilloViewbtn.addEventListener('click', () => {
+
+$id('oscilloViewbtn').addEventListener('click', () => {
   navTabButton.forEach(btn => {
     btn.classList.remove("active");
   });
-  document.getElementById('oscillograms-tab').classList.add("active");
+  $id('oscillograms-tab').classList.add("active");
   mainContents.forEach(content => {
     content.classList.remove("active");
   });
-  document.getElementById('oscillograms').classList.add("active");
+  $id('oscillograms').classList.add("active");
 });
 
 // measurments tab
-const measurmentsTabs = document.querySelector('.measurments-tabs');
+
 const measurmentTab = document.querySelectorAll('.measurment-tab');
 const measurmentsContent = document.querySelectorAll('.measurments-content');
-const measurementsAllTab = document.querySelector('#measurements-all');
-const measurementsSwitchTab = document.querySelector('#measurements-switch');
-measurmentsTabs.addEventListener('click', (e) => tabsSwitcher(e, measurmentTab, measurmentsContent));
+
+$id('measurments-tabs').addEventListener('click', (e) => tabsSwitcher(e, measurmentTab, measurmentsContent));
 
 const measurementsAllTableBody = $id('measurementsAllTableBody');
-const measurementsSwitchTableBody = $id('measurementsSwitchTableBody');
 const refreshMeasurmentsTableData = $id('refreshMeasurmentsTableData'); // доббавить обновление data
-
 
 [...document.querySelectorAll('.measurments-table')].forEach(th => { // measurmentsTablesHead
   th.insertAdjacentHTML("afterBegin", `
@@ -127,7 +123,6 @@ const refreshMeasurmentsTableData = $id('refreshMeasurmentsTableData'); // до�
     `);
 });
   
-
 let measurmentsTableCurrentObj = {
   '0201': null,
   '0204': null,
@@ -207,6 +202,8 @@ let eventsTableCurrentObj = {
   '0311': null,
 };
 
+let eventsAll = [];
+
 const evtCode = {
   1	:'Рестарт программы',
   2	:'Ошибка считывания конфигурации. Принята конфигурация по умолчанию',
@@ -259,10 +256,10 @@ const evtCode = {
   18:	"Пользователем установлена сигнализация",
   19:	"Пользователем сброшена сигнализация",
 };
-const addCurrentEntryToEventsTable = ()=> {
-  const eventsTableBody = document.querySelector('#eventsTableBody');
-  const obj = eventsTableCurrentObj;
-  eventsTableBody.insertAdjacentHTML("beforeend", `
+
+const addAllEventsToTable = (arr)=> {
+  arr.forEach(obj => {
+    $id('eventsTableBody').insertAdjacentHTML("beforeend", `
   <tr>
     <td>${obj['0301']}</td>
     <td>
@@ -274,25 +271,25 @@ const addCurrentEntryToEventsTable = ()=> {
     <td>${obj['0311']}</td>
     <td>${evtCode[obj['0311']]}</td>
   </tr>`);
+  });
 };
-
-// addCurrentEntryToEventsTable();
 
 
 // oscillograms tab
-const oscillogramsTabs = document.querySelector('.oscillograms-tabs');
+
 const oscillogramTab = document.querySelectorAll('.oscillograms-tab');
 const oscillogramsContent = document.querySelectorAll('.oscillograms-content');
-oscillogramsTabs.addEventListener('click', (e) => tabsSwitcher(e, oscillogramTab, oscillogramsContent));
+$id('oscillograms-tabs').addEventListener('click', (e) => tabsSwitcher(e, oscillogramTab, oscillogramsContent));
 
-
-const addOptToOscilloSelect = (data)=> {
-  let opt = document.createElement('option');
-  const val = (num)=> Object.values(data.info[num]);
-  let str = `${+val(0) === 1 ? 'ВКЛ' : 'ОТКЛ'} ${val(4)}.${val(3)}.${val(2)} ${val(5)}:${val(6)}:${val(7)}.${val(8)}.${val(9)}`;// on? y.m.d h:m:sss
-  opt.value = val(1); // номер (рег 0603)
-  opt.innerHTML = str;
-  $id('jsOsSelect').appendChild(opt);
+const addOptToOsSelect = (arr)=> {
+  arr.forEach(i => {
+    let opt = document.createElement('option');
+    let str = `${+i['0602'] === 1 ? 'ВКЛ' : 'ОТКЛ'} ${i['0607']}.${i['0606']}.${i['0605']} ${i['0608']}:${i['0609']}:${i['0610']}.${i['0611']}.${i['0612']}`;// on? y.m.d h:m:sss
+    opt.innerHTML = str;
+    opt.dataset.num = `${i['0603']}`;
+    opt.dataset.phase = `${i['0602']}`;
+    $id('jsOsSelect').appendChild(opt);
+  });
 };
 
 class Chart {
@@ -551,58 +548,46 @@ class Chart {
   }
 }
 
-let osData = [{
-  info: [{f:1},{1: 0},{2:2022},{3:11},{4:2},{5:16},{6:20},{7:1},{8:999},{9:0}],
+let osCurrInfo = {
+  '0602': null,
+  '0603': null,
+  '0605': null,
+  '0606': null,
+  '0607': null,
+  '0608': null,
+  '0609': null,
+  '0610': null,
+  '0611': null,
+  '0612': null,
+};
+let OsAllInfo = [];
+
+addOptToOsSelect(OsAllInfo);
+
+let osData = {
   a: { values:[
-    { X: 0, Y: 12000 },
-    { X: 1, Y: 0 },
+    { X: 0, Y:'' },
   ]},
-  
   b: { values:[
-    { X: 0, Y: 3000 },
-    { X: 1, Y: -11500 },
+    { X: 0, Y: 0 },
   ]},
-  
   c: { values:[
-    { X: 0, Y: 10000 },
-    { X: 1, Y: -11000 },
+    { X: 0, Y: 0 },
   ]},
   bk: { values:[
-    { X: 0, Y: 1 },
-    { X: 1, Y: 1 },
+    { X: 0, Y: 0 },
   ]},
-},
-{
-  info: [{f:0},{1: 1},{2:3033},{3:33},{4:'33'},{5:16},{6:20},{7:1},{8:999},{9:0}],
-  a: { values:[
-    { X: 0, Y: 16000 },
-    { X: 1, Y: 0 },
-  ]},
-  
-  b: { values:[
-    { X: 0, Y: -3000 },
-    { X: 1, Y: -1000 },
-  ]},
-  
-  c: { values:[
-    { X: 0, Y: -4000 },
-    { X: 1, Y: -1000 },
-  ]},
-  bk: { values:[
-    { X: 0, Y: 1 },
-    { X: 1, Y: 1 },
-  ]},
-},];
+};
 
 let osChrt = new Chart({
   canvasId: "osCnv",
   dotsCheck: 'osCnvDots',
   dotsValCheck: 'osCnvDotsVal',
   phRegim: 'osCnvPh',
-}, osData[0]);
+}, osData);
 
 
-osChrt.eventsListen();
+
 
 
 const addRowsToOscilorgamsTableBody = (data)=> {
@@ -620,21 +605,24 @@ const addRowsToOscilorgamsTableBody = (data)=> {
 };
 
 
-
 $id('jsOsSelect').addEventListener('click', (e)=> {
-  const idx = e.target.value;
-  osChrt.data = osData[idx];
-  delAllNodes($id('oscilorgamsTableBody'));
-  addRowsToOscilorgamsTableBody(osData[idx]);
-  osChrt.initRndr();
+  const {num, phase} = e.target.dataset;
+  send(1, '0602', phase);
+  send(1, '0603', num);
+
+
+  // osChrt.data = osData[idx];
+  // delAllNodes($id('oscilorgamsTableBody'));
+  // addRowsToOscilorgamsTableBody(osData[idx]);
+  // osChrt.initRndr();
 });
 
-const refreshOsData = (newData)=> {
-  delAllNodes($id('jsOsSelect'));
-  newData.forEach(i => addOptToOscilloSelect(i)); // опции
-};
+// const refreshOsData = (newData)=> {
+//   delAllNodes($id('jsOsSelect'));
+//   newData.forEach(i => addOptToOscilloSelect(i)); // опции
+// };
 
-refreshOsData(osData);
+// refreshOsData(osData);
 
 
 // TrendsCanvas
@@ -1023,6 +1011,9 @@ let $477_478 = [];
 let view477478 = new DataView(new ArrayBuffer(4));
 
 let firmwareStr = '';
+
+let oscilloNumOn = 0;
+let oscilloNumOff = 0;
 let oscilloNumSum = 0;
 
 
@@ -1165,9 +1156,21 @@ function recv(data){
     }
 
     if (eventsJournal.includes(register)) {
-      eventsTableCurrentObj[`${register}`] = value;
-      if(!isEmpty(eventsTableCurrentObj)) {
-        addCurrentEntryToEventsTable();
+      eventsTableCurrentObj[`${register}`] = value; // записать значение в поле объекта
+      if(!isEmpty(eventsTableCurrentObj)) { // когда все значения по текущей записи получены
+        eventsAll.push(eventsTableCurrentObj); // отправить в массив всех записей
+        eventsTableCurrentObj = {
+          '0301': null,
+          '0303': null,
+          '0304': null,
+          '0305': null,
+          '0306': null,
+          '0307': null,
+          '0308': null,
+          '0309': null,
+          '0310': null,
+          '0311': null,
+        }; // обнулить контэйнер по текущей записи
       }
     }
 
@@ -1178,6 +1181,7 @@ function recv(data){
       }
     }
 
+    // переписать
     if (regArrayToSetValuesFromBuff.includes(register)) {
       if (register === '0001') $0001_0002[0] = value; // ст
       if (register === '0002') {
@@ -1247,13 +1251,35 @@ function recv(data){
       $id('484-519').textContent = firmwareStr;
     }
     if (register === '0600' || register === '0601' ) { // число осцилограмм
+      if (register === '0600') {
+        oscilloNumOn = value;
+      }
+      oscilloNumOff = value;
+      
       oscilloNumSum += value;
       $id("0600-0601").textContent = oscilloNumSum; }
 
     if (osciloCurrentInfo.includes(register)) {
-      osData.info.push({register:value}); 
+      osCurrInfo[`${register}`] = value;
+      if(!isEmpty(osCurrInfo)) {
+        OsAllInfo.push(osCurrInfo);
+      }
+      osCurrInfo = {
+        '0602': null,
+        '0603': null,
+        '0605': null,
+        '0606': null,
+        '0607': null,
+        '0608': null,
+        '0609': null,
+        '0610': null,
+        '0611': null,
+        '0612': null,
+      };
+
     }
 
+    
     if (register >= 613 && register <= 4616) {
 
       if ( oscilloPhaseASign.includes(Number(value.toString().slice(-2))) )
@@ -1310,23 +1336,89 @@ $id('cnf').addEventListener('click', ()=> {
   regToFirmwareArray.forEach(i => send(0, i, 0));
   send(0,472,0);
 });
-// вкладки осцилогамм
+
+// вкладка осцилогамм
+
+
+const getAllOscillInfo = ()=> {
+  for (let i = 1; i <= oscilloNumOn; i++){
+    send(1, '0602', 1); // записать признак включения
+    send(1,'0603', i); // записать номер текущей осцилограмм
+    osciloCurrentInfo.forEach(j => send(0,j,0)); // считать инфо о дате записи
+  } // получены даты всех  осцилогамм вкл
+
+  for (let i = 1; i <= oscilloNumOff; i++){
+    send(1, '0602', 2); 
+    send(1,'0603', i); 
+    osciloCurrentInfo.forEach(j => send(0,j,0));
+  } // повторить для осцилогамм откл
+
+  OsAllInfo = [];
+  addOptToOsSelect(OsAllInfo); // добавить все опции в селект
+};
+
+// при переходе на вкладку и по кнопке обновить
+// получить все опции
 [...$DataId('oscillograms')].forEach(tab => {
   tab.addEventListener('click', ()=> {
-    oscilloNumSum = 0;
-    send(0, '0600', 0);// число осцилограмм
-    send(0, '0601', 0);
-    osciloCurrentInfo.forEach(i => send(0, i, 0));
+    delAllNodes($id('jsOsSelect')); 
+    getAllOscillInfo();
   });
 });
 
-// вкладки событий
-[...$DataId('events')].forEach(tab => {
-  tab.addEventListener('click', ()=> {
-    send(0, '0300', 0); // записей в журнале событий
-    eventsJournal.forEach(i => send(0, i, 0));
-  });
+// прочитать 613-4616
+async function getOsFullData() {
+  for (let i = 613; i <= 4616; i++) {
+    if (i<= 999) {
+      send(0,`0${i}`,0);
+    } else {
+      send(0,i,0);
+    }
+  }
+};
+
+// обработчик события выбора
+$id('jsOsSelect').addEventListener('click', (e)=> {
+  const {num, phase} = e.target.dataset;
+  // запрос на чтение выбранной осцил
+  send(1, '0602', phase);
+  send(1, '0603', num);
+  getOsFullData().then(()=>{
+    osChrt.data = osData;
+    osChrt.initRndr();
+    osChrt.eventsListen();
+    delAllNodes($id('oscilorgamsTableBody'));
+    addRowsToOscilorgamsTableBody(osData); 
+  });;
+
 });
+
+
+// журнал событий
+const getAlleventsRecords = ()=> {
+  delAllNodes($id('eventsTableBody')); // обнулить записи в таблице
+  eventsAll = []; // обнулить массив
+  const evNum = send(0,'0300',0); // получить число всех записей
+  
+  for (let i = 1; i <= evNum; i++) { // цикл по числу записей 
+    // старт с нуля или единицы?
+    send(1, '0301', i); // записать индекс записи как текущий
+    eventsJournal.forEach( reg => {
+      send(0, reg, 0); // считать значения регистров текущей записи
+    });
+  }
+  // все значения по всем записям получены
+  // сформировать таблицу
+  addAllEventsToTable(eventsAll);
+};
+
+// при клике на вкладку журнала событий или кнопку обновить получить все записи и сформировать таблицу
+$id('events-tab').addEventListener('click', ()=> getAlleventsRecords());
+$id('refreshEventsTable').addEventListener('click', ()=> getAlleventsRecords());
+
+
+
+
 // вкладки измерений
 [...$DataId('measurements')].forEach(tab => {
   tab.addEventListener('click', ()=> {
