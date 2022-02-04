@@ -135,13 +135,13 @@
 				</div>
 			</div> <!-- main tab end -->
 
-			<div class="main-content " id="measurements"> 	<!-- measurements start-->
+			<div class="main-content active" id="measurements"> 	<!-- measurements start-->
 				<div class="mt-4">
 					<div class="row card flex-row jcc aic">
 						<div class="col-3">Записей в устройстве: <span data-id="0200"></span>
 						</div>
 						<div class="col-3 tac">
-							<button class="py-1" id="refreshMeasurmentsTableData">Обновить</button>
+							<button class="py-1" data-id="measurements" >Обновить</button>
 						</div>
 					</div>
 					</div>
@@ -152,7 +152,28 @@
 						</ul>
 						<div class="measurments-content sub-content " id="measurements-all">
 							<table class="measurments-table mt-4 " >
-										<!-- th in js -->
+								<thead>
+									<th>№</th>
+									<th>Дата и время</th>
+									<th>Выключатель</th>
+									<th>№ сол. откл.</th>
+									<th>Износ ф.А, %</th>
+									<th>Износ ф.В, %</th>
+									<th>Износ ф.С, %</th>
+									<th>Кол-во вкл.</th>
+									<th>Кол-во откл.</th>
+									<th>Собств. вр., мс</th>
+									<th>Полное. вр., мс</th>
+									<th>Вр. дуги ф.А, мс</th>
+									<th>Вр. дуги ф.В, мс</th>
+									<th>Вр. дуги ф.С, мс</th>
+									<th>Износ за перекл. ф.А, %</th>
+									<th>Износ за перекл. ф.В, %</th>
+									<th>Износ за перекл. ф.С, %</th>
+									<th>Ток ф.А, А</th>
+									<th>Ток ф.В, А</th>
+									<th>Ток ф.С, А</th>
+								</thead>
 								<tbody id="measurementsAllTableBody">
 								</tbody>
 							</table>
@@ -161,19 +182,20 @@
 							<div class="row mt-2">
 								<div class="col-4 card">
 									<h4>Тренд</h4>
-									<div class="row pt-2  aic">
-										<select class="col-5" id="trCnvRegim">
-											<option value="wear" selected>Износ</option>
-											<option value="wearPerShift">Износ за переключения</option>
-											<option value="numOfInsertion">Кол-во включений</option>
-											<option value="numOfOutages">Кол-во отключений</option>
-											<option value="ownTimeOn">Собственное время вкл.</option>
-											<option value="ownTimeOff">Собственное время откл.</option>
-											<option value="fullTimeOn">Полное время вкл.</option>
-											<option value="fullTimeOff">Полное время откл.</option>
-											<option value="arcTimeOn">Время дуги вкл.</option>
-											<option value="arcTimeOff">Время дуги откл.</option>
-											<option value="amperage">Ток</option>
+									<div class="row pt-2 aic">
+										<select class="col-5" id="trCnvTrend">
+											<option value='' data-turn="null" selected> - </option>
+											<option value="0213 0214 0215" data-group="a">Износ</option>
+											<option value="0223 0224 0225" data-group="a">Износ за переключения</option>
+											<option value="0216" data-group="d">Кол-во включений</option>
+											<option value="0217" data-group="d">Кол-во отключений</option>
+											<option value="0212 0218" data-group="c" data-turn="on">Собственное время вкл.</option>
+											<option value="0212 0218" data-group="c" data-turn="off">Собственное время откл.</option>
+											<option value="0212 0219" data-group="c" data-turn="on">Полное время вкл.</option>
+											<option value="0212 0219" data-group="c" data-turn="off"> Полное время откл.</option>
+											<option value="0212 0220 0221 0222" data-group="b" data-turn="on">Время дуги вкл.</option>
+											<option value="0212 0220 0221 0222" data-group="b" data-turn="off">Время дуги откл.</option>
+											<option value="0226 0227 0228" data-group="a">Ток</option>
 										</select>
 										<select class="col-3 ms-3" id="trPhses">
 											<option value="all" selected>A,B,C</option>
@@ -189,9 +211,9 @@
 										<div class="col-3">
 											<input type="checkbox" id="trCnvDtsVal" >Значения точек</div>
 										<div class="col-2">
-											<input type="checkbox" id="trCnvDts" checked>Точки</div>
+											<input type="checkbox" id="trCnvDts">Точки</div>
 										<div class="col-3">
-											<input type="checkbox" id="trCnvDates" checked>Дата и время замера</div>
+											<input type="checkbox" id="trCnvDates">Дата и время замера</div>
 										<div class="col d-flex jcbtw ">
 												<div class="phaseOccilloColorWrap">Фаза А
 													<div class="phaseAOccilloColor mt-3"></div>
@@ -238,7 +260,7 @@
 				</div>
 			</div> 	<!-- events end -->
 
-			<div class="main-content active" id="oscillograms"> 	<!-- oscillograms start-->
+			<div class="main-content " id="oscillograms"> 	<!-- oscillograms start-->
 				<div class="card ">
 					<div class="row flex-row jcc aic mt-2">
 						<div class="col-3 tac">
