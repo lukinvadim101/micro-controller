@@ -19,15 +19,15 @@
       <button  class="col-1 py-1" id="serviceModal">Сервис</button>
 		</div>
 		<div class=" d-flex jcst mt-2 " id="nav-tabs">
-			<button class="nav-tab col " data-id="main">Главное окно</button>
+			<button class="nav-tab col active" data-id="main">Главное окно</button>
 			<button class="nav-tab col " data-id="measurements">Журнал измерений</button>
 			<button class="nav-tab col " data-id="events" id="events-tab">Журнал событий</button>
 			<button class="nav-tab col " data-id="oscillograms" id="oscillograms-tab">Осцилограммы</button>
 			<button class="nav-tab col " data-id="cnf">Конфигурирование</button>
 		</div>
 		<div class="main-content-wrapper ">
-			<div class="main-content " id="main"> <!-- main tab end -->
-				<div class="mt-4">Текущие дата/время:<span></span>
+			<div class="main-content active" id="main"> <!-- main tab end -->
+				<div class="mt-4">Текущие дата/время:<span data-id="currentTime"></span>
 				</div>
 				<div class="d-flex flex-row jcev mt-4 card">
 					<div><span class="signal accident-signal" ></span>Авария</div>
@@ -45,7 +45,7 @@
 							</div>
 						</div>
 						<div class="col-2">
-							<div class="status-alarm d-none"></div>
+							<div class="status-alarm d-none" id="alarmMain"></div>
 						</div>
 					</div>
 				</div>
@@ -135,7 +135,7 @@
 				</div>
 			</div> <!-- main tab end -->
 
-			<div class="main-content active" id="measurements"> 	<!-- measurements start-->
+			<div class="main-content " id="measurements"> 	<!-- measurements start-->
 				<div class="mt-4">
 					<div class="row card flex-row jcc aic">
 						<div class="col-3">Записей в устройстве: <span data-id="0200"></span>
@@ -184,18 +184,18 @@
 									<h4>Тренд</h4>
 									<div class="row pt-2 aic">
 										<select class="col-5" id="trCnvTrend">
-											<option value='' data-turn="null" selected> - </option>
-											<option value="0213 0214 0215" data-group="a">Износ</option>
-											<option value="0223 0224 0225" data-group="a">Износ за переключения</option>
-											<option value="0216" data-group="d">Кол-во включений</option>
-											<option value="0217" data-group="d">Кол-во отключений</option>
-											<option value="0212 0218" data-group="c" data-turn="on">Собственное время вкл.</option>
-											<option value="0212 0218" data-group="c" data-turn="off">Собственное время откл.</option>
-											<option value="0212 0219" data-group="c" data-turn="on">Полное время вкл.</option>
-											<option value="0212 0219" data-group="c" data-turn="off"> Полное время откл.</option>
-											<option value="0212 0220 0221 0222" data-group="b" data-turn="on">Время дуги вкл.</option>
-											<option value="0212 0220 0221 0222" data-group="b" data-turn="off">Время дуги откл.</option>
-											<option value="0226 0227 0228" data-group="a">Ток</option>
+											<option value='' 	 data-reg="" selected> - </option>
+											<option value="a"  data-reg="0213 0214 0215">Износ</option>
+											<option value="a"  data-reg="0223 0224 0225">Износ за переключения</option>
+											<option value="d"  data-reg="0216">Кол-во включений</option>
+											<option value="d"  data-reg="0217">Кол-во отключений</option>
+											<option value="c+" data-reg="0212 0218">Собственное время вкл.</option>
+											<option value="c-" data-reg="0212 0218">Собственное время откл.</option>
+											<option value="c+" data-reg="0212 0219">Полное время вкл.</option>
+											<option value="c-" data-reg="0212 0219"> Полное время откл.</option>
+											<option value="b+" data-reg="0212 0220 0221 0222">Время дуги вкл.</option>
+											<option value="b-" data-reg="0212 0220 0221 0222">Время дуги откл.</option>
+											<option value="a"  data-reg="0226 0227 0228">Ток</option>
 										</select>
 										<select class="col-3 ms-3" id="trPhses">
 											<option value="all" selected>A,B,C</option>
@@ -402,9 +402,9 @@
 									</div>
 									<div class="row mt-2 jcbtw">
 										<div class="col-7">
-											<button class="py-2" id="setDate">Получить время устройства</button>
+											<button class="py-2" id="getDate">Получить время устройства</button>
 										</div>
-									<div class="mt-3 tac">Время ПК:<span id="current_date_time_block"></span>
+									<div class="mt-3 tac">Время ПК:<span data-id="currentTime"></span>
 									</div>
 									<div class="row mt-3">
 										<h4 class="pb-2">Установка времени</h4>
@@ -426,10 +426,7 @@
 									</div>
 									<div class="row mt-3 tac">
 										<div class="col">
-											<button class="py-2">Синхронизация с ПК</button>
-										</div>
-										<div class="col">
-											<button class="py-2">Задать новое время</button>
+											<button class="py-2" id="setDate">Задать новое время</button>
 										</div>
 									</div>
 								</div>
@@ -613,22 +610,129 @@
 			<button id="selfDiagnosislAlarm"> self diagnosis alarm</button>
 			</div>
 
-			<div class="mt-2">test
+			<!-- <div class="mt-2">test
 				<span id="10"></span><span id="11"></span><span id="12"></span>
+			</div> -->
+
+			<div class="card mt-4" id="accidentAlarmContent" >
+				<p class="tac my-5">Произошло срабатывание сигнализации. <br/> Для просмотра более подробной информации нажмите на индикатор "Авария" в Главном окне</p>
+				<div class="row pt-5  me-2">
+					<button class="bold mt-3" id="accidentClose" style="color: red;">Закрыть</button>
+				</div>
+			</div>
+
+			<div class="card mt-4" id="generalAlarmContent">
+				<div class="mt-4">
+					<h3 class="tac my-3">Общая сигнализация</h3>
+						<div class="row card">
+							<h4 class="mb-3 tac">События</h4>
+							<div class="row card flex-row">
+								<div class="col-4 mt-2 me-4">
+									<div > <input type="checkbox" name="" id="">  Собственное время отключения </div>
+									<div class="mt-1"> <input type="checkbox" name="" id="">  Полное время отключения</div>
+									<div class="mt-1"> <input type="checkbox" name="" id="">  Собственное время включения</div>
+									<div class="mt-1"> <input type="checkbox" name="" id="">  Время включения </div>
+								</div>
+								<div class="col mt-2 ms-2">
+									<div > <input type="checkbox" name="" id=""> Невыполненная команда на соленоид отключения 1</div>
+									<div class="mt-1"> <input type="checkbox" name="" id=""> Невыполненная команда на соленоид отключения 2</div>
+									<div class="mt-1"> <input type="checkbox" name="" id=""> Невыполненная команда на соленоид включения</div>
+								</div>
+							</div>
+							<div class="row mt-2">
+								<div class="col card">
+									<h4 class="mb-2">Колличество операций</h4>
+									<div> <input type="checkbox" name="" id="">  Внимание </div>
+									<div class="mt-1"> <input type="checkbox" name="" id="">  Авария</div>
+								</div>
+								<div class="col-4 card ms-2">
+									<h4 class="mb-2">Неполнофазный режим работы</h4>
+									<div> <input type="checkbox" name="" id="">  Авария</div>
+								</div>
+								<div class="col ">
+									<div class="tac"> <button class="mt-4 ">  Сброс сигналов событий</button></div>
+								</div>
+							</div>
+						</div>
+							<h3 class="tac my-3">Cигнализация измерений</h3>
+							<div class="row card flex-row mt-2 justify-content-evenly">
+								<div class="col card">
+									<h3 class="mb-2 tac">Фаза А</h3>
+									<div class="row">
+										<h4 class="my-3">Износ контактов </h4>
+									</div>
+									<div class="row">
+										<div class="col"> <input type="checkbox" name="" id="">Внимание </div>
+										<div class="col"> <input type="checkbox" name="" id="">Авария</div>
+									</div>
+									<hr class="mt-3">
+									<h4 class="my-3">События </h4>
+									<div > <input type="checkbox" name="" id="">Время горения дуги</div>
+									<div class="mt-1"> <input type="checkbox" name="" id="">Повторное зажигание дуги</div>
+								</div>
+							<div class="col card mx-2">
+								<h3 class="mb-2 tac">Фаза B</h3>
+								<div class="row">
+									<h4 class="my-3">Износ контактов </h4>
+								</div>
+								<div class="row">
+									<div class="col"> <input type="checkbox" name="" id="">Внимание </div>
+									<div class="col"> <input type="checkbox" name="" id="">Авария</div>
+								</div>
+								<hr class="mt-3">
+								<h4 class="my-3">События </h4>
+								<div > <input type="checkbox" name="" id="">Время горения дуги</div>
+								<div class="mt-1"> <input type="checkbox" name="" id="">Повторное зажигание дуги</div>
+							</div>
+							<div class="col card">
+								<h3 class="mb-2 tac">Фаза C</h3>
+								<div class="row">
+									<h4 class="my-3">Износ контактов </h4>
+								</div>
+								<div class="row">
+									<div class="col"> <input type="checkbox" name="" id="">Внимание </div>
+									<div class="col"> <input type="checkbox" name="" id="">Авария</div>
+								</div>
+								<hr class="mt-3">
+								<h4 class="my-3">События </h4>
+								<div > <input type="checkbox" name="" id="">Время горения дуги</div>
+								<div class="mt-1"> <input type="checkbox" name="" id="">Повторное зажигание дуги</div>
+							</div>
+						</div>
+					</div>
+					<div class="row pt-5  me-2">
+						<button class="bold mt-3" id="genClose" style="color: red;">Закрыть</button>
+					</div>
+			</div>
+
+			<div class="card mt-4" id="selfDiagnosisContent">
+				<div class="row justify-content-center card">
+					<div class="col ms-5">
+						<div><input type="checkbox" name="" id="">Неисправность внутренней FLASH-памяти</div>
+						<div class="mt-2 "><input type="checkbox" name="" id="">Неисправность внутренней SRAM-памяти</div>
+						<div class="mt-2"><input type="checkbox" name="" id="">Неисправность АЦП</div>
+						<div class="mt-2"><input type="checkbox" name="" id="">Ошибка считывания FRAM (энергозависимых данных). Приняты данные по умолчанию</div>
+						</div>
+					</div>
+					<div class="row pt-5  me-2">
+						<button class="bold mt-3" id="selfDiagnosisClose" style="color: red;">Закрыть</button>
+					</div>
+				</div>
+				</div>
 			</div>
 
 			<div class="card mt-4" id="serviceModalContent" >
 				<div class="card">
 					<h4>Получить данные устройства</h4>
 					<div class="row jcc pt-3">
-							<button class="py-2 col-3">Получить данные главного окна</button>
-							<button class="py-2 col mx-3">Получить данные сигнализации</button>
-							<button class="py-2 col ">Получить данные коммутации</button>
-							<button class="py-2 col ms-3">Получить все данные устройства</button>
+							<button class="py-2 col-3" id="serGetMain">Получить данные главного окна</button>
+							<button class="py-2 col mx-3" id="serGetAlarm">Получить данные сигнализации</button>
+							<button class="py-2 col " id="serGetMes">Получить данные коммутации</button>
+							<button class="py-2 col ms-3" id="serGetAll">Получить все данные устройства</button>
 					</div>
 				</div>
 				<div class="card mt-2">
-					<h4>Задание данных устройства устройства</h4>
+					<h4>Задание данных устройства </h4>
 					<div class="row mt-2 " >
 						<div class="col">
 						 <div>

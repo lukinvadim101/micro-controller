@@ -110,7 +110,7 @@ button {
   width: 80%; /* Could be more or less, depending on screen size */
 }
 
-#serviceModalContent {
+#serviceModalContent, #accidentAlarmContent, #generalAlarmContent, #selfDiagnosisContent {
   display: none;
   position: absolute;
   top: 2%;

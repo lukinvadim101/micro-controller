@@ -6,7 +6,8 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable prefer-const */
 /* eslint-disable camelcase */
-
+const $DataId = (regStr) => document.querySelectorAll(`[data-id='${regStr}']`);
+const isEmpty = (obj)=> !Object.values(obj).some(x => x !== null && x !== '');
 const $id = ( id ) => document.getElementById( id );
 const delAllNodes = (node) => {
   while (node.firstChild) node.removeChild(node.lastChild);
@@ -74,7 +75,6 @@ const markElemInDiagramm = (diagrammId, value) => {
 
   // return elem;
 };
-
 
 $id('oscilloViewbtn').addEventListener('click', () => {
   navTabButton.forEach(btn => {
@@ -527,15 +527,15 @@ let newTrendData = {
 };
 
 // обработка селекта трендов
-const chooseTrend = (e)=> {
-
-  let [sel] = [...e.target.options].filter(opt => opt.selected === true);
-  const {group, turn} = sel.dataset;
-
+const chooseTrend = ()=> {
+  const trend = $id('trCnvTrend');
+  let [sel] = [...trend.options].filter(opt => opt.selected === true);
+  let {reg} = sel.dataset;
+  reg = reg.split(' ');
+    
   filtredByTrend = [];
   let time = ['0204','0205','0206','0207','0208','0209','0210'];
-  let val = e.target.value.split(" ");
-  let param = [...val, ...time];
+  let param = [...reg, ...time];
 
   mesFilter(param); // запись в filtredByTrend
   
@@ -565,37 +565,37 @@ const chooseTrend = (e)=> {
     });
   };
   $id('trPhses').removeAttribute("disabled");
-  switch(group) {
+  switch(trend.value) {
   case 'a':
     phasesTrend();
     trChrt.data = newTrendData;
     trChrt.initRndr();
     break;
-  case 'b':
-    if (turn === 'on') {
-      filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 1); // число или строка?
-      phasesTrend();
-    }
-    if (turn === 'off') {
-      filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 2); 
-      phasesTrend();
-    }
+  case 'b+':
+    filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 1); 
+    phasesTrend();
     trChrt.data = newTrendData;
     trChrt.initRndr();
     break;
-  case 'c':
-    if (turn === 'on') {
-      filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 1); 
-      singleTrend();
-    }
-    if (turn === 'off') {
-      filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 2); 
-      singleTrend();
-    }
+  case 'b-':
+    filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 2); 
+    phasesTrend();
+    trChrt.data = newTrendData;
+    trChrt.initRndr();
+    break;
+  case 'c+':
+    filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 1); 
+    singleTrend();
     $id('trPhses').setAttribute("disabled", "disabled");
     trChrt.data = newTrendData;
     trChrt.choosePhRegim('trend', 'red');
-
+    break;
+  case 'c-':
+    filtredByTrend = filtredByTrend.filter( i => +i['0212'] === 2); 
+    singleTrend();
+    $id('trPhses').setAttribute("disabled", "disabled");
+    trChrt.data = newTrendData;
+    trChrt.choosePhRegim('trend', 'red');
     break;
   case 'd':
     singleTrend();
@@ -603,33 +603,12 @@ const chooseTrend = (e)=> {
     trChrt.choosePhRegim('trend', 'red');
     break;
   default:
-    singleTrend();
+    break;
   }
-
-  // console.log('newTrendData', newTrendData);
-
 };
 
-$id('trCnvTrend').addEventListener('change', (e)=> chooseTrend(e));
-// получить соьытие, парметр
-
-
-trChrt.bk = false;
-// trChrt.padding.y = 200;
-trChrt.initRndr();
-
-trChrt.eventsListen();
-
-
-
-
-// $id('trCnvDates').addEventListener('change',()=> {
-//   trChrt.drawCanvas();
-//   chooseTrPh($id('trPhses').value);
-//   // + дата режим
-// });
-
-
+$id('trCnvTrend').addEventListener('change', (e)=> chooseTrend(e));// получить соьытие, парметр
+$id('trCnvDates').addEventListener('change', (e)=> chooseTrend(e));
 
 // events tab
 let eventsTableCurrentObj = {
@@ -802,21 +781,24 @@ function addZero(value) {
 }
 
 function pcTime() {
-  const currentDatetime = new Date();
-  const day = addZero(currentDatetime.getDate());
-  const month = addZero(currentDatetime.getMonth() + 1);
-  const year = currentDatetime.getFullYear();
-  const hours = addZero(currentDatetime.getHours());
-  const minutes = addZero(currentDatetime.getMinutes());
-  const seconds = addZero(currentDatetime.getSeconds());
+  const current = new Date();
+  const day = addZero(current.getDate());
+  const month = addZero(current.getMonth() + 1);
+  const year = current.getFullYear();
+  const hours = addZero(current.getHours());
+  const minutes = addZero(current.getMinutes());
+  const seconds = addZero(current.getSeconds());
 
   return {day, month, year, hours, minutes, seconds};
 }
 setInterval(() => {
-  $id('current_date_time_block').innerHTML = `
-  ${pcTime().day}.${pcTime().month}.${pcTime().year}
-  ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`;
-}, 1000);
+  [...$DataId('currentTime')].forEach(b => {
+    b.innerHTML = `
+    ${pcTime().day}.${pcTime().month}.${pcTime().year}
+    ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`;
+  }, 1000);
+});
+
 
 const setHadleTimeInput = ()=> {
   $id('handleDay').value = pcTime().day;
@@ -867,116 +849,36 @@ const statusAlarmSignal = (status) => {
   }
 };
 
-
+// accidentModal(); // сигнализация события
+const generalAlarm = () => {
+  $id('generalAlarmContent').style.display = "block";
+  $id('genClose').addEventListener('click', ()=> {
+    $id('generalAlarmContent').style.display = "none";
+  });
+  statusAlarmSignal('accident');
+  $id('alarmMain').addEventListener('click', generalAlarm);
+};
 
 
 const accidentModal = () => {
-  const HTMLcontent = `<p class="tac my-5">Произошло срабатывание сигнализации. <br/> Для просмотра более подробной информации нажмите на индикатор "Авария" в Главном окне</p>`;
-  setModalContent(HTMLcontent);
-
+  $id('accidentAlarmContent').style.display = "block";
+  $id('accidentClose').addEventListener('click', ()=> {
+    $id('accidentAlarmContent').style.display = "none";
+  });
   statusAlarmSignal('warning');
+  $id('alarmMain').addEventListener('click', generalAlarm);
 };
 
-// accidentModal(); // сигнализация события
-const generalAlarm = () => {
-  const HTMLcontent = ` <div class="mt-4">
-  <h3 class="tac my-3">Общая сигнализация</h3>
-    <div class="row card">
-      <h4 class="mb-3 tac">События</h4>
-      <div class="row card flex-row">
-        <div class="col-4 mt-2 me-4">
-          <div > <input type="checkbox" name="" id="">  Собственное время отключения </div>
-          <div class="mt-1"> <input type="checkbox" name="" id="">  Полное время отключения</div>
-          <div class="mt-1"> <input type="checkbox" name="" id="">  Собственное время включения</div>
-          <div class="mt-1"> <input type="checkbox" name="" id="">  Время включения </div>
-        </div>
-        <div class="col mt-2 ms-2">
-          <div > <input type="checkbox" name="" id=""> Невыполненная команда на соленоид отключения 1</div>
-          <div class="mt-1"> <input type="checkbox" name="" id=""> Невыполненная команда на соленоид отключения 2</div>
-          <div class="mt-1"> <input type="checkbox" name="" id=""> Невыполненная команда на соленоид включения</div>
-        </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col card">
-          <h4 class="mb-2">Колличество операций</h4>
-          <div> <input type="checkbox" name="" id="">  Внимание </div>
-          <div class="mt-1"> <input type="checkbox" name="" id="">  Авария</div>
-        </div>
-        <div class="col-4 card ms-2">
-          <h4 class="mb-2">Неполнофазный режим работы</h4>
-          <div> <input type="checkbox" name="" id="">  Авария</div>
-        </div>
-        <div class="col ">
-          <div class="tac"> <button class="mt-4 ">  Сброс сигналов событий</button></div>
-        </div>
-      </div>
-    </div>
-      <h3 class="tac my-3">Cигнализация измерений</h3>
-      <div class="row card flex-row mt-2 justify-content-evenly">
-        <div class="col card">
-          <h3 class="mb-2 tac">Фаза А</h3>
-          <div class="row">
-            <h4 class="my-3">Износ контактов </h4>
-          </div>
-          <div class="row">
-            <div class="col"> <input type="checkbox" name="" id="">Внимание </div>
-            <div class="col"> <input type="checkbox" name="" id="">Авария</div>
-          </div>
-          <hr class="mt-3">
-          <h4 class="my-3">События </h4>
-          <div > <input type="checkbox" name="" id="">Время горения дуги</div>
-          <div class="mt-1"> <input type="checkbox" name="" id="">Повторное зажигание дуги</div>
-        </div>
-      <div class="col card mx-2">
-        <h3 class="mb-2 tac">Фаза B</h3>
-        <div class="row">
-          <h4 class="my-3">Износ контактов </h4>
-        </div>
-        <div class="row">
-          <div class="col"> <input type="checkbox" name="" id="">Внимание </div>
-          <div class="col"> <input type="checkbox" name="" id="">Авария</div>
-        </div>
-        <hr class="mt-3">
-        <h4 class="my-3">События </h4>
-        <div > <input type="checkbox" name="" id="">Время горения дуги</div>
-        <div class="mt-1"> <input type="checkbox" name="" id="">Повторное зажигание дуги</div>
-      </div>
-      <div class="col card">
-        <h3 class="mb-2 tac">Фаза C</h3>
-        <div class="row">
-          <h4 class="my-3">Износ контактов </h4>
-        </div>
-        <div class="row">
-          <div class="col"> <input type="checkbox" name="" id="">Внимание </div>
-          <div class="col"> <input type="checkbox" name="" id="">Авария</div>
-        </div>
-        <hr class="mt-3">
-        <h4 class="my-3">События </h4>
-        <div > <input type="checkbox" name="" id="">Время горения дуги</div>
-        <div class="mt-1"> <input type="checkbox" name="" id="">Повторное зажигание дуги</div>
-      </div>
-    </div>
-  </div>
-  `;
-  setModalContent(HTMLcontent);
-  statusAlarmSignal('accident');
-};
+
 
 // generalAlarm(); // основная сигнализация
 
 const selfDiagnosisAlarm = () => {
-  const HTMLcontent = `<div class="mt-4">
-    <div class="row justify-content-center card">
-      <div class="col ms-5">
-        <div><input type="checkbox" name="" id="">Неисправность внутренней FLASH-памяти</div>
-        <div class="mt-2 "><input type="checkbox" name="" id="">Неисправность внутренней SRAM-памяти</div>
-        <div class="mt-2"><input type="checkbox" name="" id="">Неисправность АЦП</div>
-        <div class="mt-2"><input type="checkbox" name="" id="">Ошибка считывания FRAM (энергозависимых данных). Приняты данные по умолчанию</div>
-        </div>
-      </div>
-    </div>
-    </div>`;
-  setModalContent(HTMLcontent);
+  $id('selfDiagnosisContent').style.display = "block";
+  $id('selfDiagnosisClose').addEventListener('click', ()=> {
+    $id('selfDiagnosisContent').style.display = "none";
+  });
+  
   document.querySelector('.self-diagnosis-signal').classList.add('blink');
 
 };
@@ -1024,8 +926,7 @@ const comandBtnsWithArg = [setPhaseAWear, setPhaseBWear, setPhaseCWear, setNumbe
 // data
 
 // helpers func
-const $DataId = (regStr) => document.querySelectorAll(`[data-id='${regStr}']`);
-const isEmpty = (obj)=> !Object.values(obj).some(x => x !== null && x !== '');
+
 
 const ab2str = (buf) => String.fromCharCode.apply(null, new Uint16Array(buf));
 const str2ab = (str) => {
@@ -1113,6 +1014,9 @@ comandBtnsWithArg.forEach(btn => btn.addEventListener('click', (e)=> sendCommand
 let upload_pointer = 0;
 let firmware_array = 0;
 // +
+
+const getTime = ['0010', '0011', '0012', '0013', '0014', '0015']; //  время в конфиг
+
 const regArrayToSetValuesInSpan = [
   '10', '11', '12', // test date
   '0000','0001', '0002', '0003', //  конфиг
@@ -1336,8 +1240,6 @@ function recv(data){
     }
 
 
-
-
     if (regToFirmwareArray.includes(register)) {
       firmwareStr += value;
       $id('484-519').textContent = firmwareStr;
@@ -1369,7 +1271,6 @@ function recv(data){
         '0611': null,
         '0612': null,
       };
-
     }
 
     
@@ -1409,11 +1310,15 @@ function recv(data){
 
 }
 
-socket.onopen = (e)=>{
+const getMainData = ()=> {
   // данные главного окна
   regArrayToSetValuesInSpan.forEach( i => send (0, i, 0)); // данные гл. окна при старте
   phasesCoefficent.forEach( i => send (0, i, 0)); // диагнаммы гл. она и сигнализация
   regArrayToSetValuesIfElse.forEach( i => send (0, i, 0)); 
+};
+
+socket.onopen = ()=>{ 
+  getMainData();
 };
 
 socket.onmessage = (e)=>{recv(e.data);};
@@ -1422,6 +1327,13 @@ socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message
 
 //  возможность получения при загрузке сркипта 
 // $id('script').onload = ()=> {};
+
+
+// сервис
+// $id('serGetMain')
+// $id('serGetAlarm')
+// $id('serGetMes')
+// $id('serGetAll')
 
 // при переходе на вкладку конфигурация 
 $id('cnf').addEventListener('click', ()=> {
@@ -1532,22 +1444,28 @@ $id('refreshEventsTable').addEventListener('click', ()=> getAlleventsRecords());
     }); // добавить все записи в таблицу
   });
 });
+trChrt.bk = false;
+$id('trPhses').setAttribute("disabled", "disabled");
+trChrt.eventsListen();
 
 
 
-
-
-
-
-
-
-function setDate(){
-  send(0, 10, 0);
-  send(0, 11, 0);
-  send(0, 12, 0);
+// date time
+function getDate(){
+  getTime.forEach(i => send(0, i, 0));
 }
+$id('getDate').addEventListener('click', getDate);
+
+const setDate = ()=> {
+  send(0, '0010', $id('handleYear').value);
+  send(0, '0011', $id('handleMounth').value);
+  send(0, '0012', $id('handleDay').value);
+  send(0, '0013', $id('handleHour').value);
+  send(0, '0014', $id('handleMin').value);
+};
 
 $id('setDate').addEventListener('click', setDate);
+
 
 
 function read_file(inp){
