@@ -11,7 +11,7 @@
 
 <body>
 	<div class="container">
-		<div class="card py-2 flex-row jcbtw">
+		<div class="card py-2 flex-row jcbtw" id="header">
 			<form >
 				<input type="file" id="file" name="file" class="custom-file-input pt-1" >
 				<!-- <button type="submit" class="py-0 ">Загрузить</button> -->
@@ -26,8 +26,8 @@
 			<button class="nav-tab col " data-id="cnf">Конфигурирование</button>
 		</div>
 		<div class="main-content-wrapper ">
-			<div class="main-content active" id="main"> <!-- main tab end -->
-				<div class="mt-4">Текущие дата/время:<span data-id="currentTime"></span>
+			<div class="main-content " id="main"> <!-- main tab end -->
+				<div class="mt-4">Время устройства:<span data-id="currentMeTime"></span>
 				</div>
 				<div class="d-flex flex-row jcev mt-4 card">
 					<div><span class="signal accident-signal" ></span>Авария</div>
@@ -270,18 +270,26 @@
 						</div>
 					</div>
 					<div class="row jcc">
-						<select class="col-4 mt-3 px-2 py-1 jsOsSelect" size="4" id="jsOsSelect">
-
-						</select>
+						<select class="col-4 mt-3 px-2 py-1 jsOsSelect" size="4" id="jsOsSelect"></select>
 					</div>
 				</div>
 				<div class="row card mt-4">
 					<ul id="oscillograms-tabs">
-						<button class="py-2 oscillograms-tab " data-id="oscillograms-table">Таблица</button>
-						<button class="py-2 oscillograms-tab active" data-id="oscillograms-canvas">Осцилограмма</button>
+						<button class="py-2 oscillograms-tab active" data-id="oscillograms-table">Таблица</button>
+						<button class="py-2 oscillograms-tab " data-id="oscillograms-canvas">Осцилограмма</button>
+						<button class="py-2 oscillograms-tab " data-id="os-upld-tab">Загрузить</button>
 					</ul>
 					<div class="card mt-4">
-						<div class="oscillograms-content sub-content" id="oscillograms-table">
+						<div class="oscillograms-content sub-content " id="os-upld-tab">
+							<h4 class="mt-2">Загурзить данные осцилограмм</h4>
+							<div class="row mt-3">
+								<textarea id="newOsData" rows="8"  ></textarea>
+							</div>
+						
+							<button class="py-2 mt-3" id="newOsUpld">Загрузить</button>
+						</div>
+
+						<div class="oscillograms-content sub-content active" id="oscillograms-table">
 							<table class=" mt-4 " >
 								<thead>
 									<th>№</th>
@@ -294,7 +302,7 @@
 								</tbody>
 							</table>
 						</div>
-						<div class="oscillograms-content sub-content active" id="oscillograms-canvas">
+						<div class="oscillograms-content sub-content " id="oscillograms-canvas">
 							<div class="row j-c-c">
 								<div class="card col flex-row jcc">
 									<div class="col">Режим отображения
@@ -336,19 +344,33 @@
 			</div> 	<!-- oscillograms  end -->
 
 <!-- cnf start -->
-			<div class="main-content " id="cnf"> 	
+			<div class="main-content active" id="cnf"> 	
 				<ul class="cnf-tabs">
-					<button class="py-2 cnf-tab active" data-id="cnf-device">Конфигурирация устройства</button>
+					<button class="py-2 cnf-tab " data-id="cnf-device">Конфигурирация устройства</button>
 					<button class="py-2 cnf-tab " data-id="cnf-control">Конфигурирация функций контроля</button>
 					<button class="py-2 cnf-tab " data-id="cnf-alarm">Конфигурирация порогов сигнализации</button>
+					<button class="py-2 cnf-tab active" data-id="cnf-user">Пользователи</button>
 				</ul>
-				<div class="cnf-content sub-content active" id="cnf-device"> 				<!-- cnf device -->
+				<div class="cnf-content sub-content active" id="cnf-user">
+					<div class="card mt-2">
+						<h4 >Переключение прав доступа</h4>
+						<div class="mt-2">
+							Введите параметр переключения прав доступа:
+							<input type="text" name="" id="adminParam" class="col-1 my-2 ms-2" value="">
+						</div>
+						<div class="row">
+							<button class="col-2 py-2 mt-2" id="adminBtn">Переключить</button>
+							<div class="col-3 mt-3 ms-4"> Текущий доступ: <span id="adminStatus"> пользователь </span> </div>
+						</div>
+					</div>
+				</div>
+				<div class="cnf-content sub-content " id="cnf-device"> 				<!-- cnf device -->
 					<div class="card mt-2">
 						<div class="card">
 							<h4 class="pb-3">Адрес и номер устройства</h4>
 							<div class="row">
 								<div class="col-9">
-									<div>Тип устрйоства: <span id="0000"></span>  <span> (1 - НККВ; 2 - АВМ-КП; 3 - АВМ-В; 4 - АВМ-ВК; 5 - АВМ-ВКМ) </span>
+									<div>Тип устройства: <span id="0000"></span>  <span> (1 - НККВ; 2 - АВМ-КП; 3 - АВМ-В; 4 - АВМ-ВК; 5 - АВМ-ВКМ) </span>
 									</div>
 									<div class="mt-2">Серийный номер устройства: <span id="0001-0002"></span>
 									</div>
@@ -384,7 +406,7 @@
 								</div>
 								<div class="row mt-2">
 									<select class="col-3"  id="413" disabled>
-										<option value="">да</option>
+										<option value="">Да</option>
 										<option value="">Нет</option>
 									</select> <span class="col ms-2">Четность для интерфейса RS485</span>
 								</div>
@@ -396,15 +418,13 @@
 							<div class="col">
 								<div class=" card ">
 									<h4 class="pb-3">Время</h4>
-									<div>Время устройства <span id="0012"></span>.<span id="0011" class="ps-0"></span>.<span id="0010" class="ps-0"></span>
-										<span id="0013"></span>:<span id="0014" class="ps-0"></span>:<span id="0015" class="ps-0"></span>
-
+									<div>Время устройства <span data-id="currentMeTime"></span>
 									</div>
 									<div class="row mt-2 jcbtw">
 										<div class="col-7">
 											<button class="py-2" id="getDate">Получить время устройства</button>
 										</div>
-									<div class="mt-3 tac">Время ПК:<span data-id="currentTime"></span>
+									<div class="mt-3 tac">Время ПК:<span id="currentPCTime"></span>
 									</div>
 									<div class="row mt-3">
 										<h4 class="pb-2">Установка времени</h4>
@@ -585,34 +605,19 @@
 					</div>
 				</div>
 				<div class="card mt-2 flex-row">
-					<button class="col me-2 py-2">Прочитать из устройства</button>
-					<button class="col py-2">Записать в устройство</button>
-					<button class="col mx-2 py-2">Прочитать из БД</button>
-					<button class="col py-2">Записать в БД</button>
+					<button class="col me-2 py-2" data-id="cnf">Прочитать из устройства</button>
+					<button class="col py-2" id="sendCnf">Записать в устройство</button>
 					<button class="col ms-2 py-2">Значения по умолчанию</button>
 				</div>
 			</div> 	<!-- cnf end -->
 	
 
-
-
-		<div id="myModal" class="modal">
-			<div class="modal-content"> <span class="close">&times;</span>
-				<div>none</div>
-			</div>
-		</div>
-
-
 			<div class="mt-2">
 				<button id="statusAlarm"> status alarm</button>
-			<button id="accidentAlarm"> accident alarm</button>
-			<button id="generalAlarm"> general alarm</button>
-			<button id="selfDiagnosislAlarm"> self diagnosis alarm</button>
+				<button id="accidentAlarm"> accident alarm</button>
+				<button id="generalAlarm"> general alarm</button>
+				<button id="selfDiagnosislAlarm"> self diagnosis alarm</button>
 			</div>
-
-			<!-- <div class="mt-2">test
-				<span id="10"></span><span id="11"></span><span id="12"></span>
-			</div> -->
 
 			<div class="card mt-4" id="accidentAlarmContent" >
 				<p class="tac my-5">Произошло срабатывание сигнализации. <br/> Для просмотра более подробной информации нажмите на индикатор "Авария" в Главном окне</p>

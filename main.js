@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-bitwise */
 /* eslint-disable no-constant-condition */
@@ -792,12 +793,11 @@ function pcTime() {
   return {day, month, year, hours, minutes, seconds};
 }
 setInterval(() => {
-  [...$DataId('currentTime')].forEach(b => {
-    b.innerHTML = `
+  $id('currentPCTime').textContent = `
     ${pcTime().day}.${pcTime().month}.${pcTime().year}
     ${pcTime().hours}:${pcTime().minutes}:${pcTime().seconds}`;
-  }, 1000);
-});
+}, 1000);
+
 
 
 const setHadleTimeInput = ()=> {
@@ -811,25 +811,29 @@ setHadleTimeInput();
 
 setInterval(()=>setHadleTimeInput(),30000);
 
-// modal
-const modal = $id("myModal");
-const closeModal = document.getElementsByClassName("close")[0];
+let meTimeArr = [];
+let setNewDate = (a) => `${a[0]}.${a[1]}.${a[2]} ${a[3]}:${a[4]}:${a[5]}`; 
+let meTimeStr;
 
-closeModal.onclick = () => {modal.style.display = "none";};
 
-// window.onclick = (event)=> { // закрыть модалльное окно при клике вне окна
-//   if (event.target === modal) {
-//     modal.style.display = "none";
-//   }
-// };
-const setModalContent = (HTMLcontent) => {
-  const modalContent = document.querySelector('.modal-content');
-  modalContent.removeChild(modalContent.children[1]); // удалить предидущее сообщение об ошибке
-  modalContent.insertAdjacentHTML('beforeend', HTMLcontent);
-  modal.style.display = "block";
+const updMachineTime = (dateStr)=> {
+  let curent = new Date(dateStr);
+  let cSec = curent.getSeconds();
+
+  setInterval(()=> {
+    curent.setSeconds(++cSec);
+    if( cSec === 60 ) {
+      cSec = 0;
+    }
+    let upd = curent.toLocaleString('ru-RU');
+    [...$DataId('currentMeTime')].forEach(i => i.textContent = upd);
+  }, 1000);
+
+
 };
 
 // сигнализации
+
 // status alarm
 const statusAlarm = document.querySelector('.status-alarm');
 const statusAlarmSignal = (status) => {
@@ -930,8 +934,8 @@ const comandBtnsWithArg = [setPhaseAWear, setPhaseBWear, setPhaseCWear, setNumbe
 
 const ab2str = (buf) => String.fromCharCode.apply(null, new Uint16Array(buf));
 const str2ab = (str) => {
-  let buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-  let bufView = new Uint16Array(buf);
+  let buf = new ArrayBuffer(32); // 2 bytes for each char
+  let bufView = new Uint32Array(buf);
   for (let i=0, strLen=str.length; i < strLen; i++) {
     bufView[i] = str.charCodeAt(i);
   }
@@ -1017,10 +1021,10 @@ let firmware_array = 0;
 
 const getTime = ['0010', '0011', '0012', '0013', '0014', '0015']; //  время в конфиг
 
+
 const regArrayToSetValuesInSpan = [
   '10', '11', '12', // test date
   '0000','0001', '0002', '0003', //  конфиг
-  '0010', '0011', '0012', '0013', '0014', '0015', //  время в конфиг
   '0109', '0110', '0012', '0014', '0016', // главное окно. выключатель, фазы
   '0251', '0252','0253', '0254', '0255', '0256', '0257', // гл. окно. время последней коммутации
   '0258', '0260', '0261', '0262','0263','0264','0265','0266','0267', // гл. окно. данные последней коммутации
@@ -1034,12 +1038,12 @@ const regArrayToSetValuesInSpanDataId = [ // встречается дважды
 
 // +
 const regArrayToSetValuesInInput = [
-  410, 411, 413, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447,
+  410, 413, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447,
   448, 449, 450, 451, 452, 453, // service
   454, 455, 456, 457, 458, 459, 460, 461, 462, 467, 468, 471, 473, 476, // cnf control
 ];
 
-const regArrayToSetValuesFromBuff = ['0001', '0002', 411, 412, 463, 464, 465,466, 474,475, 477, 478];
+const regArrayToSetValuesFromBuff = ['0001', '0002', 411, 412, 463, 464, 465, 466, 474,475, 477, 478];
 
 // +
 const regToFirmwareArray = [
@@ -1074,6 +1078,14 @@ function recv(data){
     let value = int16_array[2];
 
     console.log(register);
+
+    if (getTime.includes(`${register}`)) {
+      meTimeArr.push(value);
+      if (meTimeArr.length === 6) {
+        meTimeStr = setNewDate(meTimeArr);
+        updMachineTime(meTimeStr);
+      }
+    }
 
     if (regArrayToSetValuesInSpan.includes(`${register}`)) {
       if (register === '0265' || '0265' || '0267') {
@@ -1290,6 +1302,24 @@ function recv(data){
         osData.bk.values.push({x:osData.bk.values.length, y: value});
       }
     } 
+    // admin
+    if (register === 399) {
+      const cnfInp = [410, '411-412', '472a', '472b', '472c', 454, 470,471, '477-478', 455, '465-466', '463-464', 467, 473,'474-475',476, 459, 460, 461, 456, 457, 458, 462, 468, 432, 433, 435, 442, 443, 444, 445, 446, 447];
+
+      if (value === '0xABCD') { // on
+        $id('header').style.display = 'flex';
+        $id('adminStatus').textContent = 'администратор';
+        cnfInp.forEach( i => $id(i).disabled = false);
+        [...$DataId('os-upld-tab')].forEach( i=> i.style.display = 'inline-flex');
+      } else { // off
+        $id('header').style.display = 'none';
+        $id('adminStatus').textContent = 'пользователь';
+        cnfInp.forEach( i => $id(i).disabled = true);
+        [...$DataId('os-upld-tab')].forEach( i=> i.style.display = 'none');
+      }
+
+    }
+
     
 
     if (int16_array[1] === 398)// #define FIRMWARE_UPLOAD 398
@@ -1310,11 +1340,13 @@ function recv(data){
 
 }
 
+
 const getMainData = ()=> {
   // данные главного окна
   regArrayToSetValuesInSpan.forEach( i => send (0, i, 0)); // данные гл. окна при старте
   phasesCoefficent.forEach( i => send (0, i, 0)); // диагнаммы гл. она и сигнализация
   regArrayToSetValuesIfElse.forEach( i => send (0, i, 0)); 
+  getTime.forEach( i => send (0, i, 0));
 };
 
 socket.onopen = ()=>{ 
@@ -1325,9 +1357,6 @@ socket.onmessage = (e)=>{recv(e.data);};
 socket.onclose = (e)=>{if (e.wasClean){dbg_out("Соединение закрыто нормально");}else{dbg_out("Соединение закрыто экстренно");}};
 socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message);};
 
-//  возможность получения при загрузке сркипта 
-// $id('script').onload = ()=> {};
-
 
 // сервис
 // $id('serGetMain')
@@ -1335,12 +1364,53 @@ socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message
 // $id('serGetMes')
 // $id('serGetAll')
 
-// при переходе на вкладку конфигурация 
-$id('cnf').addEventListener('click', ()=> {
-  regArrayToSetValuesInInput.forEach(i => send(0, i, 0));
-  regToFirmwareArray.forEach(i => send(0, i, 0));
-  send(0,472,0);
+// при переходе на вкладку конфигурация и кнопке прочитать
+[...$DataId('cnf')].forEach(i=> {
+  i.addEventListener('click', ()=> {
+    regArrayToSetValuesInInput.forEach(j => send(0, j, 0));
+    regToFirmwareArray.forEach(j => send(0, j, 0));
+    regArrayToSetValuesFromBuff.forEach(j => send(0, j, 0));
+    send(0,472,0);
+    send(0, 399, 0); // admin
+  });
 });
+
+// записать новую конфигуарциюю
+$id('sendCnf').addEventListener('click', ()=> {
+  const regInp = [410, 454, 471, 470, 455, 467, 473, 476, 459, 460, 461, 456, 457, 458, 468, 462, 432, 433, 435, 442, 443, 444, 445, 446, 447];
+  regInp.forEach(i=> send(1, i, $id(i).value));
+
+  const buffInp = ['411-412', '477-478', '463-464','465-466', '474-475'];
+  buffInp.forEach(i => {
+    let val = $id(i).value;
+    let [major, minor] = i.split('-');
+    // console.log(' ст',+major,' мл', +minor);
+    // console.log(i.split('-'));
+    console.log('val', val);
+    let f = str2ab(val);
+    // console.log('buff',f);
+
+    const conv = num => {
+      let b = new ArrayBuffer(4);
+      new DataView(b).setUint32(0, num);
+      return Array.from(new Uint8Array(b));
+    };
+    let ab = conv(val);
+    console.log('buff',ab);
+    let test = ab2int(ab);
+    console.log('test', test);
+  });
+
+});
+
+
+// переключение прав администратора
+$id('adminBtn').addEventListener('click', ()=> {
+  let param = $id('adminParam').value;
+  send(1, 399, param);
+  send(0, 399, 0);
+});
+
 
 // вкладка осцилогамм
 
@@ -1395,6 +1465,28 @@ $id('jsOsSelect').addEventListener('click', (e)=> {
       addRowsToOscilorgamsTableBody(osData); 
     });;
   }
+});
+
+// 1
+// 2,3
+// 4
+
+// загузить новую ос
+$id('newOsUpld').addEventListener('click', ()=> {
+  const val = $id('newOsData').value;
+  const data = $id('newOsData').value.split('\n');
+  let reg = 5613;
+  if (val) {
+    data.forEach(i=> {
+      if (i.includes(',')===true) {
+        i.replace(',','.');
+      }
+      send(1,reg,+i);
+      reg++;
+      console.log(i);
+    });
+  }
+  
 });
 
 
@@ -1452,16 +1544,17 @@ trChrt.eventsListen();
 
 // date time
 function getDate(){
+  meTimeArr = [];
   getTime.forEach(i => send(0, i, 0));
 }
 $id('getDate').addEventListener('click', getDate);
 
 const setDate = ()=> {
-  send(0, '0010', $id('handleYear').value);
-  send(0, '0011', $id('handleMounth').value);
-  send(0, '0012', $id('handleDay').value);
-  send(0, '0013', $id('handleHour').value);
-  send(0, '0014', $id('handleMin').value);
+  send(1, '0010', $id('handleYear').value);
+  send(1, '0011', $id('handleMounth').value);
+  send(1, '0012', $id('handleDay').value);
+  send(1, '0013', $id('handleHour').value);
+  send(1, '0014', $id('handleMin').value);
 };
 
 $id('setDate').addEventListener('click', setDate);
@@ -1494,3 +1587,6 @@ function read_file(inp){
 $id('file').addEventListener('change', ()=> {
   read_file(this);
 });
+
+
+
