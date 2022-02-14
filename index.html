@@ -11,10 +11,9 @@
 
 <body>
 	<div class="container">
-		<div class="card py-2 flex-row jcbtw" id="header">
+		<div class="card flex-row jcbtw" id="header">
 			<form >
 				<input type="file" id="file" name="file" class="custom-file-input pt-1" >
-				<!-- <button type="submit" class="py-0 ">Загрузить</button> -->
 			</form>
       <button  class="col-1 py-1" id="serviceModal">Сервис</button>
 		</div>
@@ -53,7 +52,7 @@
 					<div class="col card">
 						<h3 class="text-center my-3">Фаза А</h3>
 						<div class="row jcc">
-							<div class="col-5 phase-diagramm" id="phaseDiagrammA"> 	<!-- фазa A -->
+							<div class="col-5 ph-diagramm" id="phaseDiagrammA"> 	<!-- фазa A -->
 							</div>
 							<div class="col-6 ps-3">
 								<div class="">Расход ресурса, %: <span id="0113"></span>
@@ -66,7 +65,7 @@
 					<div class="col card mx-3">
 						<h3 class="text-center my-3">Фаза B</h3>
 						<div class="row jcc">
-							<div class="col-5 phase-diagramm" id="phaseDiagrammB"> 	<!-- фазa B -->
+							<div class="col-5 ph-diagramm" id="phaseDiagrammB"> 	<!-- фазa B -->
 							</div>
 							<div class="col-6 ps-3">
 								<div>Расход ресурса, %: <span id="0115"></span>
@@ -79,7 +78,7 @@
 					<div class="col card ">
 						<h3 class="text-center my-3">Фаза C</h3>
 						<div class="row jcc">
-							<div class="col-5 phase-diagramm" id="phaseDiagrammC"> 	<!-- фазa C -->
+							<div class="col-5 ph-diagramm" id="phaseDiagrammC"> 	<!-- фазa C -->
 							</div>
 							<div class="col-6 ps-3">
 								<div>Расход ресурса, % <span id="0117"></span>
@@ -141,14 +140,14 @@
 						<div class="col-3">Записей в устройстве: <span data-id="0200"></span>
 						</div>
 						<div class="col-3 tac">
-							<button class="py-1" data-id="measurements" >Обновить</button>
+							<button data-id="measurements" >Обновить</button>
 						</div>
 					</div>
 					</div>
 					<div class="row card mt-4">
 						<ul id="measurments-tabs">
-							<button class="py-2 measurment-tab " data-id="measurements-all">Все записи</button>
-							<button class="py-2 measurment-tab active" data-id="measurements-trends">Тренды</button>
+							<button class="measurment-tab " data-id="measurements-all">Все записи</button>
+							<button class="measurment-tab active" data-id="measurements-trends">Тренды</button>
 						</ul>
 						<div class="measurments-content sub-content " id="measurements-all">
 							<table class="measurments-table mt-4 " >
@@ -215,14 +214,14 @@
 										<div class="col-3">
 											<input type="checkbox" id="trCnvDates">Дата и время замера</div>
 										<div class="col d-flex jcbtw ">
-												<div class="phaseOccilloColorWrap">Фаза А
-													<div class="phaseAOccilloColor mt-3"></div>
+												<div class="phOccilloColorWrap">Фаза А
+													<div class="phAOccilloColor mt-3"></div>
 												</div>
-												<div class="phaseOccilloColorWrap">Фаза B
-													<div  class="phaseBOccilloColor mt-3"></div>
+												<div class="phOccilloColorWrap">Фаза B
+													<div  class="phBOccilloColor mt-3"></div>
 												</div>
-												<div class="phaseOccilloColorWrap me-2 ">Фаза C
-													<div class="phaseCOccilloColor mt-3"></div>
+												<div class="phOccilloColorWrap me-2 ">Фаза C
+													<div class="phCOccilloColor mt-3"></div>
 												</div>
 										</div>
 									</div>
@@ -241,7 +240,7 @@
 						<div class="col-3">Записей в устройстве: <span data-id="0300"></span>
 						</div>
 						<div class="col-3 tac">
-							<button class="py-1" id="refreshEventsTable">Обновить</button>
+							<button id="refreshEventsTable">Обновить</button>
 						</div>
 					</div>
 				<div class="row card mt-4">
@@ -264,20 +263,20 @@
 				<div class="card ">
 					<div class="row flex-row jcc aic mt-2">
 						<div class="col-3 tac">
-							<button class="py-1" data-id="oscillograms">Обновить список осцилограмм</button>
+							<button data-id="oscillograms">Обновить список осцилограмм</button>
 						</div>
 						<div class="col-2 ms-1">Число осцилограмм: <span data-id="0600-0601"></span>
 						</div>
 					</div>
 					<div class="row jcc">
-						<select class="col-4 mt-3 px-2 py-1 jsOsSelect" size="4" id="jsOsSelect"></select>
+						<select class="col-5 mt-3 px-2 jsOsSelect" size="4" id="jsOsSelect"></select>
 					</div>
 				</div>
 				<div class="row card mt-4">
 					<ul id="oscillograms-tabs">
-						<button class="py-2 oscillograms-tab active" data-id="oscillograms-table">Таблица</button>
-						<button class="py-2 oscillograms-tab " data-id="oscillograms-canvas">Осцилограмма</button>
-						<button class="py-2 oscillograms-tab " data-id="os-upld-tab">Загрузить</button>
+						<button class=" oscillograms-tab active" data-id="oscillograms-table">Таблица</button>
+						<button class=" oscillograms-tab " data-id="oscillograms-canvas">Осцилограмма</button>
+						<button class=" oscillograms-tab " data-id="os-upld-tab">Загрузить</button>
 					</ul>
 					<div class="card mt-4">
 						<div class="oscillograms-content sub-content " id="os-upld-tab">
@@ -286,7 +285,7 @@
 								<textarea id="newOsData" rows="8"  ></textarea>
 							</div>
 						
-							<button class="py-2 mt-3" id="newOsUpld">Загрузить</button>
+							<button class="mt-3" id="newOsUpld">Загрузить</button>
 						</div>
 
 						<div class="oscillograms-content sub-content active" id="oscillograms-table">
@@ -320,17 +319,17 @@
 											<input type="checkbox" id="osCnvDotsVal">Значения точек</div>
 									</div>
 									<div class="col d-flex jcbtw " >
-										<div class="phaseOccilloColorWrap">Фаза А
-											<div class="phaseAOccilloColor"></div>
+										<div class="phOccilloColorWrap">Фаза А
+											<div class="phAOccilloColor"></div>
 										</div>
-										<div class="phaseOccilloColorWrap">Фаза B
-											<div class="phaseBOccilloColor"></div>
+										<div class="phOccilloColorWrap">Фаза B
+											<div class="phBOccilloColor"></div>
 										</div>
-										<div class="phaseOccilloColorWrap me-2">Фаза C
-											<div  class="phaseCOccilloColor"></div>
+										<div class="phOccilloColorWrap me-2">Фаза C
+											<div  class="phCOccilloColor"></div>
 										</div>
-										<div class="phaseOccilloColorWrap me-2"> Блок контакта
-											<div  class="phaseBkOccilloColor"></div>
+										<div class="phOccilloColorWrap me-2"> Блок контакта
+											<div  class="phBkOccilloColor"></div>
 										</div>
 									</div>
 								</div>
@@ -346,10 +345,10 @@
 <!-- cnf start -->
 			<div class="main-content active" id="cnf"> 	
 				<ul class="cnf-tabs">
-					<button class="py-2 cnf-tab " data-id="cnf-device">Конфигурирация устройства</button>
-					<button class="py-2 cnf-tab " data-id="cnf-control">Конфигурирация функций контроля</button>
-					<button class="py-2 cnf-tab " data-id="cnf-alarm">Конфигурирация порогов сигнализации</button>
-					<button class="py-2 cnf-tab active" data-id="cnf-user">Пользователи</button>
+					<button class="cnf-tab " data-id="cnf-device">Конфигурирация устройства</button>
+					<button class="cnf-tab " data-id="cnf-control">Конфигурирация функций контроля</button>
+					<button class="cnf-tab " data-id="cnf-alarm">Конфигурирация порогов сигнализации</button>
+					<button class="cnf-tab active" data-id="cnf-user">Пользователи</button>
 				</ul>
 				<div class="cnf-content sub-content active" id="cnf-user">
 					<div class="card mt-2">
@@ -359,7 +358,7 @@
 							<input type="text" name="" id="adminParam" class="col-1 my-2 ms-2" value="">
 						</div>
 						<div class="row">
-							<button class="col-2 py-2 mt-2" id="adminBtn">Переключить</button>
+							<button class="col-2 mt-2" id="adminBtn">Переключить</button>
 							<div class="col-3 mt-3 ms-4"> Текущий доступ: <span id="adminStatus"> пользователь </span> </div>
 						</div>
 					</div>
@@ -398,9 +397,8 @@
 										<option value="4800">4800</option>
 										<option value="9600">9600</option>
 										<option value="19200">19200</option>
-										<option value="38400" selected>38400</option>
+										<option value="38400">38400</option>
 										<option value="57600">57600</option> <!-- ошибка? 38400*2 = 57800 -->
-										<option value="115200">115200</option>
 									</select> 
 									<span class="col ms-2">Скорость интерфейса RS485, бод</span>
 								</div>
@@ -422,7 +420,7 @@
 									</div>
 									<div class="row mt-2 jcbtw">
 										<div class="col-7">
-											<button class="py-2" id="getDate">Получить время устройства</button>
+											<button id="getDate">Получить время устройства</button>
 										</div>
 									<div class="mt-3 tac">Время ПК:<span id="currentPCTime"></span>
 									</div>
@@ -446,7 +444,7 @@
 									</div>
 									<div class="row mt-3 tac">
 										<div class="col">
-											<button class="py-2" id="setDate">Задать новое время</button>
+											<button id="setDate">Задать новое время</button>
 										</div>
 									</div>
 								</div>
@@ -604,20 +602,20 @@
 						</div>
 					</div>
 				</div>
-				<div class="card mt-2 flex-row">
-					<button class="col me-2 py-2" data-id="cnf">Прочитать из устройства</button>
-					<button class="col py-2" id="sendCnf">Записать в устройство</button>
-					<button class="col ms-2 py-2">Значения по умолчанию</button>
+				<div class="card mt-2 flex-row" id="cnfFooter">
+					<button class="col me-2" data-id="cnf">Прочитать из устройства</button>
+					<button class="col" id="sendCnf">Записать в устройство</button>
+					<button class="col ms-2 " id="cnfDflt">Значения по умолчанию</button>
 				</div>
 			</div> 	<!-- cnf end -->
 	
 
-			<div class="mt-2">
+			<!-- <div class="mt-2">
 				<button id="statusAlarm"> status alarm</button>
 				<button id="accidentAlarm"> accident alarm</button>
 				<button id="generalAlarm"> general alarm</button>
 				<button id="selfDiagnosislAlarm"> self diagnosis alarm</button>
-			</div>
+			</div> -->
 
 			<div class="card mt-4" id="accidentAlarmContent" >
 				<p class="tac my-5">Произошло срабатывание сигнализации. <br/> Для просмотра более подробной информации нажмите на индикатор "Авария" в Главном окне</p>
@@ -727,15 +725,6 @@
 			</div>
 
 			<div class="card mt-4" id="serviceModalContent" >
-				<div class="card">
-					<h4>Получить данные устройства</h4>
-					<div class="row jcc pt-3">
-							<button class="py-2 col-3" id="serGetMain">Получить данные главного окна</button>
-							<button class="py-2 col mx-3" id="serGetAlarm">Получить данные сигнализации</button>
-							<button class="py-2 col " id="serGetMes">Получить данные коммутации</button>
-							<button class="py-2 col ms-3" id="serGetAll">Получить все данные устройства</button>
-					</div>
-				</div>
 				<div class="card mt-2">
 					<h4>Задание данных устройства </h4>
 					<div class="row mt-2 " >
@@ -770,39 +759,27 @@
 							<div> <input type="text" id="451" value='' class="col-1 mt-2"> Коэффицент B фаза B</div>
 							<div> <input type="text" id="453" value='' class="col-1 mt-2"> Коэффицент B фаза C</div>
 							<div class="row jcst mt-2">
-								<button class="col py-1" id="0x10A"> Калибровка 1000 А</button>
-								<button class="col py-1 ms-2" id="0x10B"> Калибровка 10000 А</button>
+								<button class="col" id="0x10A"> Калибровка 1000 А</button>
+								<button class="col ms-2" id="0x10B"> Калибровка 10000 А</button>
 							</div>
 						</div>
 				 </div>
 						<div class="row mt-3">
-							<button class="col py-2 me-2" id="0x10C">Установить сигнализацию</button>
-							<button class="col py-2" id="0x10D">Сбросить сигнализацию</button>
+							<button class="col me-2" id="0x10C">Установить сигнализацию</button>
+							<button class="col" id="0x10D">Сбросить сигнализацию</button>
 						</div>
 					</div>
 					<div class="card mt-2">
 						<h4 class="mt-2">Очистка данных устройства и программы</h4>
 						<div class="row mt-2 ">
-							<button class="col py-2" id="0x101">  Очистить журнал измерений</button>
-							<button class="col py-2 mx-2" id="0x100">Очистить журнал событий</button>
-							<button class="col py-2" id="0x102">Очистить данные осцилограмм</button>
+							<button class="col " id="0x101">  Очистить журнал измерений</button>
+							<button class="col mx-2" id="0x100">Очистить журнал событий</button>
+							<button class="col " id="0x102">Очистить данные осцилограмм</button>
 						</div>
 						<div class="row mt-3">
-							<button class="col py-2 me-2" id="0x103"> Очистить все данные устройства</button>
-							<button class="col py-2" id="0x104">Установить конфигурацию по умолчанию</button>
+							<button class="col me-2" id="0x103"> Очистить все данные устройства</button>
+							<button class="col " id="0x104">Установить конфигурацию по умолчанию</button>
 						</div>
-						<!-- <div class="row mt-4 ">
-							<button class="col py-2 ">  Очистить главное окно</button>
-							<button class="col  py-2 ms-2">Прервать опрос устройства</button>
-						</div>
-						<div class="row mt-3 ">
-							<button class="col py-2 me-2"> Очистить БД измерений</button>
-							<button class="col py-2 me-2">Очистить БД событий</button>
-							<button class="col py-2 ">Очистить БД осцилограмм</button>
-						</div> -->
-						<!-- <div class="row mt-4 jcc">
-							<button class="col-5 ">Очистить данные устройства и БД</button>
-						</div> -->
 						<div class="row pt-5  me-2">
 							<button class="bold mt-3" id="serviceClose" style="color: red;">Закрыть</button>
 						</div>

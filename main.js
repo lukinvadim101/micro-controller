@@ -42,37 +42,37 @@ const fillDiagramms = (diagramm) => {
     scale.setAttribute('class', 'd-flex jcend '); // шкала
     node.setAttribute('data-value', i * 10); // атрибут для текущего значения
     if (i === 20) {
-      scale.insertAdjacentHTML('afterbegin', '<div class="phase-scale ">200</div>');
+      scale.insertAdjacentHTML('afterbegin', '<div class="ph-scale ">200</div>');
     }
     if (i === 10) {
-      scale.insertAdjacentHTML('afterbegin', '<div class="phase-scale">100</div>');
+      scale.insertAdjacentHTML('afterbegin', '<div class="ph-scale">100</div>');
     }
     if (i === 7) {
-      scale.insertAdjacentHTML('afterbegin', '<div class="phase-scale">80</div>');
+      scale.insertAdjacentHTML('afterbegin', '<div class="ph-scale">80</div>');
     }
     if (i === 0) {
-      scale.insertAdjacentHTML('afterbegin', '<div class="phase-scale">0</div>');
+      scale.insertAdjacentHTML('afterbegin', '<div class="ph-scale">0</div>');
     }
     if (i > 10) {
-      node.setAttribute("class", " phase phase-high ");
+      node.setAttribute("class", " ph ph-high ");
     }
     if (i <= 10 && i >= 8) {
-      node.setAttribute("class", " phase phase-mid");
+      node.setAttribute("class", " ph ph-mid");
     }
     if (i < 8) {
-      node.setAttribute("class", " phase phase-low");
+      node.setAttribute("class", " ph ph-low");
     }
     node.innerHTML = '&nbsp;';
     diagramm.append(scale);
   }
 };
-const phaseDiagramms = [...document.querySelectorAll('.phase-diagramm')];
+const phaseDiagramms = [...document.querySelectorAll('.ph-diagramm')];
 phaseDiagramms.forEach(fillDiagramms); // draw diagramm
 const markElemInDiagramm = (diagrammId, value) => {
-  const AllPhases = [...document.querySelectorAll('.phase')];
+  const AllPhases = [...document.querySelectorAll('.ph')];
   const exactDiagrammPhases = AllPhases.filter(el => el.closest(diagrammId));
   const elem = exactDiagrammPhases.filter(el => +el.dataset.value <= value && +el.dataset.value + 10 > value);
-  elem[0].classList.add('phase-active', 'blink');
+  elem[0].classList.add('ph-active', 'blink');
 
   // return elem;
 };
@@ -888,10 +888,10 @@ const selfDiagnosisAlarm = () => {
 };
 // selfDiagnosisAlarm(); // вызов самодиагностики
 
-$id('statusAlarm').addEventListener('click', ()=>statusAlarmSignal());
-$id('accidentAlarm').addEventListener('click', ()=>accidentModal());
-$id('generalAlarm').addEventListener('click', ()=>generalAlarm());
-$id('selfDiagnosislAlarm').addEventListener('click', ()=>selfDiagnosisAlarm());
+// $id('statusAlarm').addEventListener('click', ()=>statusAlarmSignal());
+// $id('accidentAlarm').addEventListener('click', ()=>accidentModal());
+// $id('generalAlarm').addEventListener('click', ()=>generalAlarm());
+// $id('selfDiagnosislAlarm').addEventListener('click', ()=>selfDiagnosisAlarm());
 
 // servise
 const serviceModal = () => {
@@ -934,8 +934,8 @@ const comandBtnsWithArg = [setPhaseAWear, setPhaseBWear, setPhaseCWear, setNumbe
 
 const ab2str = (buf) => String.fromCharCode.apply(null, new Uint16Array(buf));
 const str2ab = (str) => {
-  let buf = new ArrayBuffer(32); // 2 bytes for each char
-  let bufView = new Uint32Array(buf);
+  let buf = new ArrayBuffer(8); // 2 bytes for each char
+  let bufView = new Uint16Array(buf);
   for (let i=0, strLen=str.length; i < strLen; i++) {
     bufView[i] = str.charCodeAt(i);
   }
@@ -996,7 +996,7 @@ function send(operation, register, value){
 
 const sendCommand = (e)=> {
   const code = e.target.id;
-  console.log('code ', code);
+  // console.log('code ', code);
   send(1, 551, code);
   send(1, 550, code);
 };
@@ -1014,10 +1014,43 @@ const sendCommandWithArg = (e)=> {
 comandBtns.forEach(btn => btn.addEventListener('click', (e)=> sendCommand(e)));
 comandBtnsWithArg.forEach(btn => btn.addEventListener('click', (e)=> sendCommandWithArg(e)));
 
+// контрольные суммы
+let crc = {
+  484: null,
+  485: null,
+  486: null,
+  487: null,
+};
+
+const checkSums = ()=> {
+  send(0,484,0);
+  send(0,485,0);
+  send(0,486,0);
+  send(0,487,0);
+  
+  if(crc[484] !== crc[486] || crc[485] !== crc[487]) {
+    throw Error('Контрольные суммы не совпадают');
+  }
+};
+
+
 
 let upload_pointer = 0;
 let firmware_array = 0;
 // +
+
+const ToByteArray = (long)=> {
+  let byteArray = [0, 0, 0, 0,];
+
+  for ( let index = 0; index < byteArray.length; index ++ ) {
+    let byte = long & 0xff;
+    byteArray [ index ] = byte;
+    long = (long - byte) / 256 ;
+  }
+
+  return byteArray;
+};
+
 
 const getTime = ['0010', '0011', '0012', '0013', '0014', '0015']; //  время в конфиг
 
@@ -1183,8 +1216,6 @@ function recv(data){
           '0226': null,
           '0227': null,
           '0228': null,
-        
-        
         };
       }
     }
@@ -1239,16 +1270,10 @@ function recv(data){
     }
 
     if (register === 472) {
-      let arr = new Uint16Array(value);
-      if (arr[0] === 1 ){
-        $id('472a').checked = true;
-      } 
-      if (arr[1] === 1 ){
-        $id('472b').checked = true;
-      }  
-      if (arr[2] === 1 ){
-        $id('472c').checked = true;
-      }      
+      let arr = `${value}`.split('');
+      $id('472a').checked = arr[0];
+      $id('472b').checked = arr[1];
+      $id('472c').checked = arr[2];     
     }
 
 
@@ -1308,17 +1333,24 @@ function recv(data){
 
       if (value === '0xABCD') { // on
         $id('header').style.display = 'flex';
+        $id('cnfFooter').style.display = 'flex';
         $id('adminStatus').textContent = 'администратор';
         cnfInp.forEach( i => $id(i).disabled = false);
         [...$DataId('os-upld-tab')].forEach( i=> i.style.display = 'inline-flex');
       } else { // off
         $id('header').style.display = 'none';
+        $id('cnfFooter').style.display = 'none';
         $id('adminStatus').textContent = 'пользователь';
         cnfInp.forEach( i => $id(i).disabled = true);
         [...$DataId('os-upld-tab')].forEach( i=> i.style.display = 'none');
       }
-
+      checkSums();
     }
+
+    //  контрольные суммы 
+    if (register >= 484 && register <= 487) {
+      crc[register] = value;
+    } 
 
     
 
@@ -1347,6 +1379,7 @@ const getMainData = ()=> {
   phasesCoefficent.forEach( i => send (0, i, 0)); // диагнаммы гл. она и сигнализация
   regArrayToSetValuesIfElse.forEach( i => send (0, i, 0)); 
   getTime.forEach( i => send (0, i, 0));
+  console.log(11);
 };
 
 socket.onopen = ()=>{ 
@@ -1358,11 +1391,7 @@ socket.onclose = (e)=>{if (e.wasClean){dbg_out("Соединение закры�
 socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message);};
 
 
-// сервис
-// $id('serGetMain')
-// $id('serGetAlarm')
-// $id('serGetMes')
-// $id('serGetAll')
+
 
 // при переходе на вкладку конфигурация и кнопке прочитать
 [...$DataId('cnf')].forEach(i=> {
@@ -1384,23 +1413,34 @@ $id('sendCnf').addEventListener('click', ()=> {
   buffInp.forEach(i => {
     let val = $id(i).value;
     let [major, minor] = i.split('-');
-    // console.log(' ст',+major,' мл', +minor);
-    // console.log(i.split('-'));
-    console.log('val', val);
-    let f = str2ab(val);
-    // console.log('buff',f);
+    let [majorVal, minorVal] = ToByteArray(val);
 
-    const conv = num => {
-      let b = new ArrayBuffer(4);
-      new DataView(b).setUint32(0, num);
-      return Array.from(new Uint8Array(b));
-    };
-    let ab = conv(val);
-    console.log('buff',ab);
-    let test = ab2int(ab);
-    console.log('test', test);
+    send(1, major, majorVal);
+    send(1, minor, minorVal);
   });
 
+  const checkInp = ['472a', '472b', '472c'];
+  let checStr = [];
+  checkInp.forEach(i=> {
+    if ($id(i).checked) {
+      checStr.push(1);
+    } else {
+      checStr.push(0);
+    }
+  });
+  let val = checStr.join('');
+  send(1, 472, val);
+
+
+});
+
+
+
+// значения по умолчанию
+$id('cnfDflt').addEventListener('click', ()=>{
+  send(1, 551, '0x104');
+  send(1, 550, '0x104');
+  checkSums();
 });
 
 
@@ -1425,6 +1465,7 @@ const getAllOscillInfo = ()=> {
     send(1, '0602', 2); 
     send(1,'0603', i); 
     osciloCurrentInfo.forEach(j => send(0,j,0));
+    checkSums();
   } // повторить для осцилогамм откл
 
   OsAllInfo = [];
@@ -1448,6 +1489,7 @@ async function getOsFullData() {
       send(0,i,0);
     }
   }
+  
 };
 
 // обработчик события выбора
@@ -1467,9 +1509,6 @@ $id('jsOsSelect').addEventListener('click', (e)=> {
   }
 });
 
-// 1
-// 2,3
-// 4
 
 // загузить новую ос
 $id('newOsUpld').addEventListener('click', ()=> {
@@ -1483,10 +1522,10 @@ $id('newOsUpld').addEventListener('click', ()=> {
       }
       send(1,reg,+i);
       reg++;
-      console.log(i);
     });
   }
-  
+  send(1,5000,1);
+  checkSums();
 });
 
 
@@ -1560,7 +1599,6 @@ const setDate = ()=> {
 $id('setDate').addEventListener('click', setDate);
 
 
-
 function read_file(inp){
   const f = inp.files[0];
   const r = new FileReader();
@@ -1587,6 +1625,3 @@ function read_file(inp){
 $id('file').addEventListener('change', ()=> {
   read_file(this);
 });
-
-
-
