@@ -7,12 +7,17 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable prefer-const */
 /* eslint-disable camelcase */
+
+
 const $DataId = (regStr) => document.querySelectorAll(`[data-id='${regStr}']`);
 const isEmpty = (obj)=> !Object.values(obj).some(x => x !== null && x !== '');
 const $id = ( id ) => document.getElementById( id );
 const delAllNodes = (node) => {
   while (node.firstChild) node.removeChild(node.lastChild);
 };
+
+$id('header').style.display = 'none';
+$id('cnfFooter').style.display = 'none';
 
 // main tabs
 const navTabButton = document.querySelectorAll(".nav-tab");
@@ -1328,6 +1333,7 @@ function recv(data){
       }
     } 
     // admin
+    
     if (register === 399) {
       const cnfInp = [410, '411-412', '472a', '472b', '472c', 454, 470,471, '477-478', 455, '465-466', '463-464', 467, 473,'474-475',476, 459, 460, 461, 456, 457, 458, 462, 468, 432, 433, 435, 442, 443, 444, 445, 446, 447];
 

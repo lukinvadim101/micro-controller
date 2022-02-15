@@ -25,7 +25,7 @@
 			<button class="nav-tab col " data-id="cnf">Конфигурирование</button>
 		</div>
 		<div class="main-content-wrapper ">
-			<div class="main-content " id="main"> <!-- main tab end -->
+			<div class="main-content active" id="main"> <!-- main tab end -->
 				<div class="mt-4">Время устройства:<span data-id="currentMeTime"></span>
 				</div>
 				<div class="d-flex flex-row jcev mt-4 card">
@@ -343,7 +343,7 @@
 			</div> 	<!-- oscillograms  end -->
 
 <!-- cnf start -->
-			<div class="main-content active" id="cnf"> 	
+			<div class="main-content " id="cnf"> 	
 				<ul class="cnf-tabs">
 					<button class="cnf-tab " data-id="cnf-device">Конфигурирация устройства</button>
 					<button class="cnf-tab " data-id="cnf-control">Конфигурирация функций контроля</button>
@@ -352,9 +352,9 @@
 				</ul>
 				<div class="cnf-content sub-content active" id="cnf-user">
 					<div class="card mt-2">
-						<h4 >Переключение прав доступа</h4>
+						<h4 >Изменение прав доступа</h4>
 						<div class="mt-2">
-							Введите параметр переключения прав доступа:
+							Пароль пользователя:
 							<input type="text" name="" id="adminParam" class="col-1 my-2 ms-2" value="">
 						</div>
 						<div class="row">
