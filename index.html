@@ -15,7 +15,10 @@
 			<form >
 				<input type="file" id="file" name="file" class="custom-file-input pt-1" >
 			</form>
-      <button  class="col-1 py-1" id="serviceModal">Сервис</button>
+			<div >
+				<button class="py-1 me-2" id="unloading">Выгрузка</button>
+				<button  class=" py-1" id="serviceModal">Сервис</button>
+			</div>
 		</div>
 		<div class=" d-flex jcst mt-2 " id="nav-tabs">
 			<button class="nav-tab col active" data-id="main">Главное окно</button>
@@ -345,12 +348,12 @@
 <!-- cnf start -->
 			<div class="main-content " id="cnf"> 	
 				<ul class="cnf-tabs">
-					<button class="cnf-tab " data-id="cnf-device">Конфигурирация устройства</button>
+					<button class="cnf-tab active" data-id="cnf-device">Конфигурирация устройства</button>
 					<button class="cnf-tab " data-id="cnf-control">Конфигурирация функций контроля</button>
 					<button class="cnf-tab " data-id="cnf-alarm">Конфигурирация порогов сигнализации</button>
-					<button class="cnf-tab active" data-id="cnf-user">Пользователи</button>
+					<button class="cnf-tab " data-id="cnf-user">Пользователи</button>
 				</ul>
-				<div class="cnf-content sub-content active" id="cnf-user">
+				<div class="cnf-content sub-content " id="cnf-user">
 					<div class="card mt-2">
 						<h4 >Изменение прав доступа</h4>
 						<div class="mt-2">
@@ -363,7 +366,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="cnf-content sub-content " id="cnf-device"> 				<!-- cnf device -->
+				<div class="cnf-content sub-content active" id="cnf-device"> 				<!-- cnf device -->
 					<div class="card mt-2">
 						<div class="card">
 							<h4 class="pb-3">Адрес и номер устройства</h4>
@@ -427,19 +430,19 @@
 									<div class="row mt-3">
 										<h4 class="pb-2">Установка времени</h4>
 										<div class="col tac">день
-											<input class="col-10 mt-1" type="text" id="handleDay">
+											<input class="col-10 mt-1" type="text" id="day">
 										</div>
 										<div class="col tac">месяц
-											<input class=" col-10  mt-1" type="text" id="handleMounth">
+											<input class=" col-10  mt-1" type="text" id="mounth">
 										</div>
 										<div class="col tac">год
-											<input class="col-10 mt-1" type="text" id="handleYear">
+											<input class="col-10 mt-1" type="text" id="year">
 										</div>
 										<div class="col tac">часы
-											<input class="col-10 mt-1" type="text" id="handleHour">
+											<input class="col-10 mt-1" type="text" id="hour">
 										</div>
 										<div class="col tac">минуты
-											<input class="col-10 mt-1" type="text" id="handleMin">
+											<input class="col-10 mt-1" type="text" id="min">
 										</div>
 									</div>
 									<div class="row mt-3 tac">
@@ -617,13 +620,7 @@
 				<button id="selfDiagnosislAlarm"> self diagnosis alarm</button>
 			</div> -->
 
-			<div class="card mt-4" id="accidentAlarmContent" >
-				<p class="tac my-5">Произошло срабатывание сигнализации. <br/> Для просмотра более подробной информации нажмите на индикатор "Авария" в Главном окне</p>
-				<div class="row pt-5  me-2">
-					<button class="bold mt-3" id="accidentClose" style="color: red;">Закрыть</button>
-				</div>
-			</div>
-
+		
 			<div class="card mt-4" id="generalAlarmContent">
 				<div class="mt-4">
 					<h3 class="tac my-3">Общая сигнализация</h3>

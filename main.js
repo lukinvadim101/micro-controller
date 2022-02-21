@@ -806,11 +806,11 @@ setInterval(() => {
 
 
 const setHadleTimeInput = ()=> {
-  $id('handleDay').value = pcTime().day;
-  $id('handleMounth').value = pcTime().month;
-  $id('handleYear').value = pcTime().year;
-  $id('handleHour').value = pcTime().hours;
-  $id('handleMin').value = pcTime().minutes;
+  $id('day').value = pcTime().day;
+  $id('mounth').value = pcTime().month;
+  $id('year').value = pcTime().year;
+  $id('hour').value = pcTime().hours;
+  $id('min').value = pcTime().minutes;
 };
 setHadleTimeInput();
 
@@ -936,7 +936,6 @@ const comandBtnsWithArg = [setPhaseAWear, setPhaseBWear, setPhaseCWear, setNumbe
 
 // helpers func
 
-
 const ab2str = (buf) => String.fromCharCode.apply(null, new Uint16Array(buf));
 const str2ab = (str) => {
   let buf = new ArrayBuffer(8); // 2 bytes for each char
@@ -974,24 +973,27 @@ let $477_478 = [];
 
 let view477478 = new DataView(new ArrayBuffer(4));
 
+let setUnload = false;
+let unloadArr = [];
+
 let evNum = 0;
 let mesNum = 0;
 let firmwareStr = '';
 
-let oscilloNumOn = 0;
-let oscilloNumOff = 0;
-let oscilloNumSum = 0;
+let osNumOn = 0;
+let osNumOff = 0;
+let osNumSum = 0;
 
 
 function dbg_out(s){console.log(s);}
 
 const socket = new WebSocket("ws://127.0.0.1:8080", 76);
 
-function send(operation, register, value){
+function send(operation, reg, value){
   let sendArray = new Uint16Array(64);
 
   sendArray[0] = operation;
-  sendArray[1] = register;
+  sendArray[1] = reg;
   sendArray[2] = value;
 
   if (socket)
@@ -1058,7 +1060,8 @@ const ToByteArray = (long)=> {
 
 
 const getTime = ['0010', '0011', '0012', '0013', '0014', '0015']; //  время в конфиг
-
+const handleTime = [$id('year'),$id('mounth'),$id('day'),$id('hour'),$id('min')];
+handleTime.forEach(i => i.disabled = true);
 
 const regArrayToSetValuesInSpan = [
   '10', '11', '12', // test date
@@ -1080,6 +1083,9 @@ const regArrayToSetValuesInInput = [
   448, 449, 450, 451, 452, 453, // service
   454, 455, 456, 457, 458, 459, 460, 461, 462, 467, 468, 471, 473, 476, // cnf control
 ];
+
+const cnfInp = [410, '411-412', '472a', '472b', '472c', 454, 470,471, '477-478', 455, '465-466', '463-464', 467, 473,'474-475',476, 459, 460, 461, 456, 457, 458, 462, 468, 432, 433, 434, 435, 442, 443, 444, 445, 446, 447];
+cnfInp.forEach(i => $id(i).disabled = true);
 
 const regArrayToSetValuesFromBuff = ['0001', '0002', 411, 412, 463, 464, 465, 466, 474,475, 477, 478];
 
@@ -1112,67 +1118,71 @@ function recv(data){
   const r = new FileReader();
   r.onload = ()=> {
     let int16_array = new Uint16Array(r.result);
-    let register = int16_array[1];
-    let value = int16_array[2];
+    let reg = int16_array[1];
+    let val = int16_array[2];
 
-    console.log(register);
+    console.log(reg);
+    if (setUnload) {
+      unloadArr.push({reg:val});
+    }
+    
 
-    if (getTime.includes(`${register}`)) {
-      meTimeArr.push(value);
+    if (getTime.includes(`${reg}`)) {
+      meTimeArr.push(val);
       if (meTimeArr.length === 6) {
         meTimeStr = setNewDate(meTimeArr);
         updMachineTime(meTimeStr);
       }
     }
 
-    if (regArrayToSetValuesInSpan.includes(`${register}`)) {
-      if (register === '0265' || '0265' || '0267') {
-        $id(`${register}`).textContent = value * 0.01;
+    if (regArrayToSetValuesInSpan.includes(`${reg}`)) {
+      if (reg === '0265' || '0265' || '0267') {
+        $id(`${reg}`).textContent = val * 0.01;
       }
-      $id(`${register}`).textContent = value;
+      $id(`${reg}`).textContent = val;
     }
 
  
-    if (regArrayToSetValuesInSpanDataId.includes(`${register}`)) {
-      [...$DataId(`${register}`)].forEach(t=> {t.textContent = value;});
-      if (register === '0200') {
-        mesNum = value;
+    if (regArrayToSetValuesInSpanDataId.includes(`${reg}`)) {
+      [...$DataId(`${reg}`)].forEach(t=> {t.textContent = val;});
+      if (reg === '0200') {
+        mesNum = val;
       }
-      if (register === '0300') {
-        evNum = value;
-      }
-    }
-
-    if (register === '0111' && value === 1) {
-      $id(`${register}`).textContent = 'Включено';
-    }
-    if (register === '0111' && value === 2) {
-      $id(`${register}`).textContent = 'Отключено';
-    }
-
-    if (phasesCoefficent.includes(`${register}`)) { //  износ ресурса фаз
-      $id(`${register}`).textContent = (value * 0.01).toFixed(2);
-      if (register === '0113') {
-        markElemInDiagramm('#phaseDiagrammA', value * 0.01);
-      }
-      if (register === '0115') {
-        markElemInDiagramm('#phaseDiagrammB', value * 0.01);
-      }
-      if (register === '0117') {
-        markElemInDiagramm('#phaseDiagrammC', value * 0.01);
+      if (reg === '0300') {
+        evNum = val;
       }
     }
 
-
-    if (register === '0259' && value === 1) {
-      $id(`${register}`).textContent = 'ВКЛ.';
+    if (reg === '0111' && val === 1) {
+      $id(`${reg}`).textContent = 'Включено';
     }
-    if (register === '0259' && value === 2) {
-      $id(`${register}`).textContent = 'ОТКЛ.';
+    if (reg === '0111' && val === 2) {
+      $id(`${reg}`).textContent = 'Отключено';
     }
 
-    if (eventsJournal.includes(register)) {
-      eventsTableCurrentObj[`${register}`] = value; // записать значение в поле объекта
+    if (phasesCoefficent.includes(`${reg}`)) { //  износ ресурса фаз
+      $id(`${reg}`).textContent = (val * 0.01).toFixed(2);
+      if (reg === '0113') {
+        markElemInDiagramm('#phaseDiagrammA', val * 0.01);
+      }
+      if (reg === '0115') {
+        markElemInDiagramm('#phaseDiagrammB', val * 0.01);
+      }
+      if (reg === '0117') {
+        markElemInDiagramm('#phaseDiagrammC', val * 0.01);
+      }
+    }
+
+
+    if (reg === '0259' && val === 1) {
+      $id(`${reg}`).textContent = 'ВКЛ.';
+    }
+    if (reg === '0259' && val === 2) {
+      $id(`${reg}`).textContent = 'ОТКЛ.';
+    }
+
+    if (eventsJournal.includes(reg)) {
+      eventsTableCurrentObj[`${reg}`] = val; // записать значение в поле объекта
       if(!isEmpty(eventsTableCurrentObj)) { // когда все значения по текущей записи получены
         eventsAll.push(eventsTableCurrentObj); // отправить в массив всех записей
         eventsTableCurrentObj = {
@@ -1190,8 +1200,8 @@ function recv(data){
       }
     }
 
-    if (measurementsJournal.includes(register)) {
-      measurmentsTableCurrentObj[`${register}`] = value;
+    if (measurementsJournal.includes(reg)) {
+      measurmentsTableCurrentObj[`${reg}`] = val;
       if(!isEmpty(measurmentsTableCurrentObj)) {
         measurementsAllRecords.push(measurmentsTableCurrentObj);
         measurmentsTableCurrentObj = {
@@ -1226,78 +1236,78 @@ function recv(data){
     }
 
     // переписать
-    if (regArrayToSetValuesFromBuff.includes(register)) {
-      if (register === '0001') $0001_0002[0] = value; // ст
-      if (register === '0002') {
-        $0001_0002[1] = value;
+    if (regArrayToSetValuesFromBuff.includes(reg)) {
+      if (reg === '0001') $0001_0002[0] = val; // ст
+      if (reg === '0002') {
+        $0001_0002[1] = val;
         $id('0001-0002').textContent = ab2int($0001_0002);
       }
 
-      if (register === 411) $411_412[0] = value; // c
-      if (register === 412) {
-        $411_412[1] = value;
-        $id('411-412').value = ab2int($411_412);
+      if (reg === 411) $411_412[0] = val; // c
+      if (reg === 412) {
+        $411_412[1] = val;
+        $id('411-412').val = ab2int($411_412);
       }
 
-      if (register === 463) $463_464[0] = value; // c
-      if (register === 464) {
-        $463_464[1] = value;
+      if (reg === 463) $463_464[0] = val; // c
+      if (reg === 464) {
+        $463_464[1] = val;
         $id('463-464').value = ab2int($463_464);
       }
 
-      if (register === 465) $465_466[0] = value; // c
-      if (register === 466) {
-        $465_466[1] = value;
+      if (reg === 465) $465_466[0] = val; // c
+      if (reg === 466) {
+        $465_466[1] = val;
         $id('465-466').value = ab2int($465_466);
       }
 
-      if (register === 474) $474_475[0] = value; // c
-      if (register === 475) {
-        $474_475[1] = value;
+      if (reg === 474) $474_475[0] = val; // c
+      if (reg === 475) {
+        $474_475[1] = val;
         $id('474-475').value = ab2int($474_475);
       }
 
-      if (register === 477) $477_478[0] = value; // c
-      if (register === 478) {
-        $477_478[1] = value;
+      if (reg === 477) $477_478[0] = val; // c
+      if (reg === 478) {
+        $477_478[1] = val;
         $id('477-478').value = ab2int($477_478);
       }
     }
 
-    if(regArrayToSetValuesInInput.includes(register)) {
-      if (register === 448 ||450 || 452) {
-        value *= 0.001;
+    if(regArrayToSetValuesInInput.includes(reg)) {
+      if (reg === 448 ||450 || 452) {
+        val *= 0.001;
       }
-      if (register >= 456 &&register <= 461 ) {
-        value *= 0.1;
+      if (reg >= 456 &&reg <= 461 ) {
+        val *= 0.1;
       }
-      $id(`${register}`).value = value;
+      $id(`${reg}`).value = val;
     }
 
-    if (register === 472) {
-      let arr = `${value}`.split('');
+    if (reg === 472) {
+      let arr = `${val}`.split('');
       $id('472a').checked = arr[0];
       $id('472b').checked = arr[1];
       $id('472c').checked = arr[2];     
     }
 
 
-    if (regToFirmwareArray.includes(register)) {
-      firmwareStr += value;
+    if (regToFirmwareArray.includes(reg)) {
+      firmwareStr += val;
       $id('484-519').textContent = firmwareStr;
     }
 
-    if (register === '0600' || register === '0601' ) { // число осцилограмм
-      if (register === '0600') {
-        oscilloNumOn = value;
+    if (reg === '0600' || reg === '0601' ) { // число осцилограмм
+      if (reg === '0600') {
+        osNumOn = +val;
       }
-      oscilloNumOff = value;
+      osNumOff = +val;
       
-      oscilloNumSum += value;
-      $id("0600-0601").textContent = oscilloNumSum; }
+      osNumSum = osNumOn + osNumOff;
+      $id("0600-0601").textContent = osNumSum; }
 
-    if (osciloCurrentInfo.includes(register)) {
-      osCurrInfo[`${register}`] = value;
+    if (osciloCurrentInfo.includes(reg)) {
+      osCurrInfo[`${reg}`] = val;
       if(!isEmpty(osCurrInfo)) {
         OsAllInfo.push(osCurrInfo);
       }
@@ -1316,46 +1326,48 @@ function recv(data){
     }
 
     
-    if (register >= 613 && register <= 4616) {
+    if (reg >= 613 && reg <= 4616) {
 
-      if ( oscilloPhaseASign.includes(Number(value.toString().slice(-2))) )
-        osData.a.values.push({x:osData.a.values.length, y: value*10});
+      if ( oscilloPhaseASign.includes(Number(val.toString().slice(-2))) )
+        osData.a.values.push({x:osData.a.values.length, y: val*10});
       
-      if(register%2 === 0 && register%4 !== 0) {
-        osData.b.values.push({x:osData.b.values.length, y: value*10});
+      if(reg%2 === 0 && reg%4 !== 0) {
+        osData.b.values.push({x:osData.b.values.length, y: val*10});
       }
           
-      if ( oscilloPhaseCSign.includes(Number(value.toString().slice(-2))) )
-        osData.c.values.push({x:osData.c.values.length, y: value*10});
+      if ( oscilloPhaseCSign.includes(Number(val.toString().slice(-2))) )
+        osData.c.values.push({x:osData.c.values.length, y: val*10});
       
-      if (register%4 === 0) {
-        osData.bk.values.push({x:osData.bk.values.length, y: value});
+      if (reg%4 === 0) {
+        osData.bk.values.push({x:osData.bk.values.length, y: val});
       }
     } 
     // admin
     
-    if (register === 399) {
-      const cnfInp = [410, '411-412', '472a', '472b', '472c', 454, 470,471, '477-478', 455, '465-466', '463-464', 467, 473,'474-475',476, 459, 460, 461, 456, 457, 458, 462, 468, 432, 433, 435, 442, 443, 444, 445, 446, 447];
-
-      if (value === '0xABCD') { // on
+   
+    if (reg === 399) {
+     
+      if (val === '0xABCD') { // on
         $id('header').style.display = 'flex';
         $id('cnfFooter').style.display = 'flex';
         $id('adminStatus').textContent = 'администратор';
         cnfInp.forEach( i => $id(i).disabled = false);
+        handleTime.forEach(i => i.disabled = false);
         [...$DataId('os-upld-tab')].forEach( i=> i.style.display = 'inline-flex');
       } else { // off
         $id('header').style.display = 'none';
         $id('cnfFooter').style.display = 'none';
         $id('adminStatus').textContent = 'пользователь';
         cnfInp.forEach( i => $id(i).disabled = true);
+        handleTime.forEach(i => i.disabled = true);
         [...$DataId('os-upld-tab')].forEach( i=> i.style.display = 'none');
       }
       checkSums();
     }
 
     //  контрольные суммы 
-    if (register >= 484 && register <= 487) {
-      crc[register] = value;
+    if (reg >= 484 && reg <= 487) {
+      crc[reg] = val;
     } 
 
     
@@ -1385,7 +1397,6 @@ const getMainData = ()=> {
   phasesCoefficent.forEach( i => send (0, i, 0)); // диагнаммы гл. она и сигнализация
   regArrayToSetValuesIfElse.forEach( i => send (0, i, 0)); 
   getTime.forEach( i => send (0, i, 0));
-  console.log(11);
 };
 
 socket.onopen = ()=>{ 
@@ -1397,25 +1408,29 @@ socket.onclose = (e)=>{if (e.wasClean){dbg_out("Соединение закры�
 socket.onerror = (e)=>{dbg_out("Ошибка соединения: " + e.message);};
 
 
-
+const getCnfData = () => {
+  regArrayToSetValuesInInput.forEach(j => send(0, j, 0));
+  regToFirmwareArray.forEach(j => send(0, j, 0));
+  regArrayToSetValuesFromBuff.forEach(j => send(0, j, 0));
+  send(0,472,0);
+  send(0, 399, 0); // admin
+};
 
 // при переходе на вкладку конфигурация и кнопке прочитать
 [...$DataId('cnf')].forEach(i=> {
-  i.addEventListener('click', ()=> {
-    regArrayToSetValuesInInput.forEach(j => send(0, j, 0));
-    regToFirmwareArray.forEach(j => send(0, j, 0));
-    regArrayToSetValuesFromBuff.forEach(j => send(0, j, 0));
-    send(0,472,0);
-    send(0, 399, 0); // admin
-  });
+  i.addEventListener('click', getCnfData);
 });
 
 // записать новую конфигуарциюю
+
 $id('sendCnf').addEventListener('click', ()=> {
-  const regInp = [410, 454, 471, 470, 455, 467, 473, 476, 459, 460, 461, 456, 457, 458, 468, 462, 432, 433, 435, 442, 443, 444, 445, 446, 447];
+  const regInp = [410, 454, 471, 470, 455, 467, 473, 476, 459, 460, 461, 456, 457, 458, 468, 462, 432, 433, 434,435, 442, 443, 444, 445, 446, 447];
+  const buffInp = ['411-412', '477-478', '463-464','465-466', '474-475'];
+  const checkInp = ['472a', '472b', '472c'];
+
   regInp.forEach(i=> send(1, i, $id(i).value));
 
-  const buffInp = ['411-412', '477-478', '463-464','465-466', '474-475'];
+ 
   buffInp.forEach(i => {
     let val = $id(i).value;
     let [major, minor] = i.split('-');
@@ -1425,7 +1440,7 @@ $id('sendCnf').addEventListener('click', ()=> {
     send(1, minor, minorVal);
   });
 
-  const checkInp = ['472a', '472b', '472c'];
+ 
   let checStr = [];
   checkInp.forEach(i=> {
     if ($id(i).checked) {
@@ -1460,32 +1475,6 @@ $id('adminBtn').addEventListener('click', ()=> {
 
 // вкладка осцилогамм
 
-const getAllOscillInfo = ()=> {
-  for (let i = 1; i <= oscilloNumOn; i++){
-    send(1, '0602', 1); // записать признак включения
-    send(1,'0603', i); // записать номер текущей осцилограмм
-    osciloCurrentInfo.forEach(j => send(0,j,0)); // считать инфо о дате записи
-  } // получены даты всех  осцилогамм вкл
-
-  for (let i = 1; i <= oscilloNumOff; i++){
-    send(1, '0602', 2); 
-    send(1,'0603', i); 
-    osciloCurrentInfo.forEach(j => send(0,j,0));
-    checkSums();
-  } // повторить для осцилогамм откл
-
-  OsAllInfo = [];
-  addOptToOsSelect(OsAllInfo); // добавить все опции в селект
-};
-
-// при переходе на вкладку и по кнопке обновить
-[...$DataId('oscillograms')].forEach(tab => {
-  tab.addEventListener('click', ()=> {
-    delAllNodes($id('jsOsSelect')); 
-    getAllOscillInfo(); // получить все опции
-  });
-});
-
 // прочитать 613-4616
 async function getOsFullData() {
   for (let i = 613; i <= 4616; i++) {
@@ -1495,8 +1484,47 @@ async function getOsFullData() {
       send(0,i,0);
     }
   }
-  
 };
+
+const getAllOscillInfo = ()=> {
+  for (let i = 1; i <= osNumOn; i++){
+    send(1, '0602', 1); // записать признак включения
+    send(1,'0603', i); // записать номер текущей осцилограмм
+    osciloCurrentInfo.forEach(j => send(0,j,0)); // считать инфо о дате записи
+    if (setUnload) {
+      getOsFullData();
+    }
+  
+  } // получены даты всех  осцилогамм вкл
+
+  for (let i = 1; i <= osNumOff; i++){
+    send(1, '0602', 2); 
+    send(1,'0603', i); 
+    osciloCurrentInfo.forEach(j => send(0,j,0));
+    if (setUnload) {
+      getOsFullData();
+    }
+  } // повторить для осцилогамм откл
+
+  checkSums();
+  OsAllInfo = [];
+  addOptToOsSelect(OsAllInfo); // добавить все опции в селект
+};
+
+const getOsTabData = ()=> {
+  osNumSum = 0;
+  send(0,'0600',0);
+  send(0,'0601',0);
+  delAllNodes($id('jsOsSelect')); 
+  getAllOscillInfo(); // получить все опции
+};
+
+// при переходе на вкладку и по кнопке обновить
+[...$DataId('oscillograms')].forEach(tab => {
+  tab.addEventListener('click', getOsTabData);
+});
+
+
 
 // обработчик события выбора
 $id('jsOsSelect').addEventListener('click', (e)=> {
@@ -1534,13 +1562,8 @@ $id('newOsUpld').addEventListener('click', ()=> {
   checkSums();
 });
 
-
-// журнал событий
-const getAlleventsRecords = ()=> {
-  delAllNodes($id('eventsTableBody')); // обнулить записи в таблице
-  eventsAll = []; // обнулить массив
+const getEvtData = ()=> {
   send(0,'0300',0); // получить число всех записей
-  
   for (let i = 1; i <= evNum; i++) { // цикл по числу записей 
     // старт с нуля или единицы?
     send(1, '0301', i); // записать индекс записи как текущий
@@ -1548,6 +1571,14 @@ const getAlleventsRecords = ()=> {
       send(0, reg, 0); // считать значения регистров текущей записи
     });
   }
+};
+// журнал событий
+const getAlleventsRecords = ()=> {
+  delAllNodes($id('eventsTableBody')); // обнулить записи в таблице
+  eventsAll = []; // обнулить массив
+  
+  getEvtData();
+ 
   // все значения по всем записям получены
   // сформировать таблицу
   addAllEventsToTable(eventsAll);
@@ -1561,21 +1592,24 @@ $id('refreshEventsTable').addEventListener('click', ()=> getAlleventsRecords());
 
 // журнал измерений
 
+const getMesData = ()=> {
+  send(0, '0200', 0); // получить число записей
+    
+  for (let i = 1; i <= mesNum; i++) {
+    send(1, '0201', i); // записать индекс как текущий
+    measurementsJournal.forEach( reg => {
+      send(0, reg, 0); // считать значения регистров текущей записи
+    });
+  } // считаны все записи
+};
+
 [...$DataId('measurements')].forEach(tab => {
   tab.addEventListener('click', ()=> {
     delAllNodes($id('measurementsAllTableBody')); // очистить таблицу
     measurementsAllRecords = []; // очистить хранилище записей
     
-    send(0, '0200', 0); // получить число записей
-    
-    for (let i = 1; i <= mesNum; i++) {
-      send(1, '0201', i); // записать индекс как текущий
-      measurementsJournal.forEach( reg => {
-        send(0, reg, 0); // считать значения регистров текущей записи
-      });
-    }
-    // считаны все записи
-    
+    getMesData();
+
     measurementsAllRecords.forEach(rec => {
       addRowToMeasurmentsTable(rec);
     }); // добавить все записи в таблицу
@@ -1586,7 +1620,6 @@ $id('trPhses').setAttribute("disabled", "disabled");
 trChrt.eventsListen();
 
 
-
 // date time
 function getDate(){
   meTimeArr = [];
@@ -1595,12 +1628,13 @@ function getDate(){
 $id('getDate').addEventListener('click', getDate);
 
 const setDate = ()=> {
-  send(1, '0010', $id('handleYear').value);
-  send(1, '0011', $id('handleMounth').value);
-  send(1, '0012', $id('handleDay').value);
-  send(1, '0013', $id('handleHour').value);
-  send(1, '0014', $id('handleMin').value);
+  send(1, '0010', $id('year').value);
+  send(1, '0011', $id('mounth').value);
+  send(1, '0012', $id('day').value);
+  send(1, '0013', $id('hour').value);
+  send(1, '0014', $id('min').value);
 };
+
 
 $id('setDate').addEventListener('click', setDate);
 
@@ -1630,4 +1664,38 @@ function read_file(inp){
 
 $id('file').addEventListener('change', ()=> {
   read_file(this);
+});
+
+$id('unloading').addEventListener('click', ()=> {
+  setUnload = true;
+
+  getMainData();
+  getMesData();
+  getEvtData();
+  getOsTabData();
+  getCnfData();
+
+  // let pre = [{reg:1,UserName:"Sam Smith"},{"Id":2,"UserName":"Sam Smith"}];
+  // let json = pre;
+
+  let json = unloadArr;
+
+  let fields = Object.keys(json[0]);
+  let replacer = (key, value) => value === null ? '' : value; 
+  let csv = json.map((row)=> fields.map((fieldName)=> JSON.stringify(row[fieldName], replacer)).join(','));
+  csv.unshift(fields.join(',')); // add header column
+  csv = csv.join('\r\n');
+  // console.log(csv);
+  
+  let link = document.createElement("a");
+  let blob = new Blob(["\ufeff", csv]);
+  let url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = `data.csv`;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  unloadArr = [];
+  setUnload = false;
 });
